@@ -7,7 +7,7 @@ package chess;
  * signature of the existing methods.
  */
 public class ChessBoard {
-    private ChessPiece[][] squares = new ChessPiece[8][8];
+    private final ChessPiece[][] squares = new ChessPiece[8][8];
     public ChessBoard() {
         
     }
@@ -28,15 +28,26 @@ public class ChessBoard {
      * @return Either the piece at the position, or null if no piece is at that
      * position
      */
-    public ChessPiece getPiece(ChessPosition position) {
-        return squares[position.getRow()-1][position.getColumn()-1]
+    public  ChessPiece getPiece(ChessPosition position) {
+        return squares[position.getRow()-1][position.getColumn()-1];
     }
 
     /**
      * Sets the board to the default starting board
      * (How the game of chess normally starts)
      */
+
     public void resetBoard() {
         throw new RuntimeException("Not implemented");
+    }
+
+    public boolean isEmpty(ChessPosition position){
+        return (squares[position.getRow()-1][position.getColumn()-1] == null);
+    }
+
+    public boolean inBounds(ChessPosition position){
+        int row = position.getRow();
+        int col = position.getColumn();
+        return row>=1 && row<=8 && col>=1 && col<=8;
     }
 }

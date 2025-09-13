@@ -56,8 +56,9 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         ChessPiece piece = board.getPiece(myPosition);
+        MoveGenerator generator = new MoveGenerator(board);
         if (piece.getPieceType()== PieceType.BISHOP){
-            //return HashSet<new ChessMove()>();
+            return generator.getBishopMoves(myPosition);
         }
         return new HashSet<ChessMove>();
     }
