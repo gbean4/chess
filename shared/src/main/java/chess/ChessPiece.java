@@ -58,7 +58,11 @@ public class ChessPiece {
         ChessPiece piece = board.getPiece(myPosition);
         MoveGenerator generator = new MoveGenerator(board);
         if (piece.getPieceType()== PieceType.BISHOP){
-            return generator.getBishopMoves(myPosition);
+            return generator.getSlidingMoves(myPosition, new int [][]{{1,1}, {1,-1}, {-1,1}, {-1,-1}});
+        } else if (piece.getPieceType()== PieceType.ROOK){
+            return generator.getSlidingMoves(myPosition, new int[][] {{1,0}, {0,1}, {-1,0}, {0,-1}});
+        } else if (piece.getPieceType()== PieceType.QUEEN){
+            return generator.getSlidingMoves(myPosition, new int[][] {{1,0}, {0,1}, {-1,0}, {0,-1}, {1,1}, {1,-1}, {-1,1}, {-1,-1}});
         }
         return new HashSet<ChessMove>();
     }
