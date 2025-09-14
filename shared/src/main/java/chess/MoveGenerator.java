@@ -1,6 +1,8 @@
 package chess;
 import java.util.HashSet;
 
+import static chess.ChessPiece.PieceType.*;
+
 public class MoveGenerator {
     private final ChessBoard board;
 
@@ -34,6 +36,22 @@ public class MoveGenerator {
         }
         return moves;
     }
+
+    private void addPawnMoves(HashSet<ChessMove> moves, ChessPosition from, ChessPosition to, ChessGame.TeamColor color){
+        if (color == ChessGame.TeamColor.WHITE && to.getRow() ==8 || color == ChessGame.TeamColor.BLACK && to.getRow() ==1){
+            ChessPiece.PieceType[] promotions = {
+               QUEEN, ROOK, BISHOP, KNIGHT
+            };
+
+            for (ChessPiece.PieceType Promotion: promotions){
+                moves.add(new ChessMove(from, to, Promotion));
+            }
+        } else{
+            moves.add(new ChessMove(from, to, null));
+        }
+
+    }
+
     public HashSet<ChessMove> getPawnMoves(ChessPosition myPosition){
         HashSet<ChessMove> moves = new HashSet<>();
         ChessPiece pawn = board.getPiece(myPosition);
@@ -49,26 +67,19 @@ public class MoveGenerator {
 
         ChessPosition oneForward = new ChessPosition(row + direction, col);
         if (board.inBounds(oneForward) && board.isEmpty(oneForward)){
-            moves.add(new ChessMove(myPosition, oneForward, null));
+            addPawnMoves(moves, myPosition, oneForward, pawn.getTeamColor());
             if (pawn.getTeamColor() == ChessGame.TeamColor.WHITE && row == 2 || pawn.getTeamColor() == ChessGame.TeamColor.BLACK && row ==7){
-                ChessPosition twoForward = new ChessPosition(row + direction, col);
+                ChessPosition twoForward = new ChessPosition(row + 2 * direction, col);
                 if (board.inBounds(twoForward) && board.isEmpty(twoForward)){
-                    moves.add(new ChessMove(myPosition, twoForward, null));
+                    addPawnMoves(moves, myPosition, twoForward, pawn.getTeamColor());
                 }
-//                int [][] diagnaldir = {{row+direction, 1}, {row+direction, -1}};
-//                for (int []dir : diagnaldir){
-//                    ChessPosition diagonal = new ChessPosition(row+dir[0], col+dir[1]);
-//                    if (board.inBounds(diagonal) && !board.isEmpty(diagonal) && board.getPiece(diagonal).getTeamColor() != pawn.getTeamColor()){
-//                        moves.add(new ChessMove(myPosition, diagonal, null));
-//                    }
-//                }
             }
         }
         int [][] diagnaldir = {{direction, 1}, {direction, -1}};
         for (int []dir : diagnaldir){
             ChessPosition diagonal = new ChessPosition(row+dir[0], col+dir[1]);
             if (board.inBounds(diagonal) && !board.isEmpty(diagonal) && board.getPiece(diagonal).getTeamColor() != pawn.getTeamColor()){
-                moves.add(new ChessMove(myPosition, diagonal, null));
+                addPawnMoves(moves, myPosition, diagonal, pawn.getTeamColor());
             }
         }
         return moves;
