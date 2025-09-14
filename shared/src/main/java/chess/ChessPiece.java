@@ -61,9 +61,13 @@ public class ChessPiece {
             return generator.getSlidingMoves(myPosition, new int [][]{{1,1}, {1,-1}, {-1,1}, {-1,-1}});
         } else if (piece.getPieceType()== PieceType.ROOK){
             return generator.getSlidingMoves(myPosition, new int[][] {{1,0}, {0,1}, {-1,0}, {0,-1}});
-        } else if (piece.getPieceType()== PieceType.QUEEN){
+        } else if (piece.getPieceType()== PieceType.QUEEN || piece.getPieceType()== PieceType.KING){
             return generator.getSlidingMoves(myPosition, new int[][] {{1,0}, {0,1}, {-1,0}, {0,-1}, {1,1}, {1,-1}, {-1,1}, {-1,-1}});
+        } else if (piece.getPieceType() == PieceType.PAWN){
+            return generator.getPawnMoves(myPosition);
+        } else {
+            return generator.getKnightMoves(myPosition);
         }
-        return new HashSet<ChessMove>();
+//        return new HashSet<ChessMove>();
     }
 }
