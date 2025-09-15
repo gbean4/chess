@@ -43,8 +43,8 @@ public class MoveGenerator {
                QUEEN, ROOK, BISHOP, KNIGHT
             };
 
-            for (ChessPiece.PieceType Promotion: promotions){
-                moves.add(new ChessMove(from, to, Promotion));
+            for (ChessPiece.PieceType promotion: promotions){
+                moves.add(new ChessMove(from, to, promotion));
             }
         } else{
             moves.add(new ChessMove(from, to, null));
