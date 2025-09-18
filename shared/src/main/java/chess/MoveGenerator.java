@@ -19,8 +19,7 @@ public class MoveGenerator {
             ChessPosition current = myPosition;
 
             while(true){
-                ChessPosition next = new ChessPosition(current.getRow() + drow, current.getColumn() + dcol);
-                current = next;
+                current = new ChessPosition(current.getRow() + drow, current.getColumn() + dcol);
                 if (!board.inBounds(current)) {
                     break;
                 } else if (board.isEmpty(current)){
