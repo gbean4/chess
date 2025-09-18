@@ -85,29 +85,3 @@ public class MoveGenerator {
         return moves;
     }
 }
-
-//    public HashSet<ChessMove> getKnightMoves(ChessPosition myPosition) {
-//        HashSet<ChessMove> moves = new HashSet<>();
-//
-//        int[][] directions = {
-//                {1, 2}, {-1, -2}, {-1, 2}, {1, -2}, {2, 1}, {-2, -1}, {-2, 1}, {2, -1}
-//        };
-//
-//        for (int[] dir : directions) {
-//            int drow = dir[0];
-//            int dcol = dir[1];
-//            ChessPosition current = myPosition;
-//
-//            ChessPosition next = new ChessPosition(myPosition.getRow() + drow, myPosition.getColumn() + dcol);
-//            current = next;
-//            if (board.inBounds(current)) {
-//                if (board.isEmpty(current)) {
-//                    moves.add(new ChessMove(myPosition, current, null));
-//                } else if (board.getPiece(current).getTeamColor() != board.getPiece(myPosition).getTeamColor()) {
-//                    moves.add(new ChessMove(myPosition, current, null));
-//                }
-//            }
-//        }
-//        return moves;
-//        }
-//    }
