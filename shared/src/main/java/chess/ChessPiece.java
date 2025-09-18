@@ -66,7 +66,8 @@ public class ChessPiece {
         } else if (piece.getPieceType() == PieceType.PAWN){
             return generator.getPawnMoves(myPosition);
         } else {
-            return generator.getKnightMoves(myPosition);
+            return generator.getSlidingMoves(myPosition, new int[][]{{1, 2}, {-1, -2}, {-1, 2}, {1, -2}, {2, 1},
+                    {-2, -1}, {-2, 1}, {2, -1}});
         }
     }
 
