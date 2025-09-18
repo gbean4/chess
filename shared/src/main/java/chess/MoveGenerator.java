@@ -10,7 +10,7 @@ public class MoveGenerator {
         this.board = board;
     }
 
-    //function works for rook, bishop, and queen
+    //function works for rook, bishop, king, knight, and queen
     public HashSet<ChessMove> getSlidingMoves(ChessPosition myPosition, int[][] directions){
         HashSet<ChessMove> moves = new HashSet<>();
         for (int[] dir : directions){
