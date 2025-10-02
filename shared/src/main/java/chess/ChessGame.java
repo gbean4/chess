@@ -11,10 +11,11 @@ import java.util.Collection;
 public class ChessGame {
 
     private TeamColor currentTurn;
+    private ChessBoard squares;
 
     public ChessGame() {
-    ChessBoard board = new ChessBoard();
-    currentTurn = TeamColor.WHITE;
+        squares = new ChessBoard();
+        currentTurn = TeamColor.WHITE;
 
     }
 
@@ -104,7 +105,12 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
-        throw new RuntimeException("Not implemented");
+
+        for (int row = 1; row<9; row++){
+            for (int col = 1; col< 9; col++){
+                squares.addPiece(new ChessPosition(row, col), board.getPiece(new ChessPosition(row,col)));
+            }
+        }
     }
 
     /**
@@ -113,6 +119,6 @@ public class ChessGame {
      * @return the chessboard
      */
     public ChessBoard getBoard() {
-        throw new RuntimeException("Not implemented");
+        return this.squares;
     }
 }
