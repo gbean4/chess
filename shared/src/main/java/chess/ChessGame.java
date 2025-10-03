@@ -100,9 +100,12 @@ public class ChessGame {
         if (isInStalemate(currentTurn)) {
             throw new InvalidMoveException();
         }
-        else if (isInCheckmate(currentTurn)){
+        ChessPosition start = move.getStartPosition();
+        Collection<ChessMove> legalMoves = validMoves(start);
+        if (!legalMoves.contains(move)){
             throw new InvalidMoveException();
         }
+
         // make move now that it's good
         applyMove(move, squares);
 
@@ -121,8 +124,7 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        ChessPiece king = new ChessPiece(teamColor, ChessPiece.PieceType.KING);
-        ChessPosition kingPos = squares.getPieceLocation(teamColor, king);
+        ChessPosition kingPos = squares.getKingLocation(teamColor);
         HashSet<Collection<ChessMove>> opRawMoves = new HashSet<Collection<ChessMove>>();
         for (int row = 1; row<9; row++){
             for (int col = 1; col< 9; col++){
@@ -134,7 +136,7 @@ public class ChessGame {
         }
         for (Collection<ChessMove> opMoves: opRawMoves){
             for (ChessMove opMove : opMoves){
-                if (opMove.getEndPosition() == kingPos){
+                if (opMove.getEndPosition().equals(kingPos)){
                     return true;
                 }
             }
@@ -156,8 +158,8 @@ public class ChessGame {
             for (int col = 1; col< 9; col++){
                 ChessPosition opPos = new ChessPosition(row, col);
                 if (!squares.isEmpty(opPos) && squares.getPiece(opPos).getTeamColor()==teamColor) {
-                    if(!squares.getPiece(opPos).pieceMoves(squares, opPos).isEmpty()){
-                        continue;
+                    if(!validMoves(opPos).isEmpty()){
+                        return false;
                     }
                 }
             }
@@ -180,8 +182,8 @@ public class ChessGame {
             for (int col = 1; col< 9; col++){
                 ChessPosition opPos = new ChessPosition(row, col);
                 if (!squares.isEmpty(opPos) && squares.getPiece(opPos).getTeamColor()==teamColor) {
-                    if(!squares.getPiece(opPos).pieceMoves(squares, opPos).isEmpty()){
-                        continue;
+                    if(!validMoves(opPos).isEmpty()){
+                        return false;
                     }
                 }
             }

@@ -35,11 +35,11 @@ public class ChessBoard {
         return squares[position.getRow()-1][position.getColumn()-1];
     }
 
-    public ChessPosition getPieceLocation(ChessGame.TeamColor color, ChessPiece piece){
+    public ChessPosition getKingLocation(ChessGame.TeamColor color){
         for (int row = 1; row<9; row++){
             for (int col = 1; col< 9; col++){
                 ChessPosition pos = new ChessPosition(row, col);
-                if (getPiece(pos) == piece && getPiece(pos).getTeamColor() == color){
+                if (!isEmpty(pos) && getPiece(pos).getPieceType() == ChessPiece.PieceType.KING && getPiece(pos).getTeamColor() == color){
                     return pos;
                 }
             }
