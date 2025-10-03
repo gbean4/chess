@@ -73,12 +73,10 @@ public class ChessGame {
             if (!isInCheck(currentTurn)){
                 legalMoves.add(move);
             }
+            setBoard(savedCopy);
         }
 
         setBoard(savedCopy);
-//        if (legalMoves.isEmpty()){
-//            return null;
-//        }
         return legalMoves;
     }
 
@@ -109,7 +107,7 @@ public class ChessGame {
         // make move now that it's good
         applyMove(move, squares);
 
-        //passed and move made, now i can change color
+        //passed and move made, now I can change color
         if (currentTurn == TeamColor.WHITE){
             currentTurn = TeamColor.BLACK;
         } else {
@@ -194,11 +192,12 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
-        for (int row = 1; row<9; row++){
-            for (int col = 1; col< 9; col++){
-                squares.addPiece(new ChessPosition(row, col), board.getPiece(new ChessPosition(row,col)));
-            }
-        }
+//        for (int row = 1; row<9; row++){
+//            for (int col = 1; col< 9; col++){
+//                squares.addPiece(new ChessPosition(row, col), board.getPiece(new ChessPosition(row,col)));
+//            }
+//        }
+        this.squares = deepCopy(board);
     }
 
     /**
