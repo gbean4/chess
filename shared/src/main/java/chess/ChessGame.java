@@ -65,19 +65,23 @@ public class ChessGame {
         if (squares.isEmpty(startPosition)){
             return null;
         }
+
+        ChessPiece piece = squares.getPiece(startPosition);
+        TeamColor pieceColor = piece.getTeamColor();
+
         Collection <ChessMove> rawMoves =  (squares.getPiece(startPosition).pieceMoves(squares, startPosition));
         HashSet<ChessMove> legalMoves = new HashSet<>();
-        ChessBoard savedCopy = deepCopy(squares);
 
         for (ChessMove move: rawMoves){
+            ChessBoard savedCopy = deepCopy(squares);
             applyMove(move, squares);
-            if (!isInCheck(currentTurn)){
+
+            if (!isInCheck(pieceColor)){
                 legalMoves.add(move);
             }
             setBoard(savedCopy);
         }
 
-        setBoard(savedCopy);
         return legalMoves;
     }
 
