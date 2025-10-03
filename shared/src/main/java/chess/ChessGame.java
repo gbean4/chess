@@ -69,11 +69,12 @@ public class ChessGame {
         ChessBoard savedCopy = deepCopy(squares);
 
         for (ChessMove move: rawMoves){
-            try{
-                makeMove(move);
-            } catch(InvalidMoveException _){}
-            legalMoves.add(move);
+            applyMove(move, squares);
+            if (!isInCheck(currentTurn)){
+                legalMoves.add(move);
+            }
         }
+
         setBoard(savedCopy);
         return legalMoves;
     }
@@ -93,10 +94,16 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        if (isInStalemate(currentTurn)){
-            throw new InvalidMoveException("King would be in stalemate :(");}
-        else if (isInCheck(currentTurn)) {
-            throw new InvalidMoveException("King would be in check :(");
+//        if (isInCheck(currentTurn)){
+//            throw new InvalidMoveException();
+//        else if (isInStalemate(currentTurn)) {
+//            throw new InvalidMoveException();
+//        }
+//        else if (isInCheckmate(currentTurn)){
+//            throw new InvalidMoveException("King would be in checkmate :(");
+//        }
+        if (isInStalemate(currentTurn)) {
+            throw new InvalidMoveException();
         }
         else if (isInCheckmate(currentTurn)){
             throw new InvalidMoveException("King would be in checkmate :(");
@@ -119,7 +126,10 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        ChessPiece king = new ChessPiece(teamColor, ChessPiece.PieceType.KING);
+        ChessPosition kingPos = squares.getPieceLocation(teamColor, king);
+
+
     }
 
     /**
@@ -140,7 +150,10 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        if (isInCheck(currentTurn)){
+            return false;
+        }
+
     }
 
     /**

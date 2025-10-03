@@ -31,8 +31,20 @@ public class ChessBoard {
      * @return Either the piece at the position, or null if no piece is at that
      * position
      */
-    public  ChessPiece getPiece(ChessPosition position) {
+    public ChessPiece getPiece(ChessPosition position) {
         return squares[position.getRow()-1][position.getColumn()-1];
+    }
+
+    public ChessPosition getPieceLocation(ChessGame.TeamColor color, ChessPiece piece){
+        for (int row = 1; row<9; row++){
+            for (int col = 1; col< 9; col++){
+                ChessPosition pos = new ChessPosition(row, col);
+                if (getPiece(pos) == piece && getPiece(pos).getTeamColor() == color){
+                    return pos;
+                }
+            }
+        }
+        return null;
     }
 
     public void clearBoard(){

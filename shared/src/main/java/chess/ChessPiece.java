@@ -44,7 +44,6 @@ public class ChessPiece {
      */
     public PieceType getPieceType() {
         return type;
-
     }
 
     /**
