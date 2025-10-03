@@ -96,13 +96,15 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        if (isInStalemate(currentTurn)) {
+        ChessPosition start = move.getStartPosition();
+        ChessPiece piece = squares.getPiece(start);
+
+        if (piece == null || piece.getTeamColor() != currentTurn || isInStalemate(currentTurn)){
             throw new InvalidMoveException();
         }
-        ChessPosition start = move.getStartPosition();
-        Collection<ChessMove> legalMoves = validMoves(start);
 
-        if (legalMoves==null||!legalMoves.contains(move)){
+        Collection<ChessMove> legalMoves = validMoves(start);
+        if (legalMoves==null || !legalMoves.contains(move)){
             throw new InvalidMoveException();
         }
 
