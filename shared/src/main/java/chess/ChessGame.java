@@ -97,19 +97,11 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-//        if (isInCheck(currentTurn)){
-//            throw new InvalidMoveException();
-//        else if (isInStalemate(currentTurn)) {
-//            throw new InvalidMoveException();
-//        }
-//        else if (isInCheckmate(currentTurn)){
-//            throw new InvalidMoveException("King would be in checkmate :(");
-//        }
         if (isInStalemate(currentTurn)) {
             throw new InvalidMoveException();
         }
         else if (isInCheckmate(currentTurn)){
-            throw new InvalidMoveException("King would be in checkmate :(");
+            throw new InvalidMoveException();
         }
         // make move now that it's good
         applyMove(move, squares);
@@ -157,7 +149,20 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        if (!isInCheck(teamColor)){
+            return false;
+        }
+        for (int row = 1; row<9; row++){
+            for (int col = 1; col< 9; col++){
+                ChessPosition opPos = new ChessPosition(row, col);
+                if (!squares.isEmpty(opPos) && squares.getPiece(opPos).getTeamColor()==teamColor) {
+                    if(!squares.getPiece(opPos).pieceMoves(squares, opPos).isEmpty()){
+                        continue;
+                    }
+                }
+            }
+        }
+        return true;
     }
 
     /**
