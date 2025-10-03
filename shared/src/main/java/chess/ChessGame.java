@@ -125,19 +125,16 @@ public class ChessGame {
      */
     public boolean isInCheck(TeamColor teamColor) {
         ChessPosition kingPos = squares.getKingLocation(teamColor);
-        HashSet<Collection<ChessMove>> opRawMoves = new HashSet<Collection<ChessMove>>();
         for (int row = 1; row<9; row++){
             for (int col = 1; col< 9; col++){
                 ChessPosition opPos = new ChessPosition(row, col);
                 if (!squares.isEmpty(opPos) && squares.getPiece(opPos).getTeamColor()!=teamColor) {
-                    opRawMoves.add(squares.getPiece(opPos).pieceMoves(squares, opPos));
-                }
-            }
-        }
-        for (Collection<ChessMove> opMoves: opRawMoves){
-            for (ChessMove opMove : opMoves){
-                if (opMove.getEndPosition().equals(kingPos)){
-                    return true;
+                    Collection<ChessMove> opMoves = squares.getPiece(opPos).pieceMoves(squares, opPos);
+                    for (ChessMove opMove : opMoves){
+                        if (opMove.getEndPosition().equals(kingPos)){
+                            return true;
+                        }
+                    }
                 }
             }
         }
