@@ -1,7 +1,6 @@
 package chess;
 
-import java.util.Collection;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -18,6 +17,16 @@ public class ChessGame {
         squares = new ChessBoard();
         currentTurn = TeamColor.WHITE;
 
+    }
+
+    private ChessBoard deepCopy(ChessBoard original){
+        ChessBoard copy = new ChessBoard();
+        for (int row = 1; row<9; row++){
+            for (int col = 1; col< 9; col++){
+                copy.addPiece(new ChessPosition(row, col), original.getPiece(new ChessPosition(row,col)));
+            }
+        }
+        return copy;
     }
 
     /**
@@ -52,13 +61,29 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        ChessPiece.PieceType type = squares.getPiece(startPosition).getPieceType();
-        ChessPiece piece = new ChessPiece(currentTurn, type);
         if (squares.isEmpty(startPosition)){
             return null;
-        } else{
-            return (piece.pieceMoves(squares, startPosition));
         }
+        Collection <ChessMove> rawMoves =  (squares.getPiece(startPosition).pieceMoves(squares, startPosition));
+        HashSet<ChessMove> legalMoves = new HashSet<>();
+        ChessBoard savedCopy = deepCopy(squares);
+
+        for (ChessMove move: rawMoves){
+            try{
+                makeMove(move);
+            } catch(InvalidMoveException _){}
+            legalMoves.add(move);
+        }
+        setBoard(savedCopy);
+        return legalMoves;
+    }
+
+    public void applyMove(ChessMove move, ChessBoard board){
+        ChessPosition start = move.getStartPosition();
+        ChessPosition end = move.getEndPosition();
+        ChessPiece piece = board.getPiece(start);
+        board.addPiece(start, null);
+        board.addPiece(end, piece);
     }
 
     /**
@@ -68,6 +93,18 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
+        if (isInStalemate(currentTurn)){
+            throw new InvalidMoveException("King would be in stalemate :(");}
+        else if (isInCheck(currentTurn)) {
+            throw new InvalidMoveException("King would be in check :(");
+        }
+        else if (isInCheckmate(currentTurn)){
+            throw new InvalidMoveException("King would be in checkmate :(");
+        }
+        // make move now that it's good
+        applyMove(move, squares);
+
+        //passed and move made, now i can change color
         if (currentTurn == TeamColor.WHITE){
             currentTurn = TeamColor.BLACK;
         } else {
