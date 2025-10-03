@@ -76,6 +76,9 @@ public class ChessGame {
         }
 
         setBoard(savedCopy);
+//        if (legalMoves.isEmpty()){
+//            return null;
+//        }
         return legalMoves;
     }
 
@@ -128,8 +131,23 @@ public class ChessGame {
     public boolean isInCheck(TeamColor teamColor) {
         ChessPiece king = new ChessPiece(teamColor, ChessPiece.PieceType.KING);
         ChessPosition kingPos = squares.getPieceLocation(teamColor, king);
-
-
+        HashSet<Collection<ChessMove>> opRawMoves = new HashSet<Collection<ChessMove>>();
+        for (int row = 1; row<9; row++){
+            for (int col = 1; col< 9; col++){
+                ChessPosition opPos = new ChessPosition(row, col);
+                if (!squares.isEmpty(opPos) && squares.getPiece(opPos).getTeamColor()!=teamColor) {
+                    opRawMoves.add(squares.getPiece(opPos).pieceMoves(squares, opPos));
+                }
+            }
+        }
+        for (Collection<ChessMove> opMoves: opRawMoves){
+            for (ChessMove opMove : opMoves){
+                if (opMove.getEndPosition() == kingPos){
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -153,7 +171,17 @@ public class ChessGame {
         if (isInCheck(currentTurn)){
             return false;
         }
-
+        for (int row = 1; row<9; row++){
+            for (int col = 1; col< 9; col++){
+                ChessPosition opPos = new ChessPosition(row, col);
+                if (!squares.isEmpty(opPos) && squares.getPiece(opPos).getTeamColor()==teamColor) {
+                    if(!squares.getPiece(opPos).pieceMoves(squares, opPos).isEmpty()){
+                        continue;
+                    }
+                }
+            }
+        }
+        return true;
     }
 
     /**
