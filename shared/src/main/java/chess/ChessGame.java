@@ -52,7 +52,13 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        throw new RuntimeException("Not implemented");
+        ChessPiece.PieceType type = squares.getPiece(startPosition).getPieceType();
+        ChessPiece piece = new ChessPiece(currentTurn, type);
+        if (squares.isEmpty(startPosition)){
+            return null;
+        } else{
+            return (piece.pieceMoves(squares, startPosition));
+        }
     }
 
     /**
@@ -106,7 +112,6 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
-
         for (int row = 1; row<9; row++){
             for (int col = 1; col< 9; col++){
                 squares.addPiece(new ChessPosition(row, col), board.getPiece(new ChessPosition(row,col)));
