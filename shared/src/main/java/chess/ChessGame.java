@@ -101,7 +101,8 @@ public class ChessGame {
         }
         ChessPosition start = move.getStartPosition();
         Collection<ChessMove> legalMoves = validMoves(start);
-        if (!legalMoves.contains(move)){
+
+        if (legalMoves==null||!legalMoves.contains(move)){
             throw new InvalidMoveException();
         }
 
