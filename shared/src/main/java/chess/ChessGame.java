@@ -111,6 +111,20 @@ public class ChessGame {
         // make move now that it's good
         applyMove(move, squares);
 
+        // crap need to handle promotions too
+        ChessPiece movedPiece = squares.getPiece(move.getEndPosition());
+        if (movedPiece.getPieceType() == ChessPiece.PieceType.PAWN){
+            int promotionRow = (movedPiece.getTeamColor()== TeamColor.WHITE)? 8 :1;
+            if(move.getEndPosition().getRow() == promotionRow){
+                ChessPiece.PieceType promotionPiece = move.getPromotionPiece();
+                if (promotionPiece == null){
+                    promotionPiece = ChessPiece.PieceType.QUEEN;
+                }
+                ChessPiece promotion = new ChessPiece(movedPiece.getTeamColor(),promotionPiece);
+                squares.addPiece(move.getEndPosition(),promotion);
+            }
+        }
+
         //passed and move made, now I can change color
         if (currentTurn == TeamColor.WHITE){
             currentTurn = TeamColor.BLACK;
