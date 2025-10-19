@@ -15,7 +15,8 @@ class UserServiceTest {
         var user = new UserData("lee", "2@c","password");
 
         assertDoesNotThrow(() ->service.register(user));
-//        service.register(user);
+        assertThrows(Exception.class, () -> service.register(user));
 //        assertNotNull(a.authToken());
+
     }
 }
