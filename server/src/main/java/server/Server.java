@@ -1,10 +1,12 @@
 package server;
 
 import com.google.gson.Gson;
+import dataaccess.DataAccessException;
 import dataaccess.MemoryDataAccess;
 import datamodel.UserData;
 import io.javalin.*;
 import io.javalin.http.Context;
+import service.ForbiddenException;
 import service.UserService;
 
 import java.util.Map;
@@ -29,19 +31,26 @@ public class Server {
     }
 
     private void register(Context ctx){
-
+        var serializer = new Gson();
         try {
-            var serializer = new Gson();
             String reqJson = ctx.body();
             var user = serializer.fromJson(reqJson, UserData.class);
-            var registrationResponse = userService.register(user);
+            if (user.username()==null || user.password()==null ||user.email()==null){
+                throw new Exception("Missing required fields");
+            }
 
+            var registrationResponse = userService.register(user);
             ctx.result(serializer.toJson(registrationResponse));
+
         } catch (Exception ex){
-            var serializer = new Gson();
-            var errorResponse = Map.of("message", "Error: " + ex.getMessage());
-            //ctx.status(403).result(ex.getMessage()); //maybe put in error message
-            ctx.status(403).result(serializer.toJson(errorResponse));
+            String message = ex.getMessage() == null? "" : ex.getMessage().toLowerCase();
+            int statusCode = 400;
+//            int statusCode = ex.getMessage().toLowerCase().contains("exists")? 403:400;
+            if (message.contains("exists") || message.contains("forbidden") || message.contains("unauthorized")){
+                statusCode = 403;
+            }
+            ctx.status(statusCode).result(serializer.toJson(Map.of("message", "Error: "+ ex.getMessage())));
+
         }
     }
     public int run(int desiredPort) {
