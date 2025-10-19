@@ -10,12 +10,12 @@ import service.UserService;
 import java.util.Map;
 
 public class Server {
-
+    private static final MemoryDataAccess dataAccess = new MemoryDataAccess();
     private final Javalin server;
     private final UserService userService;
 
     public Server() {
-        var dataAccess = new MemoryDataAccess();
+//        var dataAccess = new MemoryDataAccess();
         userService = new UserService(dataAccess);
         server = Javalin.create(config -> config.staticFiles.add("web"));
 
@@ -24,6 +24,7 @@ public class Server {
     }
 
     private void clear(Context ctx){
+        dataAccess.clear();
         ctx.result("{}");
     }
 
@@ -34,9 +35,13 @@ public class Server {
             String reqJson = ctx.body();
             var user = serializer.fromJson(reqJson, UserData.class);
             var registrationResponse = userService.register(user);
+
             ctx.result(serializer.toJson(registrationResponse));
         } catch (Exception ex){
-            ctx.status(403).result(ex.getMessage()); //maybe put in error message
+            var serializer = new Gson();
+            var errorResponse = Map.of("message", "Error: " + ex.getMessage());
+            //ctx.status(403).result(ex.getMessage()); //maybe put in error message
+            ctx.status(403).result(serializer.toJson(errorResponse));
         }
     }
     public int run(int desiredPort) {

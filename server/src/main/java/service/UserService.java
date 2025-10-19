@@ -17,7 +17,7 @@ public class UserService {
             throw new Exception("User already exists");
         }
 
-
+        dataAccess.createUser(user);
 
         return new RegisterResponse(user, user.username(),  "zyz");
     }
