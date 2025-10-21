@@ -2,8 +2,11 @@ package service;
 
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
+import datamodel.AuthData;
 import datamodel.RegisterResponse;
 import datamodel.UserData;
+
+import java.util.UUID;
 
 public class UserService {
     private final DataAccess dataAccess;
@@ -24,5 +27,22 @@ public class UserService {
 
         dataAccess.createUser(user);
         return new RegisterResponse(user, user.username(),  "zyz");
+    }
+
+    public AuthData login(String username, String password) throws Exception {
+        if (username == null || password ==null){
+            throw new Exception("400: Missing fields");
+        }
+        UserData user = dataAccess.getUser(username);
+        if (user == null){
+            throw new Exception("401: User not found");
+        }
+        if (!user.password().equals(password)){
+            throw new Exception("401: Invalid password");
+        }
+
+        String token = UUID.randomUUID().toString();
+
+        return new AuthData(username, token);
     }
 }
