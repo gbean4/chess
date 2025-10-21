@@ -3,6 +3,7 @@ package server;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryDataAccess;
+import datamodel.AuthData;
 import datamodel.LoginRequest;
 import datamodel.UserData;
 import io.javalin.*;
@@ -25,7 +26,7 @@ public class Server {
         server.delete("db", ctx->ctx.result("{}"));
         server.post("user", this::register); //ctx.result("{ \"username\":\"\", \"authToken\":\"\" }")
         server.post("session", this::login);
-        server.post("session", this::logout);
+        server.delete("/session", this::logout);
     }
 
     private void clear(Context ctx){
@@ -69,7 +70,16 @@ public class Server {
         }
     }
 
-    private void logout(Context ctx){}
+    private void logout(Context ctx){
+        var serializer = new Gson();
+        try {
+            String authToken = ctx.header("authorization");
+            userService.logout(authToken);
+            ctx.status(200).result("{}");
+        } catch (Exception ex){
+            ctx.status(401).result(serializer.toJson(Map.of("message", "Error: " + ex.getMessage())));
+        }
+    }
 
     public int run(int desiredPort) {
         server.start(desiredPort);

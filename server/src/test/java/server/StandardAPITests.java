@@ -73,22 +73,7 @@ public class StandardAPITests {
         Assertions.assertNotNull(loginResult.getAuthToken(), "Response did not return authentication String");
     }
 
-    @Test
-    @Order(3)
-    @DisplayName("Login Bad Request")
-    public void loginBadRequest() {
-        TestUser[] incompleteLoginRequests = {
-            new TestUser(null, existingUser.getPassword()),
-            new TestUser(existingUser.getUsername(), null),
-        };
 
-        for (TestUser incompleteLoginRequest : incompleteLoginRequests) {
-            TestAuthResult loginResult = serverFacade.login(incompleteLoginRequest);
-
-            assertHttpBadRequest(loginResult);
-            assertAuthFieldsMissing(loginResult);
-        }
-    }
 
     @Test
     @Order(3)

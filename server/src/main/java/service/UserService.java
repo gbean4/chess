@@ -42,7 +42,21 @@ public class UserService {
         }
 
         String token = UUID.randomUUID().toString();
+        var auth = new AuthData(username, token);
+        dataAccess.createAuth(auth);
+        return auth;
+    }
 
-        return new AuthData(username, token);
+    public void logout(String authToken) throws Exception {
+        if (authToken == null){
+            throw new Exception("unauthorized");
+        }
+
+        var existingAuth= dataAccess.getAuth(authToken);
+        if (existingAuth == null){
+            throw new Exception("unauthorized");
+        }
+        dataAccess.deleteAuth(authToken);
+        // remove from GameData?
     }
 }
