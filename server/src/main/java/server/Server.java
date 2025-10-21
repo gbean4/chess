@@ -25,6 +25,7 @@ public class Server {
         server.delete("db", ctx->ctx.result("{}"));
         server.post("user", this::register); //ctx.result("{ \"username\":\"\", \"authToken\":\"\" }")
         server.post("session", this::login);
+        server.post("session", this::logout);
     }
 
     private void clear(Context ctx){
@@ -64,9 +65,11 @@ public class Server {
             ctx.status(200).result(serializer.toJson(result));
         } catch (Exception ex){
             int statusCode = ex.getMessage().toLowerCase().contains("400")? 400:401;
-            ctx.status(400).result(serializer.toJson(Map.of("message", "Error: " + ex.getMessage())));
+            ctx.status(statusCode).result(serializer.toJson(Map.of("message", "Error: " + ex.getMessage())));
         }
     }
+
+    private void logout(Context ctx){}
 
     public int run(int desiredPort) {
         server.start(desiredPort);
