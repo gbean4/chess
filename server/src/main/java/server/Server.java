@@ -73,10 +73,10 @@ public class Server {
     private void logout(Context ctx){
         var serializer = new Gson();
         try {
-            var req = serializer.fromJson(ctx.body(), AuthData.class);
-//            String authHeader = ctx.header("authorization");
+//            var req = serializer.fromJson(ctx.body(), AuthData.class);
+            String authToken = ctx.header("authorization");
 
-            userService.logout(req.authToken());
+            userService.logout(authToken);
             ctx.status(200).result("{}");
 
         } catch (Exception ex){

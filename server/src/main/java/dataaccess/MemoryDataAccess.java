@@ -39,4 +39,9 @@ public class MemoryDataAccess implements DataAccess{
         authTokens.put(auth.authToken(), auth);
 //        return auth;
     }
+    public void listAuth() {
+        for (Map.Entry<String, AuthData> entry: authTokens.entrySet()){
+            System.out.println("Token: " + entry.getKey() + ", User: "+ entry.getValue());
+        }
+    }
 }

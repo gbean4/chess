@@ -26,6 +26,36 @@ class UserServiceTest {
         assertEquals("lee", storedAuth.username());
         System.out.println(storedAuth.authToken().equals(response.authToken()));
     }
+    @Test
+    void login() throws Exception{
+        var db = new MemoryDataAccess();
+        var service = new UserService(db);
+        var user = new UserData("lee", "2@c","password");
 
+        service.register(user);
+
+        var firstAuth = service.login("lee", "password");
+        assertNotNull(firstAuth);
+        assertNotNull(firstAuth.authToken());
+
+        var secondAuth = service.login("lee", "password");
+        assertNotEquals(firstAuth.authToken(), secondAuth.authToken(), "authTokens should be different");
+    }
+
+    @Test
+    void logout() throws Exception{
+        var db = new MemoryDataAccess();
+        var service = new UserService(db);
+        var user = new UserData("lee", "2@c","password");
+
+        service.register(user);
+        var auth = service.login("lee", "password");
+
+        assertNotNull(db.getAuth(auth.authToken()), "there's nothing in db");
+        service.logout(auth.authToken());
+        db.listAuth();
+        assertNull(db.getAuth(auth.authToken()), "there should be NO auth token");
+        db.listAuth();
+    }
 
 }
