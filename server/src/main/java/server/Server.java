@@ -62,7 +62,7 @@ public class Server {
         try {
             var req = serializer.fromJson(ctx.body(), LoginRequest.class);
             var result = userService.login(req.username(), req.password());
-            ctx.result(serializer.toJson(result));
+//            ctx.result(serializer.toJson(result));
             ctx.status(200).result(serializer.toJson(result));
         } catch (Exception ex){
             int statusCode = ex.getMessage().toLowerCase().contains("400")? 400:401;
