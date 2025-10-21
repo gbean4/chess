@@ -1,6 +1,8 @@
 package service;
 
+import dataaccess.DataAccess;
 import dataaccess.MemoryDataAccess;
+import datamodel.RegisterResponse;
 import datamodel.UserData;
 import org.junit.jupiter.api.Test;
 
@@ -14,9 +16,16 @@ class UserServiceTest {
         var service = new UserService(db);
         var user = new UserData("lee", "2@c","password");
 
-        assertDoesNotThrow(() ->service.register(user));
-        assertThrows(Exception.class, () -> service.register(user));
-//        assertNotNull(a.authToken());
+        RegisterResponse response = service.register(user);
 
+        assertNotNull(response);
+        assertEquals("lee", response.username());
+        assertNotNull(response.authToken(), "authToken should not be null");
+        var storedAuth = db.getAuth(response.authToken());
+        assertNotNull(storedAuth, "oh man it's not stored in db");
+        assertEquals("lee", storedAuth.username());
+        System.out.println(storedAuth.authToken().equals(response.authToken()));
     }
+
+
 }

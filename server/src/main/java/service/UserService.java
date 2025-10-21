@@ -26,7 +26,9 @@ public class UserService {
         }
 
         dataAccess.createUser(user);
-        return new RegisterResponse(user, user.username(),  "zyz");
+        var token = UUID.randomUUID().toString();
+        dataAccess.createAuth(new AuthData(user.username(), token));
+        return new RegisterResponse(user, user.username(), token );
     }
 
     public AuthData login(String username, String password) throws Exception {
