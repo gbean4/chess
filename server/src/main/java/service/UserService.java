@@ -95,8 +95,15 @@ public class UserService {
         if (existingAuth == null){
             throw new Exception("unauthorized");
         }
+
+        String color = gameSpec.playerColor();
+        if (color == null || (!color.equalsIgnoreCase("white") && (!color.equalsIgnoreCase("black")))){
+            throw new Exception("400: invalid color");
+        }
+
         var username = auth.username();
         var game = dataAccess.getGame(gameSpec.gameID());
+
         if (game.whiteUsername() != null && game.blackUsername() != null){
             throw new Exception("already taken");
         } else if ((Objects.equals(gameSpec.playerColor().toLowerCase(), "white") && game.whiteUsername()!= null)){
