@@ -171,6 +171,10 @@ public class ChessGame {
         if (!isInCheck(teamColor)){
             return false;
         }
+        return checkHelper(teamColor);
+    }
+
+    private boolean checkHelper(TeamColor teamColor) {
         for (int row = 1; row<9; row++){
             for (int col = 1; col< 9; col++){
                 ChessPosition opPos = new ChessPosition(row, col);
@@ -195,17 +199,7 @@ public class ChessGame {
         if (isInCheck(currentTurn)){
             return false;
         }
-        for (int row = 1; row<9; row++){
-            for (int col = 1; col< 9; col++){
-                ChessPosition opPos = new ChessPosition(row, col);
-                if (!squares.isEmpty(opPos) && squares.getPiece(opPos).getTeamColor()==teamColor) {
-                    if(!validMoves(opPos).isEmpty()){
-                        return false;
-                    }
-                }
-            }
-        }
-        return true;
+        return checkHelper(teamColor);
     }
 
     /**
