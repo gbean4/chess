@@ -14,12 +14,11 @@ import java.util.Arrays;
 import java.util.Map;
 
 public class Server {
-//    private static final MemoryDataAccess dataAccess = new MemoryDataAccess();
+    private static final MemoryDataAccess dataAccess = new MemoryDataAccess();
     private final Javalin server;
     private final UserService userService;
 
     public Server() {
-        var dataAccess = new MemoryDataAccess();
         userService = new UserService(dataAccess);
         server = Javalin.create(config -> config.staticFiles.add("web"));
 
@@ -34,7 +33,6 @@ public class Server {
 
 
     private void clear(Context ctx){
-        var dataAccess = new MemoryDataAccess();
         dataAccess.clear();
         ctx.result("{}");
     }
