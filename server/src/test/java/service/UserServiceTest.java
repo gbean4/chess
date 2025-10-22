@@ -1,6 +1,8 @@
 package service;
 
 import dataaccess.MemoryDataAccess;
+import datamodel.GameData;
+import datamodel.GameSpec;
 import datamodel.RegisterResponse;
 import datamodel.UserData;
 import org.junit.jupiter.api.Test;
@@ -25,12 +27,10 @@ class UserServiceTest {
 
 
     @Test
-    void registerNegative() throws Exception {
+    void registerNegative(){
         var db = new MemoryDataAccess();
         var service = new UserService(db);
         var user = new UserData("lee", "2@c","password");
-
-        RegisterResponse response = service.register(user);
 
         Exception ex = assertThrows(Exception.class, () -> service.register(user));
         assertTrue(ex.getMessage().contains("exists"));
@@ -58,7 +58,7 @@ class UserServiceTest {
 
         service.register(user);
 
-        Exception ex = assertThrows(Exception.class, () -> service.login("lee", "wrongpass"));
+        Exception ex = assertThrows(Exception.class, () -> service.login("lee", "wrongPass"));
         assertTrue(ex.getMessage().contains("Invalid"));
     }
 
@@ -76,7 +76,7 @@ class UserServiceTest {
     }
 
     @Test
-    void logoutNegative() throws Exception{
+    void logoutNegative(){
         var db = new MemoryDataAccess();
         var service = new UserService(db);
 
@@ -126,15 +126,45 @@ class UserServiceTest {
     }
 
     @Test
-    void listGamesNegative() throws Exception{
+    void listGamesNegative(){
         var db = new MemoryDataAccess();
         var service = new UserService(db);
-        var user = new UserData("lee", "2@c","password");
-
 
         Exception ex = assertThrows(Exception.class, () -> service.listGames("badToken"));
         assertTrue(ex.getMessage().contains("401"));
     }
+    @Test
+    void joinGamePositive() throws Exception{
+        var db = new MemoryDataAccess();
+        var service = new UserService(db);
+        var user = new UserData("lee", "2@c","password");
 
+        service.register(user);
+        var auth = service.login("lee", "password");
+        var game = service.createGame(auth.authToken(), "Game1");
+
+        var spec = new GameSpec("white", game.gameID());
+        assertDoesNotThrow(() -> service.joinGame(auth.authToken(), spec));
+    }
+
+    @Test
+    void joinGameNegative() throws Exception{
+        var db = new MemoryDataAccess();
+        var service = new UserService(db);
+        var user = new UserData("lee", "2@c","password");
+
+        service.register(user);
+        var auth = service.login("lee", "password");
+        var game = service.createGame(auth.authToken(), "busyGame");
+
+        var fullGame = new GameData(game.gameID(), "a", "b", "busyGame", game.game());
+        var spec = new GameSpec("white", game.gameID());
+
+        db.updateGame(fullGame);
+
+        Exception ex = assertThrows(Exception.class, () -> service.joinGame(auth.authToken(), spec));
+        assertTrue(ex.getMessage().contains("already"));
+
+    }
 
 }

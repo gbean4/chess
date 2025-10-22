@@ -19,4 +19,5 @@ public interface DataAccess {
     void joinGame(String username, GameSpec gameSpec);
 
     GameData getGame(int gameID);
+    void updateGame(GameData game);
 }
