@@ -111,7 +111,8 @@ public class Server {
         try {
             String authToken = ctx.header("authorization");
             var games = userService.listGames(authToken);
-            ctx.status(200).result(Arrays.toString(games));
+            ctx.status(200).result(serializer.toJson(Map.of("games", games)));
+
         } catch (Exception ex){
             ctx.status(401).result(serializer.toJson(Map.of("message", "Error: " + ex.getMessage())));
         }
