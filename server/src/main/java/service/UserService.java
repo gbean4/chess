@@ -76,4 +76,17 @@ public class UserService {
         var username = auth.username();
         return dataAccess.createGame(username, gameName);
     }
+
+    public GameData[] listGames(String authToken) throws Exception {
+        AuthData auth= dataAccess.getAuth(authToken);
+        if (auth == null){
+            throw new Exception("401: Bad Request");
+        }
+        var existingAuth= dataAccess.getAuth(authToken);
+        if (existingAuth == null){
+            throw new Exception("unauthorized");
+        }
+
+        return dataAccess.listGames(authToken);
+    }
 }

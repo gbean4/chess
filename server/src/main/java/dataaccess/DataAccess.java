@@ -14,4 +14,5 @@ public interface DataAccess {
     void createAuth(AuthData auth);
 
     GameData createGame(String username, String gameName);
+    GameData [] listGames(String authToken);
 }

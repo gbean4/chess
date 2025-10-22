@@ -5,7 +5,9 @@ import datamodel.AuthData;
 import datamodel.GameData;
 import datamodel.UserData;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -55,6 +57,22 @@ public class MemoryDataAccess implements DataAccess{
         GameData gameData = new GameData(gameID, username, null, gameName, new ChessGame());
         games.put(gameID, gameData);
         return gameData;
+    }
+
+    @Override
+    public GameData[] listGames(String authToken) {
+
+        List<GameData> gameList = new ArrayList<>();
+
+        for (Map.Entry<Integer, GameData> entry: games.entrySet()){
+            GameData g = entry.getValue();
+            gameList.add(new GameData(entry.getKey(),
+                    g.whiteUsername(),
+                    g.blackUsername(),
+                    g.gameName(),
+                    g.game()));
+        }
+        return gameList.toArray(new GameData[0]);
     }
 
     public void listAuth() {

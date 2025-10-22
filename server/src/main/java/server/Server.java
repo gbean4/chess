@@ -7,8 +7,10 @@ import datamodel.LoginRequest;
 import datamodel.UserData;
 import io.javalin.*;
 import io.javalin.http.Context;
+import org.jetbrains.annotations.NotNull;
 import service.UserService;
 
+import java.util.Arrays;
 import java.util.Map;
 
 public class Server {
@@ -27,7 +29,9 @@ public class Server {
         server.delete("/session", this::logout);
         server.get("/game", this::listGames);
         server.post("/game", this::createGame);
+        server.put("/game", this::joinGame);
     }
+
 
     private void clear(Context ctx){
         dataAccess.clear();
@@ -105,7 +109,19 @@ public class Server {
         }
     }
 
-    private void listGames(Context ctx){}
+    private void listGames(Context ctx){
+        var serializer = new Gson();
+        try {
+            String authToken = ctx.header("authorization");
+            var games = userService.listGames(authToken);
+            ctx.status(200).result(Arrays.toString(games));
+        } catch (Exception ex){
+            ctx.status(401).result(serializer.toJson(Map.of("message", "Error: " + ex.getMessage())));
+        }
+    }
+
+    private void joinGame(Context context) {
+    }
 
     public int run(int desiredPort) {
         server.start(desiredPort);
