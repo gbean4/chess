@@ -63,7 +63,7 @@ class UserServiceTest {
     }
 
     @Test
-    void logout() throws Exception{
+    void logoutPositive() throws Exception{
         var db = new MemoryDataAccess();
         var service = new UserService(db);
         var user = new UserData("lee", "2@c","password");
@@ -71,11 +71,17 @@ class UserServiceTest {
         service.register(user);
         var auth = service.login("lee", "password");
 
-        assertNotNull(db.getAuth(auth.authToken()), "there's nothing in db");
         service.logout(auth.authToken());
-        db.listAuth();
-        assertNull(db.getAuth(auth.authToken()), "there should be NO auth token");
-        db.listAuth();
+        assertNull(db.getAuth(auth.authToken()));
+    }
+
+    @Test
+    void logoutNegative() throws Exception{
+        var db = new MemoryDataAccess();
+        var service = new UserService(db);
+
+        Exception ex = assertThrows(Exception.class, () -> service.logout("badToken"));
+        assertTrue(ex.getMessage().contains("unauthorized"));
     }
 
 }
