@@ -12,6 +12,19 @@ import static org.junit.jupiter.api.Assertions.*;
 class UserServiceTest {
 
     @Test
+    void constructorPositive(){
+        var db = new MemoryDataAccess();
+        var service = new UserService(db);
+        assertNotNull(service, "Service should be all good");
+    }
+
+    @Test
+    void constructorNegative(){
+        var service = new UserService(null);
+        assertNotNull(service, "Service should not work, db null");
+    }
+
+    @Test
     void registerPositive() throws Exception{
         var db = new MemoryDataAccess();
         var service = new UserService(db);
