@@ -3,6 +3,7 @@ package server;
 import com.google.gson.Gson;
 import dataaccess.MemoryDataAccess;
 import datamodel.GameData;
+import datamodel.GameSpec;
 import datamodel.LoginRequest;
 import datamodel.UserData;
 import io.javalin.*;
@@ -19,17 +20,16 @@ public class Server {
     private final UserService userService;
 
     public Server() {
-//        var dataAccess = new MemoryDataAccess();
         userService = new UserService(dataAccess);
         server = Javalin.create(config -> config.staticFiles.add("web"));
 
         server.delete("db", ctx->ctx.result("{}"));
         server.post("user", this::register); //ctx.result("{ \"username\":\"\", \"authToken\":\"\" }")
         server.post("session", this::login);
-        server.delete("/session", this::logout);
-        server.get("/game", this::listGames);
-        server.post("/game", this::createGame);
-        server.put("/game", this::joinGame);
+        server.delete("session", this::logout);
+        server.get("game", this::listGames);
+        server.post("game", this::createGame);
+        server.put("game", this::joinGame);
     }
 
 
@@ -120,7 +120,23 @@ public class Server {
         }
     }
 
-    private void joinGame(Context context) {
+    private void joinGame(Context ctx){
+        var serializer = new Gson();
+        try {
+            String authToken = ctx.header("authorization");
+            var gameSpec = serializer.fromJson(ctx.body(), GameSpec.class);
+
+            userService.joinGame(authToken, gameSpec);
+            ctx.status(200).result("{}");
+        } catch (Exception ex){
+            int statusCode = 400;
+            var msg = ex.getMessage().toLowerCase();
+
+            if (msg.contains("401")) statusCode = 401;
+            if (msg.contains("already taken")) statusCode = 403;
+            ctx.status(statusCode).result(serializer.toJson(Map.of("message", "Error: " + ex.getMessage())));
+        }
+
     }
 
     public int run(int desiredPort) {

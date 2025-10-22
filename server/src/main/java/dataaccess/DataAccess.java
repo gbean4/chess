@@ -2,6 +2,7 @@ package dataaccess;
 
 import datamodel.AuthData;
 import datamodel.GameData;
+import datamodel.GameSpec;
 import datamodel.UserData;
 
 public interface DataAccess {
@@ -13,6 +14,9 @@ public interface DataAccess {
     void deleteAuth(String authToken);
     void createAuth(AuthData auth);
 
-    GameData createGame(String username, String gameName);
+    GameData createGame(String gameName);
     GameData [] listGames(String authToken);
+    void joinGame(String username, GameSpec gameSpec);
+
+    GameData getGame(int gameID);
 }

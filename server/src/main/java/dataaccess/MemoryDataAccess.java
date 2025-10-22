@@ -3,12 +3,10 @@ package dataaccess;
 import chess.ChessGame;
 import datamodel.AuthData;
 import datamodel.GameData;
+import datamodel.GameSpec;
 import datamodel.UserData;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class MemoryDataAccess implements DataAccess{
@@ -52,9 +50,9 @@ public class MemoryDataAccess implements DataAccess{
     }
 
     @Override
-    public GameData createGame(String username, String gameName) {
+    public GameData createGame(String gameName) {
         int gameID = nextID();
-        GameData gameData = new GameData(gameID, username, null, gameName, new ChessGame());
+        GameData gameData = new GameData(gameID, null, null, gameName, new ChessGame());
         games.put(gameID, gameData);
         return gameData;
     }
@@ -73,6 +71,21 @@ public class MemoryDataAccess implements DataAccess{
                     g.game()));
         }
         return gameList.toArray(new GameData[0]);
+    }
+
+    @Override
+    public GameData getGame(int gameID) {
+        return games.get(gameID);
+    }
+
+    @Override
+    public void joinGame(String username, GameSpec gameSpec) {
+        var game = games.get(gameSpec.gameID());
+        if (Objects.equals(gameSpec.PlayerColor().toLowerCase(), "white")){
+            games.put(game.gameID(),new GameData(game.gameID(), username, game.blackUsername(), game.gameName(), game.game()));
+        } else{
+            games.put(game.gameID(),new GameData(game.gameID(), game.whiteUsername(), username, game.gameName(), game.game()));
+        }
     }
 
     public void listAuth() {

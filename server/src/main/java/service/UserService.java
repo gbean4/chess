@@ -2,11 +2,9 @@ package service;
 
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
-import datamodel.AuthData;
-import datamodel.GameData;
-import datamodel.RegisterResponse;
-import datamodel.UserData;
+import datamodel.*;
 
+import java.util.Objects;
 import java.util.UUID;
 
 public class UserService {
@@ -72,9 +70,7 @@ public class UserService {
         if (gameName == null || gameName.isBlank()){
             throw new Exception("400: missing game name");
         }
-
-        var username = auth.username();
-        return dataAccess.createGame(username, gameName);
+        return dataAccess.createGame(gameName);
     }
 
     public GameData[] listGames(String authToken) throws Exception {
@@ -88,5 +84,26 @@ public class UserService {
         }
 
         return dataAccess.listGames(authToken);
+    }
+
+    public void joinGame(String authToken, GameSpec gameSpec) throws Exception {
+        AuthData auth= dataAccess.getAuth(authToken);
+        if (auth == null){
+            throw new Exception("401: Bad Request");
+        }
+        var existingAuth= dataAccess.getAuth(authToken);
+        if (existingAuth == null){
+            throw new Exception("unauthorized");
+        }
+        var username = auth.username();
+        var game = dataAccess.getGame(gameSpec.gameID());
+        if (game.whiteUsername() != null && game.blackUsername() != null){
+            throw new Exception("already taken");
+        } else if ((Objects.equals(gameSpec.PlayerColor().toLowerCase(), "white") && game.whiteUsername()!= null)){
+            throw new Exception("already taken");
+        } else if ((Objects.equals(gameSpec.PlayerColor().toLowerCase(), "black") && game.blackUsername()!= null)){
+            throw new Exception("already taken");
+        } else {
+            dataAccess.joinGame(username, gameSpec);}
     }
 }
