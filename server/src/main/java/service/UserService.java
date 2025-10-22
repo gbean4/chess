@@ -99,9 +99,9 @@ public class UserService {
         var game = dataAccess.getGame(gameSpec.gameID());
         if (game.whiteUsername() != null && game.blackUsername() != null){
             throw new Exception("already taken");
-        } else if ((Objects.equals(gameSpec.PlayerColor().toLowerCase(), "white") && game.whiteUsername()!= null)){
+        } else if ((Objects.equals(gameSpec.playerColor().toLowerCase(), "white") && game.whiteUsername()!= null)){
             throw new Exception("already taken");
-        } else if ((Objects.equals(gameSpec.PlayerColor().toLowerCase(), "black") && game.blackUsername()!= null)){
+        } else if ((Objects.equals(gameSpec.playerColor().toLowerCase(), "black") && game.blackUsername()!= null)){
             throw new Exception("already taken");
         } else {
             dataAccess.joinGame(username, gameSpec);}

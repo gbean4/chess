@@ -15,11 +15,12 @@ import java.util.Arrays;
 import java.util.Map;
 
 public class Server {
-    private static final MemoryDataAccess dataAccess = new MemoryDataAccess();
+//    private static final MemoryDataAccess dataAccess = new MemoryDataAccess();
     private final Javalin server;
     private final UserService userService;
 
     public Server() {
+        var dataAccess = new MemoryDataAccess();
         userService = new UserService(dataAccess);
         server = Javalin.create(config -> config.staticFiles.add("web"));
 
@@ -34,6 +35,7 @@ public class Server {
 
 
     private void clear(Context ctx){
+        var dataAccess = new MemoryDataAccess();
         dataAccess.clear();
         ctx.result("{}");
     }
@@ -103,7 +105,9 @@ public class Server {
             int statusCode = 400;
             var msg = ex.getMessage().toLowerCase();
 //            if (msg.contains("400")) statusCode = 400;
-            if (msg.contains("401")) statusCode = 401;
+            if (msg.contains("401")) {
+                statusCode = 401;
+            }
 
             ctx.status(statusCode).result(serializer.toJson(Map.of("message", "Error: " + ex.getMessage())));
         }
@@ -132,8 +136,12 @@ public class Server {
             int statusCode = 400;
             var msg = ex.getMessage().toLowerCase();
 
-            if (msg.contains("401")) statusCode = 401;
-            if (msg.contains("already taken")) statusCode = 403;
+            if (msg.contains("401")) {
+                statusCode = 401;
+            }
+            if (msg.contains("already taken")) {
+                statusCode = 403;
+            }
             ctx.status(statusCode).result(serializer.toJson(Map.of("message", "Error: " + ex.getMessage())));
         }
 

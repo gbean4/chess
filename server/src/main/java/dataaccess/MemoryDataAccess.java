@@ -81,7 +81,7 @@ public class MemoryDataAccess implements DataAccess{
     @Override
     public void joinGame(String username, GameSpec gameSpec) {
         var game = games.get(gameSpec.gameID());
-        if (Objects.equals(gameSpec.PlayerColor().toLowerCase(), "white")){
+        if (Objects.equals(gameSpec.playerColor().toLowerCase(), "white")){
             games.put(game.gameID(),new GameData(game.gameID(), username, game.blackUsername(), game.gameName(), game.game()));
         } else{
             games.put(game.gameID(),new GameData(game.gameID(), game.whiteUsername(), username, game.gameName(), game.game()));
