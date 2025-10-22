@@ -2,10 +2,7 @@ package server;
 
 import com.google.gson.Gson;
 import dataaccess.MemoryDataAccess;
-import datamodel.GameData;
-import datamodel.GameSpec;
-import datamodel.LoginRequest;
-import datamodel.UserData;
+import datamodel.*;
 import io.javalin.*;
 import io.javalin.http.Context;
 import service.UserService;
@@ -90,18 +87,17 @@ public class Server {
     private void createGame(Context ctx){
         var serializer = new Gson();
         try{
-            var name = serializer.fromJson(ctx.body(), String.class);
-            if (name == null || name.isEmpty()){
+            var req = serializer.fromJson(ctx.body(), CreateGameRequest.class);
+            if (req == null || req.gameName() == null || req.gameName().isEmpty()){
                 throw new Exception("400: missing required fields");
             }
             String authToken = ctx.header("authorization");
+            GameData gameData = userService.createGame(authToken, req.gameName());
 
-            GameData gameData = userService.createGame(authToken, name);
-            ctx.status(200).result(String.valueOf(gameData.gameID()));
+            ctx.status(200).result(serializer.toJson(Map.of("gameID", gameData.gameID())));
         } catch (Exception ex){
             int statusCode = 400;
             var msg = ex.getMessage().toLowerCase();
-//            if (msg.contains("400")) statusCode = 400;
             if (msg.contains("401")) {
                 statusCode = 401;
             }
