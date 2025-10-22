@@ -7,16 +7,15 @@ import io.javalin.*;
 import io.javalin.http.Context;
 import service.UserService;
 
-import java.util.Arrays;
 import java.util.Map;
 
 public class Server {
-    private static final MemoryDataAccess dataAccess = new MemoryDataAccess();
+    private static final MemoryDataAccess DATA_ACCESS = new MemoryDataAccess();
     private final Javalin server;
     private final UserService userService;
 
     public Server() {
-        userService = new UserService(dataAccess);
+        userService = new UserService(DATA_ACCESS);
         server = Javalin.create(config -> config.staticFiles.add("web"));
 
         server.delete("db", this::clear);
@@ -30,7 +29,7 @@ public class Server {
 
 
     private void clear(Context ctx){
-        dataAccess.clear();
+        DATA_ACCESS.clear();
         ctx.result("{}");
     }
 
