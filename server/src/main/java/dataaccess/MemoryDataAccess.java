@@ -92,10 +92,4 @@ public class MemoryDataAccess implements DataAccess{
             games.put(game.gameID(),new GameData(game.gameID(), game.whiteUsername(), username, game.gameName(), game.game()));
         }
     }
-
-    public void listAuth() {
-        for (Map.Entry<String, AuthData> entry: authTokens.entrySet()){
-            System.out.println("Token: " + entry.getKey() + ", User: "+ entry.getValue());
-        }
-    }
 }
