@@ -8,7 +8,6 @@ import datamodel.LoginRequest;
 import datamodel.UserData;
 import io.javalin.*;
 import io.javalin.http.Context;
-import org.jetbrains.annotations.NotNull;
 import service.UserService;
 
 import java.util.Arrays;
@@ -24,7 +23,7 @@ public class Server {
         userService = new UserService(dataAccess);
         server = Javalin.create(config -> config.staticFiles.add("web"));
 
-        server.delete("db", ctx->ctx.result("{}"));
+        server.delete("db", this::clear);
         server.post("user", this::register); //ctx.result("{ \"username\":\"\", \"authToken\":\"\" }")
         server.post("session", this::login);
         server.delete("session", this::logout);

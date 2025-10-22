@@ -27,10 +27,11 @@ class UserServiceTest {
 
 
     @Test
-    void registerNegative(){
+    void registerNegative() throws Exception {
         var db = new MemoryDataAccess();
         var service = new UserService(db);
         var user = new UserData("lee", "2@c","password");
+        service.register(user);
 
         Exception ex = assertThrows(Exception.class, () -> service.register(user));
         assertTrue(ex.getMessage().contains("exists"));
