@@ -1,14 +1,12 @@
 package server;
 
 import com.google.gson.Gson;
-import dataaccess.DataAccessException;
 import dataaccess.MemoryDataAccess;
-import datamodel.AuthData;
+import datamodel.GameData;
 import datamodel.LoginRequest;
 import datamodel.UserData;
 import io.javalin.*;
 import io.javalin.http.Context;
-import service.ForbiddenException;
 import service.UserService;
 
 import java.util.Map;
@@ -27,6 +25,8 @@ public class Server {
         server.post("user", this::register); //ctx.result("{ \"username\":\"\", \"authToken\":\"\" }")
         server.post("session", this::login);
         server.delete("/session", this::logout);
+        server.get("/game", this::listGames);
+        server.post("/game", this::createGame);
     }
 
     private void clear(Context ctx){
@@ -83,6 +83,29 @@ public class Server {
             ctx.status(401).result(serializer.toJson(Map.of("message", "Error: " + ex.getMessage())));
         }
     }
+
+    private void createGame(Context ctx){
+        var serializer = new Gson();
+        try{
+            var name = serializer.fromJson(ctx.body(), String.class);
+            if (name == null || name.isEmpty()){
+                throw new Exception("400: missing required fields");
+            }
+            String authToken = ctx.header("authorization");
+
+            GameData gameData = userService.createGame(authToken, name);
+            ctx.status(200).result(String.valueOf(gameData.gameID()));
+        } catch (Exception ex){
+            int statusCode = 400;
+            var msg = ex.getMessage().toLowerCase();
+//            if (msg.contains("400")) statusCode = 400;
+            if (msg.contains("401")) statusCode = 401;
+
+            ctx.status(statusCode).result(serializer.toJson(Map.of("message", "Error: " + ex.getMessage())));
+        }
+    }
+
+    private void listGames(Context ctx){}
 
     public int run(int desiredPort) {
         server.start(desiredPort);

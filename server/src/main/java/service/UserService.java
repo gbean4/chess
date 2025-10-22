@@ -3,6 +3,7 @@ package service;
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
 import datamodel.AuthData;
+import datamodel.GameData;
 import datamodel.RegisterResponse;
 import datamodel.UserData;
 
@@ -60,5 +61,19 @@ public class UserService {
         }
         dataAccess.deleteAuth(authToken);
         // remove from GameData?
+    }
+
+    public GameData createGame(String authToken, String gameName) throws Exception {
+        AuthData auth= dataAccess.getAuth(authToken);
+        if (auth == null){
+            throw new Exception("401: Bad Request");
+        }
+
+        if (gameName == null || gameName.isBlank()){
+            throw new Exception("400: missing game name");
+        }
+
+        var username = auth.username();
+        return dataAccess.createGame(username, gameName);
     }
 }
