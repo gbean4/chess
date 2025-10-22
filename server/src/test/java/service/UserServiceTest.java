@@ -84,4 +84,57 @@ class UserServiceTest {
         assertTrue(ex.getMessage().contains("unauthorized"));
     }
 
+    @Test
+    void createGamePositive() throws Exception{
+        var db = new MemoryDataAccess();
+        var service = new UserService(db);
+        var user = new UserData("lee", "2@c","password");
+
+        service.register(user);
+        var auth = service.login("lee", "password");
+
+        var game = service.createGame(auth.authToken(), "Chess Game");
+        assertNotNull(game);
+        assertEquals("Chess Game", game.gameName());
+    }
+
+    @Test
+    void createGameNegative() throws Exception{
+        var db = new MemoryDataAccess();
+        var service = new UserService(db);
+        var user = new UserData("lee", "2@c","password");
+
+        service.register(user);
+
+        Exception ex = assertThrows(Exception.class, () -> service.createGame("badToken", "Chess Game"));
+        assertTrue(ex.getMessage().contains("401"));
+    }
+
+    @Test
+    void listGamesPositive() throws Exception{
+        var db = new MemoryDataAccess();
+        var service = new UserService(db);
+        var user = new UserData("lee", "2@c","password");
+
+        service.register(user);
+        var auth = service.login("lee", "password");
+        service.createGame(auth.authToken(), "Game1");
+        var games = service.listGames(auth.authToken());
+
+        assertNotNull(games);
+        assertTrue(games.length>= 1);
+    }
+
+    @Test
+    void listGamesNegative() throws Exception{
+        var db = new MemoryDataAccess();
+        var service = new UserService(db);
+        var user = new UserData("lee", "2@c","password");
+
+
+        Exception ex = assertThrows(Exception.class, () -> service.listGames("badToken"));
+        assertTrue(ex.getMessage().contains("401"));
+    }
+
+
 }
