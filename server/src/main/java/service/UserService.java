@@ -3,6 +3,7 @@ package service;
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
 import datamodel.*;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -12,6 +13,26 @@ public class UserService {
 
     public UserService(DataAccess dataAccess){
         this.dataAccess = dataAccess;
+    }
+
+    void storeUserPassword(String username, String clearTextPassword) {
+        String hashedPassword = BCrypt.hashpw(clearTextPassword, BCrypt.gensalt());
+
+        // write the hashed password in database along with the user's other information
+        writeHashedPasswordToDatabase(username, hashedPassword);
+    }
+
+    private void writeHashedPasswordToDatabase(String username, String hashedPassword) {
+    }
+
+    boolean verifyUser(String username, String providedClearTextPassword) {
+        // read the previously hashed password from the database
+        var hashedPassword = readHashedPasswordFromDatabase(username);
+
+        return BCrypt.checkpw(providedClearTextPassword, hashedPassword);
+    }
+
+    private String readHashedPasswordFromDatabase(String username) {
     }
 
     public RegisterResponse register(UserData user) throws Exception {
