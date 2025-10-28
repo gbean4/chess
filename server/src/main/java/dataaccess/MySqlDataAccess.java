@@ -121,8 +121,29 @@ public class MySqlDataAccess implements DataAccess {
     }
 
     @Override
-    public GameData getGame(int gameID) {
-        return null;
+    public GameData getGame(int gameID) throws ResponseException {
+        var statement = "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM GameData WHERE gameID = ?";
+        try(Connection conn = DatabaseManager.getConnection(); PreparedStatement ps = conn.prepareStatement(statement)){
+            ps.setInt(1, gameID);
+            try(ResultSet rs = ps.executeQuery()){
+                if (rs.next()){
+                    int foundGameID = rs.getInt("gameID");
+                    String whiteUsername = rs.getString("whiteUsername");
+                    String blackUsername = rs.getString("blackUsername");
+                    String gameName = rs.getString("gameName");
+                    String gameJson = rs.getString("game");
+                    Gson gson = new Gson();
+                    ChessGame game = gson.fromJson(gameJson, ChessGame.class);
+                    return new GameData(foundGameID, whiteUsername,blackUsername, gameName, game);
+                } else {
+                    return null;
+                }
+            }
+        } catch (SQLException e) {
+            throw new ResponseException(ResponseException.Code.ServerError, String.format("unable to connect to user: %s", e.getMessage()));
+        } catch (DataAccessException e){
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -174,8 +195,8 @@ public class MySqlDataAccess implements DataAccess {
             """
             CREATE TABLE IF NOT EXISTS  GameData (
               gameID INT NOT NULL AUTO_INCREMENT,
-              whiteUSERNAME VARCHAR(255),
-              blackUSERNAME VARCHAR(255),
+              whiteUsername VARCHAR(255),
+              blackUsername VARCHAR(255),
               gameName VARCHAR(255),
               game JSON,
               PRIMARY KEY (gameID),
