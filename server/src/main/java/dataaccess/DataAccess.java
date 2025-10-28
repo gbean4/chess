@@ -17,7 +17,7 @@ public interface DataAccess {
 
     int createGame(String gameName);
     GameData [] listGames(String authToken) throws ResponseException;
-    void joinGame(String username, GameSpec gameSpec);
+    void joinGame(String username, GameSpec gameSpec) throws ResponseException;
 
     GameData getGame(int gameID) throws ResponseException;
     void updateGame(GameData game);

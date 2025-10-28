@@ -151,8 +151,27 @@ public class MySqlDataAccess implements DataAccess {
     }
 
     @Override
-    public void joinGame(String username, GameSpec gameSpec) {
+    public void joinGame(String username, GameSpec gameSpec) throws ResponseException {
+        String color = gameSpec.playerColor();
+        if (color == null){
+            return;
+        }
+        color = color.toLowerCase();
 
+        String statement;
+        if (color.equals("white")){
+            statement = "UPDATE GameData SET whiteUsername = ? WHERE gameID = ?";
+        } else if (color.equals("black")){
+            statement = "UPDATE GameData SET blackUsername = ? WHERE gameID = ?";
+        } else {
+            throw new ResponseException(ResponseException.Code.BadRequest, "Invalid color");
+        }
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(statement)){
+            ps.setString(1,username);
+        } catch (ResponseException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
