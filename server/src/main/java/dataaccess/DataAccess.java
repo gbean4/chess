@@ -14,7 +14,7 @@ public interface DataAccess {
     void deleteAuth(String authToken);
     void createAuth(AuthData auth);
 
-    GameData createGame(String gameName);
+    int createGame(String gameName);
     GameData [] listGames(String authToken);
     void joinGame(String username, GameSpec gameSpec);
 

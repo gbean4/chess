@@ -91,9 +91,11 @@ public class Server {
                 throw new Exception("400: missing required fields");
             }
             String authToken = ctx.header("authorization");
-            GameData gameData = userService.createGame(authToken, req.gameName());
+//            GameData gameData = userService.createGame(authToken, req.gameName());
+            int gameID = userService.createGame(authToken, req.gameName());
 
-            ctx.status(200).result(serializer.toJson(Map.of("gameID", gameData.gameID())));
+
+            ctx.status(200).result(serializer.toJson(Map.of("gameID", gameID)));
         } catch (Exception ex){
             int statusCode = 400;
             var msg = ex.getMessage().toLowerCase();

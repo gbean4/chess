@@ -50,13 +50,20 @@ public class MemoryDataAccess implements DataAccess{
 //        return auth;
     }
 
-    @Override
-    public GameData createGame(String gameName) {
-        int gameID = nextID();
-        GameData gameData = new GameData(gameID, null, null, gameName, new ChessGame());
-        games.put(gameID, gameData);
-        return gameData;
-    }
+//    @Override
+//    public GameData createGame(String gameName) {
+//        int gameID = nextID();
+//        GameData gameData = new GameData(gameID, null, null, gameName, new ChessGame());
+//        games.put(gameID, gameData);
+//        return gameData;
+//    }
+@Override
+public int createGame(String gameName) {
+    int gameID = nextID();
+    GameData gameData = new GameData(gameID, null, null, gameName, new ChessGame());
+    games.put(gameID, gameData);
+    return gameData.gameID();
+}
 
     @Override
     public GameData[] listGames(String authToken) {

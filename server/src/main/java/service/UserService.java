@@ -78,7 +78,7 @@ public class UserService {
         // remove from GameData?
     }
 
-    public GameData createGame(String authToken, String gameName) throws Exception {
+    public int createGame(String authToken, String gameName) throws Exception {
         AuthData auth= dataAccess.getAuth(authToken);
         if (auth == null){
             throw new Exception("401: Bad Request");

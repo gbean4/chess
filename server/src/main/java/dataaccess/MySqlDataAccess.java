@@ -1,5 +1,6 @@
 package dataaccess;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import datamodel.AuthData;
 import datamodel.GameData;
@@ -64,8 +65,16 @@ public class MySqlDataAccess implements DataAccess {
     }
 
     @Override
-    public GameData createGame(String gameName) {
-        return null;
+    public int createGame(String gameName) {
+        var statement ="INSERT INTO GameData (whiteUsername, blackUsername, gameName, game) VALUES(?, ?, ?, ?, ?)";
+        try {
+            ChessGame game = new ChessGame();
+            String gameJson = new Gson().toJson(game);
+
+            return executeUpdate(statement,null, null, gameName, gameJson);
+        } catch (ResponseException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
