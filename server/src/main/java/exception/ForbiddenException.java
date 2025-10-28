@@ -1,4 +1,4 @@
-package service;
+package exception;
 
 public class ForbiddenException extends Exception{
     public ForbiddenException(String message){
