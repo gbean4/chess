@@ -15,14 +15,8 @@ public class UserService {
         this.dataAccess = dataAccess;
     }
 
-    void storeUserPassword(String username, String clearTextPassword) {
-        String hashedPassword = BCrypt.hashpw(clearTextPassword, BCrypt.gensalt());
-
-        // write the hashed password in database along with the user's other information
-        writeHashedPasswordToDatabase(username, hashedPassword);
-    }
-
-    private void writeHashedPasswordToDatabase(String username, String hashedPassword) {
+    String makeUserPassword(String clearTextPassword) {
+        return BCrypt.hashpw(clearTextPassword, BCrypt.gensalt());
     }
 
     boolean verifyUser(String username, String providedClearTextPassword) {
@@ -33,6 +27,8 @@ public class UserService {
     }
 
     private String readHashedPasswordFromDatabase(String username) {
+        var userData = dataAccess.getUser(username);
+        return userData.password();
     }
 
     public RegisterResponse register(UserData user) throws Exception {
@@ -44,8 +40,8 @@ public class UserService {
 //            throw new Exception("User already exists");
             throw new DataAccessException("User already exists");
         }
-
-        dataAccess.createUser(user);
+        String hashedPassword = makeUserPassword(user.password());
+        dataAccess.createUser(new UserData(user.username(), user.email(), hashedPassword));
         var token = UUID.randomUUID().toString();
         dataAccess.createAuth(new AuthData(user.username(), token));
         return new RegisterResponse(user, user.username(), token );
@@ -59,7 +55,7 @@ public class UserService {
         if (user == null){
             throw new Exception("401: User not found");
         }
-        if (!user.password().equals(password)){
+        if (!verifyUser(user.username(), password)){
             throw new Exception("401: Invalid password");
         }
 
