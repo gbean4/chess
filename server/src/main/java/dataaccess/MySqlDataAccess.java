@@ -40,8 +40,25 @@ public class MySqlDataAccess implements DataAccess {
     }
 
     @Override
-    public UserData getUser(String username) {
-        return null;
+    public UserData getUser(String username) throws ResponseException {
+        var statement = "SELECT username, email, password FROM UserData WHERE username = ?";
+        try(Connection conn = DatabaseManager.getConnection(); PreparedStatement ps = conn.prepareStatement(statement)){
+            ps.setString(1, username);
+            try(ResultSet rs = ps.executeQuery()){
+                if (rs.next()){
+                    String uname = rs.getString("username");
+                    String email = rs.getString("email");
+                    String password = rs.getString("password");
+                    return new UserData(uname, email, password);
+                } else {
+                    return null;
+                }
+            }
+        } catch (SQLException e) {
+            throw new ResponseException(ResponseException.Code.ServerError, String.format("unable to connect to user: %s", e.getMessage()));
+        } catch (DataAccessException e){
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -66,7 +83,7 @@ public class MySqlDataAccess implements DataAccess {
 
     @Override
     public int createGame(String gameName) {
-        var statement ="INSERT INTO GameData (whiteUsername, blackUsername, gameName, game) VALUES(?, ?, ?, ?, ?)";
+        var statement ="INSERT INTO GameData (whiteUsername, blackUsername, gameName, game) VALUES(?, ?, ?, ?)";
         try {
             ChessGame game = new ChessGame();
             String gameJson = new Gson().toJson(game);

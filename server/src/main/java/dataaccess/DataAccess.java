@@ -4,11 +4,12 @@ import datamodel.AuthData;
 import datamodel.GameData;
 import datamodel.GameSpec;
 import datamodel.UserData;
+import exception.ResponseException;
 
 public interface DataAccess {
     void clear();
     void createUser(UserData user);
-    UserData getUser (String username);
+    UserData getUser (String username) throws ResponseException;
 
     AuthData getAuth(String authToken);
     void deleteAuth(String authToken);
