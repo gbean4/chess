@@ -10,6 +10,8 @@ import exception.DataAccessException;
 import exception.ResponseException;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 import static java.sql.Types.NULL;
@@ -123,8 +125,29 @@ public class MySqlDataAccess implements DataAccess {
     }
 
     @Override
-    public GameData[] listGames(String authToken) {
-        return new GameData[0];
+    public GameData[] listGames(String authToken) throws ResponseException {
+        var statement = "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM GameData; ";
+        try(Connection conn = DatabaseManager.getConnection();
+            PreparedStatement ps = conn.prepareStatement(statement);
+            ResultSet rs = ps.executeQuery()){
+            List<GameData> games = new ArrayList<>();
+            Gson gson = new Gson();
+            while (rs.next()){
+                int gameID = rs.getInt("gameID");
+                String whiteUsername = rs.getString("whiteUsername");
+                String blackUsername = rs.getString("blackUsername");
+                String gameName = rs.getString("gameName");
+                String gameJson = rs.getString("game");
+                ChessGame game = gson.fromJson(gameJson, ChessGame.class);
+                games.add (new GameData(gameID, whiteUsername,blackUsername, gameName, game));
+            }
+            return games.toArray(new GameData[0]);
+        } catch (SQLException e) {
+            throw new ResponseException(ResponseException.Code.ServerError,
+                    String.format("unable to connect to user: %s", e.getMessage()));
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
