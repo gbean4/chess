@@ -2,7 +2,10 @@ package server;
 
 import com.google.gson.Gson;
 import dataaccess.MemoryDataAccess;
+import dataaccess.MySqlDataAccess;
 import datamodel.*;
+import exception.DataAccessException;
+import exception.ResponseException;
 import io.javalin.*;
 import io.javalin.http.Context;
 import service.UserService;
@@ -10,11 +13,17 @@ import service.UserService;
 import java.util.Map;
 
 public class Server {
-    private static final MemoryDataAccess DATA_ACCESS = new MemoryDataAccess();
+//    private static final MemoryDataAccess DATA_ACCESS = new MemoryDataAccess();
     private final Javalin server;
     private final UserService userService;
 
     public Server() {
+        MySqlDataAccess DATA_ACCESS;
+        try {
+            DATA_ACCESS = new MySqlDataAccess();
+        } catch (ResponseException | DataAccessException e) {
+            throw new RuntimeException(e);
+        }
         userService = new UserService(DATA_ACCESS);
         server = Javalin.create(config -> config.staticFiles.add("web"));
 
@@ -29,8 +38,14 @@ public class Server {
 
 
     private void clear(Context ctx){
-        DATA_ACCESS.clear();
-        ctx.result("{}");
+        MySqlDataAccess DATA_ACCESS;
+        try {
+            DATA_ACCESS = new MySqlDataAccess();
+            DATA_ACCESS.clear();
+            ctx.result("{}");
+        } catch (ResponseException | DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void register(Context ctx){

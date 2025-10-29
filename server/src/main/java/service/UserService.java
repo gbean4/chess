@@ -3,6 +3,7 @@ package service;
 import dataaccess.DataAccess;
 import exception.DataAccessException;
 import datamodel.*;
+import exception.ResponseException;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.Objects;
@@ -27,7 +28,12 @@ public class UserService {
     }
 
     private String readHashedPasswordFromDatabase(String username) {
-        var userData = dataAccess.getUser(username);
+        UserData userData;
+        try {
+            userData = dataAccess.getUser(username);
+        } catch (ResponseException e) {
+            throw new RuntimeException(e);
+        }
         return userData.password();
     }
 
