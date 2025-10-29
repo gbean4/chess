@@ -1,7 +1,6 @@
 package server;
 
 import com.google.gson.Gson;
-import dataaccess.MemoryDataAccess;
 import dataaccess.MySqlDataAccess;
 import datamodel.*;
 import exception.DataAccessException;
@@ -13,18 +12,17 @@ import service.UserService;
 import java.util.Map;
 
 public class Server {
-//    private static final MemoryDataAccess DATA_ACCESS = new MemoryDataAccess();
     private final Javalin server;
     private final UserService userService;
 
     public Server() {
-        MySqlDataAccess DATA_ACCESS;
+        MySqlDataAccess dataAccess;
         try {
-            DATA_ACCESS = new MySqlDataAccess();
+            dataAccess = new MySqlDataAccess();
         } catch (ResponseException | DataAccessException e) {
             throw new RuntimeException(e);
         }
-        userService = new UserService(DATA_ACCESS);
+        userService = new UserService(dataAccess);
         server = Javalin.create(config -> config.staticFiles.add("web"));
 
         server.delete("db", this::clear);
@@ -36,6 +34,20 @@ public class Server {
         server.put("game", this::joinGame);
     }
 
+    private void handleException(Context ctx, Exception ex){
+        var serializer= new Gson();
+        int statusCode;
+        var msg = (ex.getMessage() != null)? ex.getMessage().toLowerCase(): "";
+        if (msg.contains("401") || msg.contains("unauthorized")) {
+            statusCode = 401;
+        } else if (msg.contains("400") || msg.contains("missing required")){
+            statusCode = 400;
+        } else{
+            statusCode = 500;
+        }
+
+        ctx.status(statusCode).result(serializer.toJson(Map.of("message", "Error: " + ex.getMessage())));
+    }
 
     private void clear(Context ctx){
         var serializer = new Gson();
@@ -81,44 +93,21 @@ public class Server {
         try {
             var req = serializer.fromJson(ctx.body(), LoginRequest.class);
             var result = userService.login(req.username(), req.password());
-//            ctx.result(serializer.toJson(result));
             ctx.status(200).result(serializer.toJson(result));
         } catch (Exception ex){
-            int statusCode;
-            var msg = (ex.getMessage() != null)? ex.getMessage().toLowerCase(): "";
-            if (msg.contains("401") || msg.contains("unauthorized")) {
-                statusCode = 401;
-            } else if (msg.contains("400") || msg.contains("missing required")){
-                statusCode = 400;
-            } else{
-                statusCode = 500;
-            }
-
-            ctx.status(statusCode).result(serializer.toJson(Map.of("message", "Error: " + ex.getMessage())));
+            handleException(ctx, ex);
         }
     }
 
     private void logout(Context ctx){
-        var serializer = new Gson();
         try {
-//            var req = serializer.fromJson(ctx.body(), AuthData.class);
             String authToken = ctx.header("authorization");
 
             userService.logout(authToken);
             ctx.status(200).result("{}");
 
         } catch (Exception ex){
-            int statusCode;
-            var msg = (ex.getMessage() != null)? ex.getMessage().toLowerCase(): "";
-            if (msg.contains("401") || msg.contains("unauthorized")) {
-                statusCode = 401;
-            } else if (msg.contains("400") || msg.contains("missing required")){
-                statusCode = 400;
-            } else{
-                statusCode = 500;
-            }
-
-            ctx.status(statusCode).result(serializer.toJson(Map.of("message", "Error: " + ex.getMessage())));
+            handleException(ctx, ex);
         }
     }
 
@@ -136,17 +125,7 @@ public class Server {
 
             ctx.status(200).result(serializer.toJson(Map.of("gameID", gameID)));
         } catch (Exception ex){
-            int statusCode;
-            var msg = (ex.getMessage() != null)? ex.getMessage().toLowerCase(): "";
-            if (msg.contains("401") || msg.contains("unauthorized")) {
-                statusCode = 401;
-            } else if (msg.contains("400") || msg.contains("missing required")){
-               statusCode = 400;
-            } else{
-                statusCode = 500;
-            }
-
-            ctx.status(statusCode).result(serializer.toJson(Map.of("message", "Error: " + ex.getMessage())));
+            handleException(ctx, ex);
         }
     }
 
@@ -158,17 +137,7 @@ public class Server {
             ctx.status(200).result(serializer.toJson(Map.of("games", games)));
 
         } catch (Exception ex){
-            int statusCode;
-            var msg = (ex.getMessage() != null)? ex.getMessage().toLowerCase(): "";
-            if (msg.contains("401") || msg.contains("unauthorized")) {
-                statusCode = 401;
-            } else if (msg.contains("400") || msg.contains("missing required")){
-                statusCode = 400;
-            } else{
-                statusCode = 500;
-            }
-
-            ctx.status(statusCode).result(serializer.toJson(Map.of("message", "Error: " + ex.getMessage())));
+            handleException(ctx, ex);
         }
     }
 
