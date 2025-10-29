@@ -54,9 +54,10 @@ class DataAccessTest {
     void createUserNegative() throws ResponseException{
         var user = new UserData("chase", "c@c.com", "pwd");
         db.createUser(user);
-        var resultingUser = db.getUser(user.username());
-        assertEquals(user, resultingUser);
-        assertEquals(user.password(), resultingUser.password());
+        var user2 = new UserData("chase", "c@c.com", "pwd");
+        var ex = assertThrows(RuntimeException.class, ()-> db.createUser(user2));
+        assertTrue(ex.getMessage().toLowerCase().contains("duplicate") ||
+                ex.getMessage().toLowerCase().contains("constraint"));
     }
 
     @Test
