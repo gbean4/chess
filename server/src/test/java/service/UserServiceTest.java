@@ -1,10 +1,12 @@
 package service;
 
-import dataaccess.MemoryDataAccess;
+import dataaccess.MySqlDataAccess;
 import datamodel.GameData;
 import datamodel.GameSpec;
 import datamodel.RegisterResponse;
 import datamodel.UserData;
+import exception.DataAccessException;
+import exception.ResponseException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -12,8 +14,8 @@ import static org.junit.jupiter.api.Assertions.*;
 class UserServiceTest {
 
     @Test
-    void constructorPositive(){
-        var db = new MemoryDataAccess();
+    void constructorPositive() throws ResponseException, DataAccessException {
+        var db = new MySqlDataAccess();
         var service = new UserService(db);
         assertNotNull(service, "Service should be all good");
     }
@@ -26,7 +28,7 @@ class UserServiceTest {
 
     @Test
     void registerPositive() throws Exception{
-        var db = new MemoryDataAccess();
+        var db = new MySqlDataAccess();
         var service = new UserService(db);
         var user = new UserData("lee", "2@c","password");
 
@@ -41,7 +43,7 @@ class UserServiceTest {
 
     @Test
     void registerNegative() throws Exception {
-        var db = new MemoryDataAccess();
+        var db = new MySqlDataAccess();
         var service = new UserService(db);
         var user = new UserData("lee", "2@c","password");
         service.register(user);
@@ -52,7 +54,7 @@ class UserServiceTest {
 
     @Test
     void loginPositive() throws Exception{
-        var db = new MemoryDataAccess();
+        var db = new MySqlDataAccess();
         var service = new UserService(db);
         var user = new UserData("lee", "2@c","password");
 
@@ -66,7 +68,7 @@ class UserServiceTest {
 
     @Test
     void loginNegative() throws Exception{
-        var db = new MemoryDataAccess();
+        var db = new MySqlDataAccess();
         var service = new UserService(db);
         var user = new UserData("lee", "2@c","password");
 
@@ -78,7 +80,7 @@ class UserServiceTest {
 
     @Test
     void logoutPositive() throws Exception{
-        var db = new MemoryDataAccess();
+        var db = new MySqlDataAccess();
         var service = new UserService(db);
         var user = new UserData("lee", "2@c","password");
 
@@ -90,8 +92,8 @@ class UserServiceTest {
     }
 
     @Test
-    void logoutNegative(){
-        var db = new MemoryDataAccess();
+    void logoutNegative() throws ResponseException, DataAccessException {
+        var db = new MySqlDataAccess();
         var service = new UserService(db);
 
         Exception ex = assertThrows(Exception.class, () -> service.logout("badToken"));
@@ -100,21 +102,23 @@ class UserServiceTest {
 
     @Test
     void createGamePositive() throws Exception{
-        var db = new MemoryDataAccess();
+        var db = new MySqlDataAccess();
+        db.clear();
         var service = new UserService(db);
         var user = new UserData("lee", "2@c","password");
 
         service.register(user);
         var auth = service.login("lee", "password");
 
-        var game = service.createGame(auth.authToken(), "Chess Game");
-        assertNotNull(game);
-        assertEquals("Chess Game", game.gameName());
+        int gameID = service.createGame(auth.authToken(), "Chess Game");
+        var createdGame = db.getGame(gameID);
+        assertNotNull(createdGame);
+        assertEquals("Chess Game", createdGame.gameName());
     }
 
     @Test
     void createGameNegative() throws Exception{
-        var db = new MemoryDataAccess();
+        var db = new MySqlDataAccess();
         var service = new UserService(db);
         var user = new UserData("lee", "2@c","password");
 
@@ -126,7 +130,7 @@ class UserServiceTest {
 
     @Test
     void listGamesPositive() throws Exception{
-        var db = new MemoryDataAccess();
+        var db = new MySqlDataAccess();
         var service = new UserService(db);
         var user = new UserData("lee", "2@c","password");
 
@@ -140,8 +144,8 @@ class UserServiceTest {
     }
 
     @Test
-    void listGamesNegative(){
-        var db = new MemoryDataAccess();
+    void listGamesNegative() throws ResponseException, DataAccessException {
+        var db = new MySqlDataAccess();
         var service = new UserService(db);
 
         Exception ex = assertThrows(Exception.class, () -> service.listGames("badToken"));
@@ -149,30 +153,34 @@ class UserServiceTest {
     }
     @Test
     void joinGamePositive() throws Exception{
-        var db = new MemoryDataAccess();
+        var db = new MySqlDataAccess();
+        db.clear();
         var service = new UserService(db);
         var user = new UserData("lee", "2@c","password");
 
         service.register(user);
         var auth = service.login("lee", "password");
-        var game = service.createGame(auth.authToken(), "Game1");
+        var gameID = service.createGame(auth.authToken(), "Game1");
 
-        var spec = new GameSpec("white", game.gameID());
+        var spec = new GameSpec("white", gameID);
         assertDoesNotThrow(() -> service.joinGame(auth.authToken(), spec));
     }
 
     @Test
     void joinGameNegative() throws Exception{
-        var db = new MemoryDataAccess();
+        var db = new MySqlDataAccess();
         var service = new UserService(db);
         var user = new UserData("lee", "2@c","password");
 
         service.register(user);
         var auth = service.login("lee", "password");
-        var game = service.createGame(auth.authToken(), "busyGame");
+        var gameID = service.createGame(auth.authToken(), "busyGame");
 
-        var fullGame = new GameData(game.gameID(), "a", "b", "busyGame", game.game());
-        var spec = new GameSpec("white", game.gameID());
+        var createdGame = db.getGame(gameID);
+        assertNotNull(createdGame);
+        var fullGame = new GameData(gameID, "a", "b", "busyGame", createdGame.game());
+
+        var spec = new GameSpec("white", createdGame.gameID());
 
         db.updateGame(fullGame);
 
