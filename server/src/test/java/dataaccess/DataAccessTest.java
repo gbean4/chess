@@ -1,6 +1,5 @@
 package dataaccess;
 
-import chess.ChessGame;
 import datamodel.*;
 import exception.DataAccessException;
 import exception.ResponseException;
@@ -51,7 +50,7 @@ class DataAccessTest {
     }
 
     @Test
-    void createUserNegative() throws ResponseException{
+    void createUserNegative() {
         var user = new UserData("chase", "c@c.com", "pwd");
         db.createUser(user);
         var user2 = new UserData("chase", "c@c.com", "pwd");
@@ -154,8 +153,8 @@ class DataAccessTest {
         db.createUser(user);
         String authToken = UUID.randomUUID().toString();
         db.createAuth(new AuthData(user.username(), authToken));
-        int game1 = db.createGame("newGame1");
-        int game2 = db.createGame("newGame2");
+        db.createGame("newGame1");
+        db.createGame("newGame2");
         assertNotNull(db.listGames(authToken));
     }
 
@@ -175,7 +174,7 @@ class DataAccessTest {
         String authToken = UUID.randomUUID().toString();
         db.createAuth(new AuthData(user.username(), authToken));
         int game1 = db.createGame("newGame1");
-        int game2 = db.createGame("newGame2");
+        db.createGame("newGame2");
 
         var mySpec = new GameSpec("white", game1);
         db.joinGame(user.username(), mySpec);
@@ -183,13 +182,13 @@ class DataAccessTest {
     }
 
     @Test
-    void joinGameNegative() throws ResponseException {
+    void joinGameNegative() {
         var user = new UserData("Max", "a@c.com", "pwd");
         db.createUser(user);
         String authToken = UUID.randomUUID().toString();
         db.createAuth(new AuthData(user.username(), authToken));
         int game1 = db.createGame("newGame1");
-        int game2 = db.createGame("newGame2");
+        db.createGame("newGame2");
 
         var mySpec = new GameSpec("green", game1);
 
@@ -206,7 +205,7 @@ class DataAccessTest {
 
     @Test
     void getGameNegative() throws ResponseException {
-        int gameID = db.createGame("newGameName");
+        db.createGame("newGameName");
         var foundGame = db.getGame(222);
         assertNull(foundGame);
     }
