@@ -67,7 +67,9 @@ public class Server {
                 statusCode = 401;
             } else if (msg.contains("400") || msg.contains("missing required")){
                 statusCode = 400;
-            } else{
+            } else if (msg.contains("403") || msg.contains("forbidden")) {
+                statusCode = 403;
+            }else{
                 statusCode = 500;
             }
 
@@ -179,11 +181,13 @@ public class Server {
             userService.joinGame(authToken, gameSpec);
             ctx.status(200).result("{}");
         } catch (Exception ex){
-            int statusCode = 400;
+            int statusCode;
             var msg = ex.getMessage().toLowerCase();
 
             if (msg.contains("401")) {
                 statusCode = 401;
+            } else if (msg.contains("400") || msg.contains("bad request")) {
+                statusCode = 400;
             } else if (msg.contains("already taken")) {
                 statusCode = 403;
             } else{

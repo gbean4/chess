@@ -43,8 +43,8 @@ public class UserService {
             throw new Exception("Missing required fields");
         }
         if (existingUser != null){
-//            throw new Exception("User already exists");
-            throw new DataAccessException("User already exists");
+            throw new Exception("403 Forbidden: User already exists");
+//            throw new DataAccessException("403 User already exists");
         }
         String hashedPassword = makeUserPassword(user.password());
         dataAccess.createUser(new UserData(user.username(), user.email(), hashedPassword));
@@ -121,11 +121,15 @@ public class UserService {
 
         String color = gameSpec.playerColor();
         if (color == null || (!color.equalsIgnoreCase("white") && (!color.equalsIgnoreCase("black")))){
-            throw new Exception("400: invalid color");
+            throw new Exception("400: bad request invalid color");
         }
 
         var username = auth.username();
         var game = dataAccess.getGame(gameSpec.gameID());
+
+        if (game == null){
+            throw new Exception("400: bad request");
+        }
 
         if (game.whiteUsername() != null && game.blackUsername() != null){
             throw new Exception("already taken");
