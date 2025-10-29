@@ -38,10 +38,9 @@ public class Server {
 
 
     private void clear(Context ctx){
-        MySqlDataAccess DATA_ACCESS;
         try {
-            DATA_ACCESS = new MySqlDataAccess();
-            DATA_ACCESS.clear();
+            MySqlDataAccess dataAccess = new MySqlDataAccess();
+            dataAccess.clear();
             ctx.result("{}");
         } catch (ResponseException | DataAccessException e) {
             throw new RuntimeException(e);

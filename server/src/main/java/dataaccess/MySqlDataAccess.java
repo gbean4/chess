@@ -27,12 +27,12 @@ public class MySqlDataAccess implements DataAccess {
              Statement stmt = conn.createStatement()){
             stmt.execute("SET FOREIGN_KEY_CHECKS =0");
 
-            executeUpdate("DELETE FROM GameData;");
-            executeUpdate("DELETE FROM AuthData;");
-            executeUpdate("DELETE FROM UserData;");
+            stmt.executeUpdate("DELETE FROM GameData;");
+            stmt.executeUpdate("DELETE FROM AuthData;");
+            stmt.executeUpdate("DELETE FROM UserData;");
 
             stmt.execute("SET FOREIGN_KEY_CHECKS =1");
-        } catch (SQLException | DataAccessException | ResponseException e) {
+        } catch (SQLException | DataAccessException e) {
             throw new RuntimeException(new ResponseException(ResponseException.Code.ServerError,
                     "unable to clear database: " + e.getMessage()));
         }
@@ -176,6 +176,8 @@ public class MySqlDataAccess implements DataAccess {
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(statement)){
             ps.setString(1,username);
+            ps.setInt(2, gameSpec.gameID());
+            ps.executeUpdate();
         } catch (DataAccessException | SQLException e) {
             throw new RuntimeException(e);
         }
@@ -229,7 +231,7 @@ public class MySqlDataAccess implements DataAccess {
 
                 ResultSet rs = ps.getGeneratedKeys();
                 if (rs.next()) {
-                    rs.getInt(1);
+                    return rs.getInt(1);
                 }
 
             }
