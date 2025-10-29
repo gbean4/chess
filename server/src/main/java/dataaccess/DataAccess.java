@@ -20,5 +20,4 @@ public interface DataAccess {
     void joinGame(String username, GameSpec gameSpec) throws ResponseException;
 
     GameData getGame(int gameID) throws ResponseException;
-    void updateGame(GameData game);
 }

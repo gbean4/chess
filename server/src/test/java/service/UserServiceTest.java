@@ -1,6 +1,5 @@
 package service;
 import dataaccess.MySqlDataAccess;
-import datamodel.GameData;
 import datamodel.GameSpec;
 import datamodel.RegisterResponse;
 import datamodel.UserData;
@@ -44,7 +43,7 @@ class UserServiceTest {
     void registerNegative() throws Exception {
         var db = new MySqlDataAccess();
         var service = new UserService(db);
-        var user = new UserData("brek", "love@c","pass");
+        var user = new UserData("Bree", "love@c","pass");
         service.register(user);
 
         Exception ex = assertThrows(Exception.class, () -> service.register(user));

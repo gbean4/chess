@@ -78,10 +78,6 @@ public int createGame(String gameName) {
         return games.get(gameID);
     }
 
-    @Override
-    public void updateGame(GameData game) {
-        games.put(game.gameID(), game);
-    }
 
     @Override
     public void joinGame(String username, GameSpec gameSpec) {

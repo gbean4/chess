@@ -209,11 +209,6 @@ public class MySqlDataAccess implements DataAccess {
         }
     }
 
-    @Override
-    public void updateGame(GameData game) {
-
-    }
-
     private int executeUpdate(String statement, Object... params) throws ResponseException {
         try (Connection conn = DatabaseManager.getConnection()) {
             try (PreparedStatement ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
