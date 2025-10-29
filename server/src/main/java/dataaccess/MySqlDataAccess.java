@@ -169,7 +169,7 @@ public class MySqlDataAccess implements DataAccess {
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(statement)){
             ps.setString(1,username);
-        } catch (ResponseException e) {
+        } catch (DataAccessException | SQLException e) {
             throw new RuntimeException(e);
         }
     }
