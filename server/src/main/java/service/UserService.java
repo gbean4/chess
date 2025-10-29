@@ -131,11 +131,11 @@ public class UserService {
         }
 
         if (game.whiteUsername() != null && game.blackUsername() != null){
-            throw new Exception("already taken");
+            throw new Exception("403 already taken");
         } else if ((Objects.equals(gameSpec.playerColor().toLowerCase(), "white") && game.whiteUsername()!= null)){
-            throw new Exception("already taken");
+            throw new Exception("403 already taken");
         } else if ((Objects.equals(gameSpec.playerColor().toLowerCase(), "black") && game.blackUsername()!= null)){
-            throw new Exception("already taken");
+            throw new Exception("403 already taken");
         } else {
             dataAccess.joinGame(username, gameSpec);}
     }

@@ -1,6 +1,4 @@
 package service;
-
-import com.google.gson.internal.LinkedTreeMap;
 import dataaccess.MySqlDataAccess;
 import datamodel.GameData;
 import datamodel.GameSpec;
@@ -8,7 +6,6 @@ import datamodel.RegisterResponse;
 import datamodel.UserData;
 import exception.DataAccessException;
 import exception.ResponseException;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -32,12 +29,12 @@ class UserServiceTest {
     void registerPositive() throws Exception{
         var db = new MySqlDataAccess();
         var service = new UserService(db);
-        var user = new UserData("lee", "2@c","password");
+        var user = new UserData("Bella", "gbean@c","pass");
 
         RegisterResponse response = service.register(user);
 
         assertNotNull(response);
-        assertEquals("lee", response.username());
+        assertEquals("Bella", response.username());
         assertNotNull(response.authToken(), "authToken should not be null");
     }
 
@@ -47,7 +44,7 @@ class UserServiceTest {
     void registerNegative() throws Exception {
         var db = new MySqlDataAccess();
         var service = new UserService(db);
-        var user = new UserData("lee", "2@c","password");
+        var user = new UserData("brek", "love@c","pass");
         service.register(user);
 
         Exception ex = assertThrows(Exception.class, () -> service.register(user));
@@ -58,13 +55,13 @@ class UserServiceTest {
     void loginPositive() throws Exception{
         var db = new MySqlDataAccess();
         var service = new UserService(db);
-        var user = new UserData("lee", "2@c","password");
+        var user = new UserData("another", "account@c","yay");
 
         service.register(user);
 
-        var auth = service.login("lee", "password");
+        var auth = service.login("another", "yay");
         assertNotNull(auth);
-        assertEquals("lee", auth.username());
+        assertEquals("another", auth.username());
         assertNotNull(db.getAuth(auth.authToken()));
      }
 
@@ -72,11 +69,11 @@ class UserServiceTest {
     void loginNegative() throws Exception{
         var db = new MySqlDataAccess();
         var service = new UserService(db);
-        var user = new UserData("lee", "2@c","password");
+        var user = new UserData("mary", "serene@c","password");
 
         service.register(user);
 
-        Exception ex = assertThrows(Exception.class, () -> service.login("lee", "wrongPass"));
+        Exception ex = assertThrows(Exception.class, () -> service.login("mary", "wrongPass"));
         assertTrue(ex.getMessage().contains("Invalid"));
     }
 
@@ -84,10 +81,10 @@ class UserServiceTest {
     void logoutPositive() throws Exception{
         var db = new MySqlDataAccess();
         var service = new UserService(db);
-        var user = new UserData("lee", "2@c","password");
+        var user = new UserData("ben", "jamin@c","password");
 
         service.register(user);
-        var auth = service.login("lee", "password");
+        var auth = service.login("ben", "password");
 
         service.logout(auth.authToken());
         assertNull(db.getAuth(auth.authToken()));
@@ -122,7 +119,7 @@ class UserServiceTest {
     void createGameNegative() throws Exception{
         var db = new MySqlDataAccess();
         var service = new UserService(db);
-        var user = new UserData("lee", "2@c","password");
+        var user = new UserData("pumpkin", "yo@c","password");
 
         service.register(user);
 
@@ -134,10 +131,10 @@ class UserServiceTest {
     void listGamesPositive() throws Exception{
         var db = new MySqlDataAccess();
         var service = new UserService(db);
-        var user = new UserData("lee", "2@c","password");
+        var user = new UserData("please", "pass@c","password");
 
         service.register(user);
-        var auth = service.login("lee", "password");
+        var auth = service.login("please", "password");
         service.createGame(auth.authToken(), "Game1");
         var games = service.listGames(auth.authToken());
 
@@ -172,21 +169,21 @@ class UserServiceTest {
     void joinGameNegative() throws Exception{
         var db = new MySqlDataAccess();
         var service = new UserService(db);
-        var user = new UserData("lee", "2@c","password");
+        var user1 = new UserData("john", "2@c","password");
+        var user2 = new UserData("Steph", "3@c", "password");
 
-        service.register(user);
-        var auth = service.login("lee", "password");
-        var gameID = service.createGame(auth.authToken(), "busyGame");
+        service.register(user1);
+        service.register(user2);
 
-        var createdGame = db.getGame(gameID);
-        assertNotNull(createdGame);
-        var fullGame = new GameData(gameID, "a", "b", "busyGame", createdGame.game());
+        var auth1 = service.login("john", "password");
+        var auth2 = service.login("Steph", "password");
 
-        var spec = new GameSpec("white", createdGame.gameID());
+        var gameID = service.createGame(auth1.authToken(), "busyGame");
 
-        db.updateGame(fullGame);
+        service.joinGame(auth1.authToken(), new GameSpec("white", gameID));
 
-        Exception ex = assertThrows(Exception.class, () -> service.joinGame(auth.authToken(), spec));
+        Exception ex = assertThrows(Exception.class,
+                () -> service.joinGame(auth2.authToken(), new GameSpec("white", gameID)));
         assertTrue(ex.getMessage().contains("already"));
 
     }
