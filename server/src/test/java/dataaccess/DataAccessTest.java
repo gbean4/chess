@@ -5,8 +5,18 @@ import exception.DataAccessException;
 import exception.ResponseException;
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
+import datamodel.UserData;
+import org.junit.jupiter.api.Test;
+import service.UserService;
 
 class DataAccessTest {
+
+    @BeforeEach
+    void setup() throws ResponseException, DataAccessException{
+        MySqlDataAccess db = new MySqlDataAccess();
+        db.clear();
+    }
+
 
     @Test
     void clear() throws ResponseException, DataAccessException {
