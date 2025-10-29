@@ -23,11 +23,18 @@ public class MySqlDataAccess implements DataAccess {
 
     @Override
     public void clear() {
-        var statement = "TRUNCATE TABLE UserData; TRUNCATE TABLE gameData; TRUNCATE TABLE AuthData";
-        try {
-            executeUpdate(statement);
-        } catch (ResponseException e) {
-            throw new RuntimeException(e);
+        try (Connection conn = DatabaseManager.getConnection();
+             Statement stmt = conn.createStatement()){
+            stmt.execute("SET FOREIGN_KEY_CHECKS =0");
+
+            executeUpdate("DELETE FROM UserData;");
+            executeUpdate("DELETE FROM GameData;");
+            executeUpdate("DELETE FROM AuthData;");
+
+            stmt.execute("SET FOREIGN_KEY_CHECKS =1");
+        } catch (SQLException | DataAccessException | ResponseException e) {
+            throw new RuntimeException(new ResponseException(ResponseException.Code.ServerError,
+                    "unable to clear database: " + e.getMessage()));
         }
     }
 
