@@ -1,5 +1,6 @@
 package dataaccess;
 
+import chess.ChessGame;
 import datamodel.*;
 import exception.DataAccessException;
 import exception.ResponseException;
@@ -123,7 +124,7 @@ class DataAccessTest {
     }
 
     @Test
-    void deleteAuthNegative() throws ResponseException {
+    void deleteAuthNegative(){
         var user = new UserData("Max", "a@c.com", "pwd");
         db.createUser(user);
         String authToken = UUID.randomUUID().toString();
@@ -133,42 +134,79 @@ class DataAccessTest {
     }
 
     @Test
-    void createGamePositive() {
-
+    void createGamePositive() throws ResponseException {
+        int gameID = db.createGame("newGameName");
+        var foundGame = db.getGame(gameID);
+        assertEquals(foundGame.gameID(), gameID);
     }
 
     @Test
-    void createGameNegative() {
-
+    void createGameNegative() throws ResponseException {
+        int gameID = db.createGame("newGameName");
+        var foundGame = db.getGame(gameID);
+        assertEquals(foundGame.gameID(), gameID);
     }
 
     @Test
-    void listGamesPositive() {
-
+    void listGamesPositive() throws ResponseException {
+        var user = new UserData("Max", "a@c.com", "pwd");
+        db.createUser(user);
+        String authToken = UUID.randomUUID().toString();
+        db.createAuth(new AuthData(user.username(), authToken));
+        int game1 = db.createGame("newGame1");
+        int game2 = db.createGame("newGame2");
+        assertNotNull(db.listGames(authToken));
     }
 
     @Test
-    void listGamesNegative() {
-
+    void listGamesNegative() throws ResponseException {
+        var user = new UserData("Max", "a@c.com", "pwd");
+        db.createUser(user);
+        String authToken = UUID.randomUUID().toString();
+        db.createAuth(new AuthData(user.username(), authToken));
+        assertNotNull(db.listGames(authToken));
     }
 
     @Test
-    void joinGamePositive() {
+    void joinGamePositive() throws ResponseException {
+        var user = new UserData("Max", "a@c.com", "pwd");
+        db.createUser(user);
+        String authToken = UUID.randomUUID().toString();
+        db.createAuth(new AuthData(user.username(), authToken));
+        int game1 = db.createGame("newGame1");
+        int game2 = db.createGame("newGame2");
 
+        var mySpec = new GameSpec("white", game1);
+        db.joinGame(user.username(), mySpec);
+        assertEquals(user.username(), db.getGame(game1).whiteUsername());
     }
 
     @Test
-    void joinGameNegative() {
+    void joinGameNegative() throws ResponseException {
+        var user = new UserData("Max", "a@c.com", "pwd");
+        db.createUser(user);
+        String authToken = UUID.randomUUID().toString();
+        db.createAuth(new AuthData(user.username(), authToken));
+        int game1 = db.createGame("newGame1");
+        int game2 = db.createGame("newGame2");
 
+        var mySpec = new GameSpec("green", game1);
+
+        var ex = assertThrows(ResponseException.class, ()-> db.joinGame(user.username(), mySpec));
+        assertTrue(ex.getMessage().toLowerCase().contains("invalid"));
     }
 
     @Test
-    void getGamePositive() {
-
+    void getGamePositive() throws ResponseException {
+        int gameID = db.createGame("newGameName");
+        var foundGame = db.getGame(gameID);
+        assertEquals(foundGame.gameID(), gameID);
     }
 
     @Test
-    void getGameNegative() {
-
+    void getGameNegative() throws ResponseException {
+        int gameID = db.createGame("newGameName");
+        var foundGame = db.getGame(222);
+        assertNull(foundGame);
     }
 }
