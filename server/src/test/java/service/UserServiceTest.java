@@ -15,12 +15,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class UserServiceTest {
 
-//    @BeforeEach
-//    void setUp(){
-//        serverFacade.clear();
-//    }
-
-
     @Test
     void constructorPositive() throws ResponseException, DataAccessException {
         var db = new MySqlDataAccess();

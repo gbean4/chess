@@ -217,23 +217,11 @@ public class MySqlDataAccess implements DataAccess {
     private int executeUpdate(String statement, Object... params) throws ResponseException {
         try (Connection conn = DatabaseManager.getConnection()) {
             try (PreparedStatement ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
-                for (int i = 0; i < params.length; i++) {
-                    Object param = params[i];
-                    switch (param) {
-                        case String p -> ps.setString(i + 1, p);
-                        case Integer p -> ps.setInt(i + 1, p);
-                        case null -> ps.setNull(i + 1, NULL);
-                        default -> {
-                        }
-                    }
-                }
+
+                setParameters(params, ps);
                 ps.executeUpdate();
 
-                ResultSet rs = ps.getGeneratedKeys();
-                if (rs.next()) {
-                    return rs.getInt(1);
-                }
-
+                return getGeneratedKey(ps);
             }
         } catch (SQLException e) {
             throw new ResponseException(
@@ -243,7 +231,28 @@ public class MySqlDataAccess implements DataAccess {
             throw new ResponseException(ResponseException.Code.ServerError,
                     String.format("unable to connect to database: %s", e.getMessage()));
         }
-        return 0;
+    }
+
+    private int getGeneratedKey(PreparedStatement ps) throws SQLException {
+        try(ResultSet rs = ps.getGeneratedKeys()){
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+            return 0;
+        }
+    }
+
+    private void setParameters(Object[] params, PreparedStatement ps) throws SQLException {
+        for (int i = 0; i < params.length; i++) {
+            Object param = params[i];
+            switch (param) {
+                case String p -> ps.setString(i + 1, p);
+                case Integer p -> ps.setInt(i + 1, p);
+                case null -> ps.setNull(i + 1, NULL);
+                default -> {
+                }
+            }
+        }
     }
 
     private final String[] createStatements = {
