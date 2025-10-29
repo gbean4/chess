@@ -27,9 +27,9 @@ public class MySqlDataAccess implements DataAccess {
              Statement stmt = conn.createStatement()){
             stmt.execute("SET FOREIGN_KEY_CHECKS =0");
 
-            executeUpdate("DELETE FROM UserData;");
             executeUpdate("DELETE FROM GameData;");
             executeUpdate("DELETE FROM AuthData;");
+            executeUpdate("DELETE FROM UserData;");
 
             stmt.execute("SET FOREIGN_KEY_CHECKS =1");
         } catch (SQLException | DataAccessException | ResponseException e) {
@@ -79,7 +79,7 @@ public class MySqlDataAccess implements DataAccess {
                 if (rs.next()){
                     String authT = rs.getString("authToken");
                     String username = rs.getString("username");
-                    return new AuthData(authT, username);
+                    return new AuthData(username, authT);
                 } else {
                     return null;
                 }
@@ -110,7 +110,7 @@ public class MySqlDataAccess implements DataAccess {
 
     @Override
     public void createAuth(AuthData auth) {
-        var statement ="INSERT INTO AuthData (username, authToken) VALUES(?, ?, ?)";
+        var statement ="INSERT INTO AuthData (username, authToken) VALUES(?, ?)";
         try {
             executeUpdate(statement, auth.username(), auth.authToken());
         } catch (ResponseException e) {
@@ -267,8 +267,8 @@ public class MySqlDataAccess implements DataAccess {
             """,
             """
             CREATE TABLE IF NOT EXISTS  AuthData (
-              authToken VARCHAR(255) NOT NULL,
               username VARCHAR(255) NOT NULL,
+              authToken VARCHAR(255) NOT NULL,
               PRIMARY KEY (authToken),
               FOREIGN KEY (username) REFERENCES UserData(username) ON DELETE CASCADE ON UPDATE CASCADE
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci

@@ -1,5 +1,6 @@
 package service;
 
+import com.google.gson.internal.LinkedTreeMap;
 import dataaccess.MySqlDataAccess;
 import datamodel.GameData;
 import datamodel.GameSpec;
@@ -7,11 +8,18 @@ import datamodel.RegisterResponse;
 import datamodel.UserData;
 import exception.DataAccessException;
 import exception.ResponseException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserServiceTest {
+
+//    @BeforeEach
+//    void setUp(){
+//        serverFacade.clear();
+//    }
+
 
     @Test
     void constructorPositive() throws ResponseException, DataAccessException {
