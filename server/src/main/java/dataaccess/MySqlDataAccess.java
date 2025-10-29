@@ -262,8 +262,8 @@ public class MySqlDataAccess implements DataAccess {
             CREATE TABLE IF NOT EXISTS  AuthData (
               authToken VARCHAR(255) NOT NULL,
               username VARCHAR(255) NOT NULL,
-              PRIMARY KEY (authToken)
-              FOREIGN KEY (username) REFERENCES UserData(username) ON DELETE CASCADE ON UPDATE CASCADE,
+              PRIMARY KEY (authToken),
+              FOREIGN KEY (username) REFERENCES UserData(username) ON DELETE CASCADE ON UPDATE CASCADE
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """
     };
