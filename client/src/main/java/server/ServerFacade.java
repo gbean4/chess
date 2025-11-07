@@ -10,19 +10,22 @@ import java.net.http.*;
 import java.net.http.HttpRequest.BodyPublisher;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse.BodyHandlers;
-import java.util.Map;
 
 public class ServerFacade {
     private final HttpClient client = HttpClient.newHttpClient();
     private final String serverUrl;
     private final Gson gson = new Gson();
 
-    public ServerFacade(String url) {
-        serverUrl = url.endsWith("/")? url : url + "/";
+    public ServerFacade(String serverUrl) {
+        if (serverUrl.endsWith("/")) {
+            serverUrl += "/";
+        };
+        this.serverUrl = serverUrl;
+//        this.client = HttpClient.newHttpClient();
     }
 
     public RegisterResponse register(RegisterResponse req) throws ResponseException {
-        var request = buildRequest("POST", "user",req, null);
+        var request = buildRequest("POST", "user",req);
         var response = sendRequest(request);
         return handleResponse(response, RegisterResponse.class);
     }
@@ -47,7 +50,7 @@ public class ServerFacade {
     }
 
     public CreateGameRequest createGame(CreateGameRequest gameResponse) throws ResponseException {
-        var request = buildRequest("POST", "game", this::register);
+        var request = buildRequest("POST", "game", gameResponse.);
         var response = sendRequest(request);
         return handleResponse(response, gameID);
     }
