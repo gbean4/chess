@@ -47,10 +47,10 @@ public class ServerFacade {
         sendRequest(httpRequest);
     }
 
-    public CreateGameRequest createGame(CreateGameRequest request, String authToken) throws ResponseException {
+    public int createGame(CreateGameRequest request, String authToken) throws ResponseException {
         var httpRequest = buildRequest("POST", "game", request, authToken);
         var response = sendRequest(httpRequest);
-        return handleResponse(response, CreateGameRequest.class);
+        return handleResponse(response, Integer.class);
     }
 
     public ListGamesResponse listGames(String authToken) throws ResponseException {

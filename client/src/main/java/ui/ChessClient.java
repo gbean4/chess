@@ -2,21 +2,12 @@ package ui;
 
 import java.util.Arrays;
 import java.util.Scanner;
-
-import com.google.gson.Gson;
-//import model.*;
-import datamodel.AuthData;
-import datamodel.LoginRequest;
-import datamodel.RegisterResponse;
-import datamodel.UserData;
+import java.util.UUID;
+import datamodel.*;
 import exception.ResponseException;
 import server.ServerFacade;
-
 import static java.awt.Color.*;
-//import client.websocket.NotificationHandler;
-
-//import client.websocket.WebSocketFacade;
-//import webSocketMessages.Notification;
+import static ui.EscapeSequences.RESET_TEXT_COLOR;
 
 public class ChessClient {
     private final ServerFacade server;
@@ -40,16 +31,16 @@ public class ChessClient {
 
             try {
                 result = eval(line);
-                System.out.print(BLUE + result + RESET);
+                System.out.print(BLUE + result + RESET_TEXT_COLOR);
             } catch (Throwable e) {
-                System.out.print(RED + e.getMessage() + RESET);
+                System.out.print(RED + e.getMessage() + RESET_TEXT_COLOR);
             }
         }
         System.out.println();
     }
 
     private void printPrompt() {
-        System.out.print("\n" + RESET + ">>> " + GREEN);
+        System.out.print("\n" + RESET_TEXT_COLOR + ">>> " + GREEN);
     }
 
     public String eval(String input) {
@@ -63,7 +54,7 @@ public class ChessClient {
                 case "logout" -> logout();
                 case "list" -> listGames();
                 case "create" -> createGame(params);
-                case "join" -> joinHame(params);
+                case "join" -> joinGame(params);
                 case "help" -> help();
                 case "quit" -> "quit";
                 default -> "Unknown command. Type 'help' for options.";
@@ -73,11 +64,13 @@ public class ChessClient {
         }
     }
 
-    public String register(UserData user) throws ResponseException {
-        if (user == null) {
+    public String register(String... params) throws ResponseException {
+        if (params.length != 3) {
             return "Usage: register <username <password> <email>";
         }
-        var req = new RegisterResponse(user, user.username(), authToken);
+        var user = new UserData(params[0],params[1], params[2]);
+        var generateAuth = UUID.randomUUID().toString();
+        var req = new RegisterResponse(user, user.username(), generateAuth);
         var res = server.register(req);
         username = res.username();
         authToken = res.authToken();
@@ -85,11 +78,11 @@ public class ChessClient {
         return String.format("Registered! Welcome, %s!", username);
     }
 
-    public String login(LoginRequest userReq) throws ResponseException {
-        if (userReq == null) {
+    public String login(String... params) throws ResponseException {
+        if (params.length != 2) {
             return "Usage: login <username> <password>";
         }
-        var req= new LoginRequest(userReq.username(), userReq.password());
+        var req= new LoginRequest(params[0], params[1]);
         var res = server.login(req);
         username = res.username();
         authToken = res.authToken();
@@ -105,7 +98,39 @@ public class ChessClient {
         return "BYE! Logged out successfully.";
     }
 
+    public String listGames() throws ResponseException {
+        assertSignedIn();
+        var res = server.listGames(authToken);
+        var out = new StringBuilder("Games:\n");
+        for (GameData game : res.games()){
+            out.append(String.format("  ID: %d | Name: %s | White: %s | Black: %s%n",
+                    game.gameID(), game.gameName(), game.whiteUsername(), game.blackUsername()));
+        }
+        return out.toString();
+    }
 
+    public String createGame(String ... params) throws ResponseException {
+        assertSignedIn();
+        if (params.length != 1) {
+            return "Usage: create <gameName>";
+        }
+        var req = new CreateGameRequest(params[0]);
+        int gameID = server.createGame(req, authToken);
+        return String.format("Game created with ID %d", gameID);
+    }
+
+    public String joinGame(String... params) throws ResponseException {
+        assertSignedIn();
+        if (params.length != 2) {
+            return "Usage: join <gameID> <WHITE|BLACK|OBSERVER>";
+        }
+        int gameID = Integer.parseInt(params[1]);
+        String playerColor = params[0].toLowerCase();
+        var spec = new GameSpec(playerColor, gameID);
+        server.joinGame(spec);
+        state = State.INGAME;
+        return String.format("Joined game %d as %s", gameID, playerColor);
+    }
 
     public String help() {
         if (state == State.SIGNED_OUT) {
