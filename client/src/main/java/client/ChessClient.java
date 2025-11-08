@@ -1,4 +1,4 @@
-package ui;
+package client;
 
 import java.util.Arrays;
 import java.util.Scanner;
