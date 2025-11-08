@@ -30,10 +30,10 @@ public class ServerFacade {
         return handleResponse(response, RegisterResponse.class);
     }
 
-    public void login(LoginRequest request) throws ResponseException {
+    public AuthData login(LoginRequest request) throws ResponseException {
         var httpRequest = buildRequest("POST", "session", request);
         var response = sendRequest(httpRequest);
-        handleResponse(response, LoginRequest.class);
+        return handleResponse(response, AuthData.class);
     }
 
     public void logout(String authToken) throws ResponseException {
