@@ -24,47 +24,45 @@ public class ServerFacade {
 //        this.client = HttpClient.newHttpClient();
     }
 
-    public RegisterResponse register(RegisterResponse req) throws ResponseException {
-        var request = buildRequest("POST", "user",req);
-        var response = sendRequest(request);
+    public RegisterResponse register(RegisterResponse request) throws ResponseException {
+        var httpRequest = buildRequest("POST", "user", request);
+        var response = sendRequest(httpRequest);
         return handleResponse(response, RegisterResponse.class);
     }
 
-    public void login(LoginRequest loginReq) throws ResponseException {
-        var path = String.format("/session/%s", loginReq);
-        var request = buildRequest("POST", path, null);
-        var response = sendRequest(request);
-        handleResponse(response, null);
+    public void login(LoginRequest request) throws ResponseException {
+        var httpRequest = buildRequest("POST", "session", request);
+        var response = sendRequest(httpRequest);
+        handleResponse(response, LoginRequest.class);
     }
 
     public void logout(String authToken) throws ResponseException {
-        var path = String.format("/session/%s", authToken);
-        var request = buildRequest("DELETE", path, null);
-        var response = sendRequest(request);
+        var httpRequest = buildRequest("DELETE", "session", null, authToken);
+        var response = sendRequest(httpRequest);
         handleResponse(response, null);
     }
 
     public void clear() throws ResponseException {
-        var request = buildRequest("DELETE", "db", null);
-        sendRequest(request);
+        var httpRequest = buildRequest("DELETE", "db", null);
+        sendRequest(httpRequest);
     }
 
-    public CreateGameRequest createGame(CreateGameRequest gameResponse) throws ResponseException {
-        var request = buildRequest("POST", "game", gameResponse.);
-        var response = sendRequest(request);
-        return handleResponse(response, gameID);
+    public CreateGameRequest createGame(CreateGameRequest request, String authToken) throws ResponseException {
+        var httpRequest = buildRequest("POST", "game", request, authToken);
+        var response = sendRequest(httpRequest);
+        return handleResponse(response, CreateGameRequest.class);
     }
 
-    public GameData[] listGames() throws ResponseException {
-        var request = buildRequest("GET", "game", null);
-        var response = sendRequest(request);
-        return handleResponse(response, games);
+    public ListGamesResponse listGames(String authToken) throws ResponseException {
+        var httpRequest = buildRequest("GET", "game", null, authToken);
+        var response = sendRequest(httpRequest);
+        return handleResponse(response, ListGamesResponse.class);
     }
 
     public void joinGame(GameSpec gameSpec) throws ResponseException {
         var path = String.format("/game/%s", gameSpec);
-        var request = buildRequest("PUT", path, GameSpec.class);
-        var response = sendRequest(request);
+        var httpRequest = buildRequest("PUT", path, GameSpec.class);
+        var response = sendRequest(httpRequest);
         handleResponse(response, null);
     }
 
