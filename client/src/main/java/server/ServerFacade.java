@@ -19,7 +19,7 @@ public class ServerFacade {
     public ServerFacade(String serverUrl) {
         if (serverUrl.endsWith("/")) {
             serverUrl += "/";
-        };
+        }
         this.serverUrl = serverUrl;
 //        this.client = HttpClient.newHttpClient();
     }

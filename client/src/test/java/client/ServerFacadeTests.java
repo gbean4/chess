@@ -25,5 +25,32 @@ public class ServerFacadeTests {
     public void sampleTest() {
         Assertions.assertTrue(true);
     }
+    @Test
+    void register() {
+    }
+
+    @Test
+    void login() {
+    }
+
+    @Test
+    void logout() {
+    }
+
+    @Test
+    void clear() {
+    }
+
+    @Test
+    void createGame() {
+    }
+
+    @Test
+    void listGames() {
+    }
+
+    @Test
+    void joinGame() {
+    }
 
 }
