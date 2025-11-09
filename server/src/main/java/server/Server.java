@@ -32,6 +32,8 @@ public class Server {
         server.get("game", this::listGames);
         server.post("game", this::createGame);
         server.put("game", this::joinGame);
+        server.put("/game/leave", this::leaveGame);
+        server.put("game/resign", this::resignGame);
     }
 
     private void handleException(Context ctx, Exception ex){
@@ -165,6 +167,30 @@ public class Server {
             ctx.status(statusCode).result(serializer.toJson(Map.of("message", "Error: " + ex.getMessage())));
         }
 
+    }
+
+    private void leaveGame(Context ctx){
+        var serializer = new Gson();
+        try{
+            String authToken = ctx.header("authorization");
+            var request = serializer.fromJson(ctx.body(), GameSpec.class);
+            userService.leaveGame(authToken, request);
+            ctx.status(200).result("{}");
+        } catch(Exception ex){
+            handleException(ctx, ex);
+        }
+    }
+
+    private void resignGame(Context ctx){
+        var serializer = new Gson();
+        try{
+            String authToken = ctx.header("authorization");
+            var request = serializer.fromJson(ctx.body(), GameSpec.class);
+            userService.resignGame(authToken, request);
+            ctx.status(200).result("{}");
+        } catch(Exception ex){
+            handleException(ctx, ex);
+        }
     }
 
     public int run(int desiredPort) {

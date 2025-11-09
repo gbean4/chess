@@ -59,7 +59,4 @@ public class GameUI {
         }
     }
 
-    private void leave() throws ResponseException{
-
-    }
 }

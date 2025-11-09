@@ -4,6 +4,7 @@ import datamodel.AuthData;
 import datamodel.GameData;
 import datamodel.GameSpec;
 import datamodel.UserData;
+import exception.DataAccessException;
 import exception.ResponseException;
 
 public interface DataAccess {
@@ -20,4 +21,6 @@ public interface DataAccess {
     void joinGame(String username, GameSpec gameSpec) throws ResponseException;
 
     GameData getGame(int gameID) throws ResponseException;
+    void leaveGame(String username, int gameID) throws DataAccessException;
+    void resignGame(String username, int gameID);
 }

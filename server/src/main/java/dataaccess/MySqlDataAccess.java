@@ -209,6 +209,40 @@ public class MySqlDataAccess implements DataAccess {
         }
     }
 
+    @Override
+    public void leaveGame(String username, int gameID){
+        String statement = """
+                UPDATE GameData
+                SET whiteUsername = CASE WHEN whiteUsername = ? THEN NULL ELSE whiteUsername END,
+                    blackUsername = CASE WHEN blackUsername = ? THEN NULL ELSE blackUsername END
+                WHERE gameID = ?;
+                """;
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(statement)) {
+            ps.setInt(1, gameID);
+            ps.executeUpdate();
+        } catch (SQLException | DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void resignGame(String username, int gameID){
+        String statement = """
+                UPDATE GameData
+                SET whiteUsername = NULL,
+                blackUsername = NULL
+                WHERE gameID = ?;
+                """;
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(statement)) {
+            ps.setInt(1, gameID);
+            ps.executeUpdate();
+        } catch (SQLException | DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private int executeUpdate(String statement, Object... params) throws ResponseException {
         try (Connection conn = DatabaseManager.getConnection()) {
             try (PreparedStatement ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
