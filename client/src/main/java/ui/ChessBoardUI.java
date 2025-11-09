@@ -5,7 +5,6 @@ import chess.ChessGame;
 import chess.ChessPiece;
 import chess.ChessPosition;
 
-import static chess.ChessPiece.PieceType.*;
 import static ui.EscapeSequences.*;
 
 public class ChessBoardUI {
@@ -19,7 +18,7 @@ public class ChessBoardUI {
             int rank = 8 - row;
             System.out.print(SET_BG_COLOR_LIGHT_GREY + " " + rank + " " + RESET_BG_COLOR);
 
-            String bg = null;
+            String bg;
             String color = null;
             String symbol = null;
             for (int col = 1; col <= 8; col++) {
