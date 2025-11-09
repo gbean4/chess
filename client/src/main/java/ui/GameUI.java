@@ -1,10 +1,7 @@
 package ui;
 
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessMove;
-import chess.ChessPosition;
+import chess.*;
 import exception.ResponseException;
 import server.ServerFacade;
 
@@ -13,10 +10,16 @@ import java.util.Arrays;
 public class GameUI {
     private final ChessGame game;
     private final String playerColor;
+    private final ServerFacade server;
+    private final String authToken;
+    private final int gameID;
 
-    public GameUI(ChessGame game, String playerColor) {
+    public GameUI(ChessGame game, String playerColor, ServerFacade server, String authToken, int gameID) {
         this.game = game;
         this.playerColor = playerColor;
+        this.server = server;
+        this.authToken = authToken;
+        this.gameID =  gameID;
     }
 
     public void render(){
@@ -32,31 +35,48 @@ public class GameUI {
         ChessBoardUI.renderBoard(game, perspective);
     }
 
-    public String handleCommand(String input) throws ResponseException{
+    public String leave() throws ResponseException{
+        server.leaveGame(authToken, gameID);
+        return "You left the game";
+    }
+    public String resign() throws ResponseException{
+        server.resignGame(authToken, gameID);
+        return "You resigned. Game over.";
+    }
+
+    public String handleCommand(String input) throws ResponseException, InvalidMoveException {
         String[] tokens = input.toLowerCase().split("\\s+");
         String cmd = (tokens.length > 0) ? tokens[0].toLowerCase(): "";
+        ChessPosition from = posConvert(tokens[1]);
+        ChessPosition to = posConvert(tokens[2]);
 
-        switch(cmd){
+        return switch(cmd){
             case "move" -> {
-                if (tokens.length != 3) return "Usage: move <from> <to>";
-                return game.makeMove(new ChessMove(tokens[1], tokens[2], game.getBoard().getPiece(new ChessPosition(tokens[1]))));
+                if (tokens.length != 3) yield "Usage: move <from> <to>";
+                game.makeMove(new ChessMove(from, to, game.getBoard().getPiece(from).getPieceType()));
+                yield "";
             }
             case "board" -> {
                 render();
-                return "";
+                yield "";
             }
-            case "resign" ->{
-                resign();
-                return "You resigned.";
-            }
-            case "leave"-> {
-                leave();
-                return "You left the game.";
-            }
+            case "resign" -> resign();
+            case "leave"-> leave();
             default -> {
-                return "Unknown command. Type help for available commands.";
+                yield "Unknown command. Type help for available commands.";
             }
-        }
+        };
+    }
+    public static ChessPosition posConvert(String pos){
+        char file = pos.charAt(0);
+        char rank = pos.charAt(1);
+
+        int col = file - 'a';
+        int row = 8- (rank - '0');
+        return new ChessPosition(row,col);
     }
 
+    public int getGameID(){
+        return gameID;
+    }
 }

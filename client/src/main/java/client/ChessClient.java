@@ -5,6 +5,7 @@ import java.util.Scanner;
 import java.util.UUID;
 
 import chess.ChessGame;
+import chess.InvalidMoveException;
 import datamodel.*;
 import exception.ResponseException;
 import server.ServerFacade;
@@ -71,20 +72,14 @@ public class ChessClient {
                 case "list" -> listGames();
                 case "create" -> createGame(params);
                 case "join" -> joinGame(params);
-                case "leave" -> {
-                    leave();
-                    yield "Returned to lobby";
-                }
-                case "resign" -> {
-                    resign();
-                    yield "You resigned the game";
-                }
                 case "help" -> help();
                 case "quit" -> "quit";
                 default -> "Unknown command. Type 'help' for options.";
             };
         } catch (ResponseException ex) {
             return ex.getMessage();
+        } catch (InvalidMoveException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -156,31 +151,31 @@ public class ChessClient {
         ChessGame game = gameData.game();
         state = State.INGAME;
 
-        gameUI = new GameUI(game, spec.playerColor());
+        gameUI = new GameUI(game, spec.playerColor(), server, authToken, gameID);
         gameUI.render();
 
         return String.format("Joined game %d as %s", gameID, playerColor);
     }
 
-    private void leave() throws ResponseException{
-        assertSignedIn();
-        if (state != State.INGAME){
-            throw new ResponseException(ResponseException.Code.ClientError, "You are not currently in a game.");
-        }
-        server.leaveGame(authToken, );
-        state = State.SIGNED_IN;
-        System.out.println("You left the game");
-    }
-
-    private void resign() throws ResponseException{
-        assertSignedIn();
-        if (state != State.INGAME){
-            throw new ResponseException(ResponseException.Code.ClientError, "You are not currently in a game.");
-        }
-        server.leaveGame(authToken, );
-        state = State.SIGNED_IN;
-        System.out.println("You resigned. Game over.");
-    }
+//    private void leave() throws ResponseException{
+//        assertSignedIn();
+//        if (state != State.INGAME){
+//            throw new ResponseException(ResponseException.Code.ClientError, "You are not currently in a game.");
+//        }
+//        server.leaveGame(authToken, gameUI.getGameID());
+//        state = State.SIGNED_IN;
+//        System.out.println("You left the game");
+//    }
+//
+//    private void resign() throws ResponseException{
+//        assertSignedIn();
+//        if (state != State.INGAME){
+//            throw new ResponseException(ResponseException.Code.ClientError, "You are not currently in a game.");
+//        }
+//        server.leaveGame(authToken, gameUI.getGameID());
+//        state = State.SIGNED_IN;
+//        System.out.println("You resigned. Game over.");
+//    }
 
     public String help() {
         if (state == State.SIGNED_OUT) {
