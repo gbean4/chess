@@ -106,7 +106,7 @@ public class ChessClient {
         }
         var user = new UserData(params[0],params[1], params[2]);
         var generateAuth = UUID.randomUUID().toString();
-        var req = new RegisterResponse(user, user.username(), generateAuth);
+        var req = new RegisterRequest(user.username(), user.email(), user.password());
         var res = server.register(req);
         username = res.username();
         authToken = res.authToken();

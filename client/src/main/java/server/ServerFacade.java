@@ -24,7 +24,7 @@ public class ServerFacade {
 //        this.client = HttpClient.newHttpClient();
     }
 
-    public RegisterResponse register(RegisterResponse request) throws ResponseException {
+    public RegisterResponse register(RegisterRequest request) throws ResponseException {
         var httpRequest = buildRequest("POST", "user", request);
         var response = sendRequest(httpRequest);
         return handleResponse(response, RegisterResponse.class);
