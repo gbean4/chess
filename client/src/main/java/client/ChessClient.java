@@ -148,7 +148,7 @@ public class ChessClient {
         ChessGame game = gameData.game();
         state = State.INGAME;
 
-        gameUI = new GameUI(game, authToken, server);
+        gameUI = new GameUI(game, spec.playerColor());
         gameUI.render();
 
         return String.format("Joined game %d as %s", gameID, playerColor);
@@ -175,8 +175,9 @@ public class ChessClient {
             return """
                     Commands:
                     - move <from> <to>
+                    - board
+                    - leave
                     - resign
-                    - logout
                     - quit
                     """;
         }
