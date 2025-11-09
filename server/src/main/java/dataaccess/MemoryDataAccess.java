@@ -5,6 +5,7 @@ import datamodel.AuthData;
 import datamodel.GameData;
 import datamodel.GameSpec;
 import datamodel.UserData;
+import exception.DataAccessException;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -76,6 +77,16 @@ public int createGame(String gameName) {
     @Override
     public GameData getGame(int gameID) {
         return games.get(gameID);
+    }
+
+    @Override
+    public void leaveGame(String username, int gameID) throws DataAccessException {
+
+    }
+
+    @Override
+    public void resignGame(String username, int gameID) {
+
     }
 
 
