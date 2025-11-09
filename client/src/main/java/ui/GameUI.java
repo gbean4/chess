@@ -2,24 +2,24 @@ package ui;
 
 
 import chess.*;
+import client.ChessClient;
 import exception.ResponseException;
 import server.ServerFacade;
 
-import java.util.Arrays;
 
 public class GameUI {
-    private final ChessGame game;
     private final String playerColor;
+    private final ChessGame game;
     private final ServerFacade server;
     private final String authToken;
     private final int gameID;
 
-    public GameUI(ChessGame game, String playerColor, ServerFacade server, String authToken, int gameID) {
-        this.game = game;
-        this.playerColor = playerColor;
-        this.server = server;
-        this.authToken = authToken;
-        this.gameID =  gameID;
+    public GameUI(ChessClient client) {
+        this.playerColor = client.getPlayerColor();
+        this.server = client.getServer();
+        this.authToken = client.getAuthToken();
+        this.gameID =  client.getGameID();
+        this.game = client.getGame();
     }
 
     public void render(){
@@ -74,9 +74,5 @@ public class GameUI {
         int col = file - 'a';
         int row = 8- (rank - '0');
         return new ChessPosition(row,col);
-    }
-
-    public int getGameID(){
-        return gameID;
     }
 }

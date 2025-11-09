@@ -20,10 +20,22 @@ public class ChessClient {
     private String authToken = null;
     private String username = null;
     private GameUI gameUI = null;
+    private ChessGame game = null;
+    private String playerColor = null;
+    private int gameID = -1;
 
-    public ChessClient(String serverUrl) {
-        this.server = new ServerFacade(serverUrl);
+    public ChessClient(ServerFacade serverFacade) {
+        this.server = serverFacade;
     }
+
+    public void setGameUI(GameUI gameUI){
+        this.gameUI = gameUI;
+    }
+    public ChessGame getGame() {return game;}
+    public String getPlayerColor(){return playerColor;}
+    public int getGameID() {return gameID;}
+    public String getAuthToken() {return authToken;}
+    public ServerFacade getServer() {return server;}
 
     public void run() {
         System.out.println(LOGO + " Welcome to Chess!");
@@ -144,15 +156,21 @@ public class ChessClient {
             return "Usage: join <gameID> <WHITE|BLACK|OBSERVER>";
         }
         int gameID = Integer.parseInt(params[1]);
-        String playerColor = params[0].toLowerCase();
+        String playerColor = params[0].toUpperCase();
         var spec = new GameSpec(playerColor, gameID);
-
         var gameData = server.joinGame(spec);
-        ChessGame game = gameData.game();
-        state = State.INGAME;
 
-        gameUI = new GameUI(game, spec.playerColor(), server, authToken, gameID);
-        gameUI.render();
+        state = State.INGAME;
+        this.game = gameData.game();
+        this.playerColor = playerColor;
+        this.gameID = gameID;
+
+        if (this.gameUI == null){
+            this.gameUI = new GameUI(this);
+            this.gameUI.render();
+        } else{
+            this.gameUI.updateBoard();
+        }
 
         return String.format("Joined game %d as %s", gameID, playerColor);
     }
