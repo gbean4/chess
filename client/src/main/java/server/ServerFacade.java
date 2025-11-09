@@ -18,7 +18,7 @@ public class ServerFacade {
     private final Gson gson = new Gson();
 
     public ServerFacade(String serverUrl) {
-        if (serverUrl.endsWith("/")) {
+        if (!serverUrl.endsWith("/")) {
             serverUrl += "/";
         }
         this.serverUrl = serverUrl;

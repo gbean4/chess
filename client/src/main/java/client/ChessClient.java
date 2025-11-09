@@ -11,8 +11,8 @@ import exception.ResponseException;
 import server.ServerFacade;
 import ui.GameUI;
 
-import static java.awt.Color.*;
 import static ui.EscapeSequences.RESET_TEXT_COLOR;
+import static ui.EscapeSequences.*;
 
 public class ChessClient {
     private final ServerFacade server;
@@ -38,27 +38,32 @@ public class ChessClient {
     public ServerFacade getServer() {return server;}
 
     public void run() {
-        System.out.println(LOGO + " Welcome to Chess!");
-        System.out.print(help());
+        System.out.println(LOGO + " Welcome to Chess! Type Help to get started.");
+//        System.out.print(help());
 
         Scanner scanner = new Scanner(System.in);
         var result = "";
-        while (!result.equals("quit")) {
+        while (!result.equals("bye")) {
             printPrompt();
             String line = scanner.nextLine();
 
             try {
                 result = eval(line);
-                System.out.print(BLUE + result + RESET_TEXT_COLOR);
+                System.out.print(SET_TEXT_COLOR_BLUE + result + RESET_TEXT_COLOR);
             } catch (Throwable e) {
-                System.out.print(RED + e.getMessage() + RESET_TEXT_COLOR);
+                System.out.print(SET_TEXT_COLOR_RED + e.getMessage() + RESET_TEXT_COLOR);
             }
         }
         System.out.println();
     }
 
     private void printPrompt() {
-        System.out.print("\n" + RESET_TEXT_COLOR + ">>> " + GREEN);
+        String stateText = switch(state){
+            case SIGNED_OUT -> "[SIGNED_OUT]";
+            case SIGNED_IN -> "[SIGNED_IN]";
+            case INGAME -> "[INGAME]";
+        };
+        System.out.print("\n" + RESET_TEXT_COLOR + stateText + " >>> " + SET_TEXT_COLOR_GREEN);
     }
 
     public String eval(String input) {
@@ -85,7 +90,7 @@ public class ChessClient {
                 case "create" -> createGame(params);
                 case "join" -> joinGame(params);
                 case "help" -> help();
-                case "quit" -> "quit";
+                case "quit" -> "bye";
                 default -> "Unknown command. Type 'help' for options.";
             };
         } catch (ResponseException ex) {
@@ -97,7 +102,7 @@ public class ChessClient {
 
     public String register(String... params) throws ResponseException {
         if (params.length != 3) {
-            return "Usage: register <username <password> <email>";
+            return "Usage: register <username <email> <password>";
         }
         var user = new UserData(params[0],params[1], params[2]);
         var generateAuth = UUID.randomUUID().toString();
@@ -169,7 +174,7 @@ public class ChessClient {
             this.gameUI = new GameUI(this);
             this.gameUI.render();
         } else{
-            this.gameUI.updateBoard();
+            this.gameUI.render();
         }
 
         return String.format("Joined game %d as %s", gameID, playerColor);
@@ -199,27 +204,28 @@ public class ChessClient {
         if (state == State.SIGNED_OUT) {
             return """
                     Commands:
-                    - register <username> <password> <email>
-                    - login <username> <password>
-                    - quit
+                    register <username> <email> <password> - to create an account
+                    login <username> <password> - to play chess
+                    help - with possible commands
+                    quit - playing chess
                     """;
         } else if (state == State.SIGNED_IN){
             return """
                     Commands:
-                    - list
-                    - create <gameName>
-                    - join <gameID> <WHITE|BLACK|OBSERVER>
-                    - logout
-                    - quit
+                    list - show all games
+                    create <gameName> - create your own
+                    join <gameID> <WHITE|BLACK|OBSERVER> - join a game or observe
+                    logout - end session
+                    quit - playing chess
                     """;
         } else{
             return """
                     Commands:
-                    - move <from> <to>
-                    - board
-                    - leave
-                    - resign
-                    - quit
+                    move <from> <to> - make move
+                    board - render board
+                    leave - let someone else take your spot
+                    resign - give up :(
+                    quit - playing chess
                     """;
         }
     }
