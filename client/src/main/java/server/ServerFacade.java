@@ -1,5 +1,6 @@
 package server;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import datamodel.*;
 import exception.ResponseException;
@@ -59,12 +60,16 @@ public class ServerFacade {
         return handleResponse(response, ListGamesResponse.class);
     }
 
-    public void joinGame(GameSpec gameSpec) throws ResponseException {
+    public GameData joinGame(GameSpec gameSpec) throws ResponseException {
         var path = String.format("/game/%s", gameSpec);
         var httpRequest = buildRequest("PUT", path, GameSpec.class);
         var response = sendRequest(httpRequest);
-        handleResponse(response, null);
+        return handleResponse(response, GameData.class);
     }
+
+//    public ChessGame getGame(int gameID, authToken){
+//        return
+//    }
 
     private HttpRequest buildRequest(String method, String path, Object body){
         return buildRequest(method, path, body, null);

@@ -108,7 +108,7 @@ public class UserService {
         return dataAccess.listGames(authToken);
     }
 
-    public void joinGame(String authToken, GameSpec gameSpec) throws Exception {
+    public GameData joinGame(String authToken, GameSpec gameSpec) throws Exception {
         AuthData auth= dataAccess.getAuth(authToken);
         if (auth == null){
             throw new Exception("401: Bad Request");
@@ -137,6 +137,8 @@ public class UserService {
         } else if ((Objects.equals(gameSpec.playerColor().toLowerCase(), "black") && game.blackUsername()!= null)){
             throw new Exception("403 already taken");
         } else {
-            dataAccess.joinGame(username, gameSpec);}
+            dataAccess.joinGame(username, gameSpec);
+            return dataAccess.getGame(gameSpec.gameID());
+        }
     }
 }

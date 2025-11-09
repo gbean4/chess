@@ -3,9 +3,13 @@ package client;
 import java.util.Arrays;
 import java.util.Scanner;
 import java.util.UUID;
+
+import chess.ChessGame;
 import datamodel.*;
 import exception.ResponseException;
 import server.ServerFacade;
+import ui.GameUI;
+
 import static java.awt.Color.*;
 import static ui.EscapeSequences.RESET_TEXT_COLOR;
 
@@ -14,6 +18,7 @@ public class ChessClient {
     private State state = State.SIGNED_OUT;
     private String authToken = null;
     private String username = null;
+    private GameUI gameUI = null;
 
     public ChessClient(String serverUrl) {
         this.server = new ServerFacade(serverUrl);
@@ -48,6 +53,17 @@ public class ChessClient {
             String[] tokens = input.toLowerCase().split("\\s+");
             String cmd = (tokens.length > 0) ? tokens[0].toLowerCase(): "";
             String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
+
+            if (state == State.INGAME){
+                String result = gameUI.handleCommand(input);
+                if (result.equalsIgnoreCase("You resigned.") ||
+                result.equalsIgnoreCase("You left the game.")){
+                    state = State.SIGNED_IN;
+                    gameUI = null;
+                }
+                return result;
+            }
+
             return switch (cmd) {
                 case "register" -> register(params);
                 case "login" -> login(params);
@@ -127,8 +143,14 @@ public class ChessClient {
         int gameID = Integer.parseInt(params[1]);
         String playerColor = params[0].toLowerCase();
         var spec = new GameSpec(playerColor, gameID);
-        server.joinGame(spec);
+
+        var gameData = server.joinGame(spec);
+        ChessGame game = gameData.game();
         state = State.INGAME;
+
+        gameUI = new GameUI(game, authToken, server);
+        gameUI.render();
+
         return String.format("Joined game %d as %s", gameID, playerColor);
     }
 
