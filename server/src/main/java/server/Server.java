@@ -42,13 +42,17 @@ public class Server {
         var msg = (ex.getMessage() != null)? ex.getMessage().toLowerCase(): "";
         if (msg.contains("401") || msg.contains("unauthorized")) {
             statusCode = 401;
-        } else if (msg.contains("400") || msg.contains("missing required")){
+        } else if (msg.contains("400") || msg.contains("missing required") || msg.contains("bad request")){
             statusCode = 400;
-        } else{
+        } else if (msg.contains("403") || msg.contains("forbidden") || msg.contains("already exists")|| msg.contains("already taken")){
+            statusCode = 403;
+        }else{
             statusCode = 500;
         }
 
-        ctx.status(statusCode).result(serializer.toJson(Map.of("message", "Error: " + ex.getMessage())));
+        ctx.status(statusCode).result(serializer.toJson(Map.of(
+                "message", "Error: " + ex.getMessage(),
+                "status", statusCode)));
     }
 
     private void clear(Context ctx){
@@ -81,14 +85,15 @@ public class Server {
                 statusCode = 401;
             } else if (msg.contains("400") || msg.contains("missing required")){
                 statusCode = 400;
-            } else if (msg.contains("403") || msg.contains("forbidden")) {
+            } else if (msg.contains("403") || msg.contains("forbidden")|| msg.contains("already exists")) {
                 statusCode = 403;
             }else{
                 statusCode = 500;
             }
 
-            ctx.status(statusCode).result(serializer.toJson(Map.of("message", "Error: " + ex.getMessage())));
-        }
+            ctx.status(statusCode).result(serializer.toJson(Map.of(
+                    "message", "Error: " + ex.getMessage(),
+                    "status", statusCode)));        }
     }
     private void login(Context ctx){
         var serializer = new Gson();
@@ -164,9 +169,10 @@ public class Server {
             } else{
                 statusCode = 500;
             }
-            ctx.status(statusCode).result(serializer.toJson(Map.of("message", "Error: " + ex.getMessage())));
+            ctx.status(statusCode).result(serializer.toJson(Map.of(
+                    "message", "Error: " + ex.getMessage(),
+                    "status", statusCode)));
         }
-
     }
 
     private void leaveGame(Context ctx){

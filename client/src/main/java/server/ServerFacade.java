@@ -125,10 +125,10 @@ public class ServerFacade {
 
     private <T> T handleResponse(HttpResponse<String> response, Class<T> responseClass) throws ResponseException {
         var status = response.statusCode();
-        if (!isSuccessful(status)) {
+        if (status == 200) {
             var body = response.body();
             if (body != null) {
-                throw ResponseException.fromJson(body);
+                throw ResponseException.fromJson(body, responseClass);
             }
 
             throw new ResponseException(ResponseException.fromHttpStatusCode(status), "other failure: " + status);
@@ -139,9 +139,5 @@ public class ServerFacade {
         }
 
         return null;
-    }
-
-    private boolean isSuccessful(int status) {
-        return status / 100 == 2;
     }
 }

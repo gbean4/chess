@@ -63,9 +63,7 @@ public class GameUI {
             }
             case "resign" -> resign();
             case "leave"-> leave();
-            default -> {
-                yield "Unknown command. Type help for available commands.";
-            }
+            default -> "Unknown command. Type help for available commands.";
         };
     }
     public static ChessPosition posConvert(String pos){

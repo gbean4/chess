@@ -42,7 +42,7 @@ public class UserService {
         }
         var existingUser = dataAccess.getUser(user.username());
         if (existingUser != null){
-            throw new Exception("User already exists");
+            throw new ResponseException(ResponseException.Code.Forbidden, "User already exists");
         }
 
         String hashedPassword = makeUserPassword(user.password());
