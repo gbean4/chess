@@ -60,7 +60,7 @@ public class ServerFacade {
     }
 
     public GameData joinGame(GameSpec gameSpec) throws ResponseException {
-        var path = "/game";
+        var path = "game";
         var httpRequest = buildRequest("PUT", path, gameSpec);
         var response = sendRequest(httpRequest);
         return handleResponse(response, GameData.class);

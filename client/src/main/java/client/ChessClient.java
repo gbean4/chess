@@ -158,7 +158,7 @@ public class ChessClient {
         }
         var req = new CreateGameRequest(params[0]);
         var result = server.createGame(req, authToken);
-        return String.format("Game created with ID:"+ result.gameID());
+        return "Game created. Type List to check its ID to join";
     }
 
     public String joinGame(String... params) throws ResponseException {
@@ -251,7 +251,7 @@ public class ChessClient {
 
     private void assertSignedIn() throws ResponseException {
         if (state == State.SIGNED_OUT) {
-            throw new ResponseException(ResponseException.Code.ClientError, "You must sign in");
+            throw new ResponseException(ResponseException.Code.BadRequest, "You must sign in");
         }
     }
 }
