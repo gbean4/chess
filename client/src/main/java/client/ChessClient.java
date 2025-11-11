@@ -1,8 +1,6 @@
 package client;
 
-import java.util.Arrays;
-import java.util.Scanner;
-import java.util.UUID;
+import java.util.*;
 
 import chess.ChessGame;
 import chess.InvalidMoveException;
@@ -23,6 +21,7 @@ public class ChessClient {
     private ChessGame game = null;
     private String playerColor = null;
     private int gameID = -1;
+    private final Map<Integer, Integer> tempToRealIDs = new HashMap<>();
 
     public ChessClient(ServerFacade serverFacade) {
         this.server = serverFacade;
@@ -105,7 +104,6 @@ public class ChessClient {
             return "Usage: register <username <email> <password>";
         }
         var user = new UserData(params[0],params[1], params[2]);
-        var generateAuth = UUID.randomUUID().toString();
         var req = new RegisterRequest(user.username(), user.email(), user.password());
         var res = server.register(req);
         username = res.username();
@@ -115,6 +113,9 @@ public class ChessClient {
     }
 
     public String login(String... params) throws ResponseException {
+        if (state!= State.SIGNED_OUT) {
+            return "Silly goose, you're already logged in! Logout first.";
+        }
         if (params.length != 2) {
             return "Usage: login <username> <password>";
         }
@@ -137,10 +138,15 @@ public class ChessClient {
     public String listGames() throws ResponseException {
         assertSignedIn();
         var res = server.listGames(authToken);
+        tempToRealIDs.clear();
+
         var out = new StringBuilder("Games:\n");
+        int tempID = 1;
         for (GameData game : res.games()){
+            tempToRealIDs.put(tempID, game.gameID());
             out.append(String.format("  ID: %d | Name: %s | White: %s | Black: %s%n",
-                    game.gameID(), game.gameName(), game.whiteUsername(), game.blackUsername()));
+                    tempID, game.gameName(), game.whiteUsername(), game.blackUsername()));
+            tempID++;
         }
         return out.toString();
     }
@@ -160,8 +166,8 @@ public class ChessClient {
         if (params.length != 2) {
             return "Usage: join <gameID> <WHITE|BLACK|OBSERVER>";
         }
-        int gameID = Integer.parseInt(params[1]);
-        String playerColor = params[0].toUpperCase();
+        int gameID = tempToRealIDs.get(Integer.parseInt(params[0]));
+        String playerColor = params[1].toUpperCase();
         var spec = new GameSpec(playerColor, gameID);
         var gameData = server.joinGame(spec);
 
