@@ -42,15 +42,15 @@ public class ServerFacade {
         handleResponse(response, null);
     }
 
-    public void clear() throws ResponseException {
-        var httpRequest = buildRequest("DELETE", "db", null);
-        sendRequest(httpRequest);
-    }
+//    public void clear() throws ResponseException {
+//        var httpRequest = buildRequest("DELETE", "db", null);
+//        sendRequest(httpRequest);
+//    }
 
-    public int createGame(CreateGameRequest request, String authToken) throws ResponseException {
+    public CreateGameResult createGame(CreateGameRequest request, String authToken) throws ResponseException {
         var httpRequest = buildRequest("POST", "game", request, authToken);
         var response = sendRequest(httpRequest);
-        return handleResponse(response, Integer.class);
+        return handleResponse(response, CreateGameResult.class);
     }
 
     public ListGamesResponse listGames(String authToken) throws ResponseException {
@@ -60,8 +60,8 @@ public class ServerFacade {
     }
 
     public GameData joinGame(GameSpec gameSpec) throws ResponseException {
-        var path = String.format("/game/%s", gameSpec);
-        var httpRequest = buildRequest("PUT", path, GameSpec.class);
+        var path = "/game";
+        var httpRequest = buildRequest("PUT", path, gameSpec);
         var response = sendRequest(httpRequest);
         return handleResponse(response, GameData.class);
     }
