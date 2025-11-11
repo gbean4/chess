@@ -128,13 +128,17 @@ public class ServerFacade {
         if (status == 200) {
             var body = response.body();
             if (body != null) {
-                throw ResponseException.fromJson(body, responseClass);
+                throw ResponseException.fromJson(body);
             }
-
             throw new ResponseException(ResponseException.fromHttpStatusCode(status), "other failure: " + status);
         }
 
         if (responseClass != null) {
+            T result = new Gson().fromJson(response.body(), responseClass);
+            if (result == null){
+                throw new ResponseException(ResponseException.Code.ServerError,
+                        "Server returned empty or invalid response: " + response.body());
+            }
             return new Gson().fromJson(response.body(), responseClass);
         }
 
