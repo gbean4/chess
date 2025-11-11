@@ -157,8 +157,8 @@ public class ChessClient {
             return "Usage: create <gameName>";
         }
         var req = new CreateGameRequest(params[0]);
-        int gameID = server.createGame(req, authToken);
-        return String.format("Game created with ID %d", gameID);
+        var result = server.createGame(req, authToken);
+        return String.format("Game created with ID:"+ result.gameID());
     }
 
     public String joinGame(String... params) throws ResponseException {

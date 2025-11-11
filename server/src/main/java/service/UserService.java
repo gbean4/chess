@@ -37,14 +37,14 @@ public class UserService {
     }
 
     public RegisterResponse register(UserData user) throws Exception {
-        var existingUser = dataAccess.getUser(user.username());
         if (user.username()==null || user.password()==null ||user.email()==null){
             throw new Exception("Missing required fields");
         }
+        var existingUser = dataAccess.getUser(user.username());
         if (existingUser != null){
-            throw new Exception("403 Forbidden: User already exists");
-//            throw new DataAccessException("403 User already exists");
+            throw new Exception("User already exists");
         }
+
         String hashedPassword = makeUserPassword(user.password());
         dataAccess.createUser(new UserData(user.username(), user.email(), hashedPassword));
         var token = UUID.randomUUID().toString();

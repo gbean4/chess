@@ -159,7 +159,7 @@ public class Server {
                 statusCode = 401;
             } else if (msg.contains("400") || msg.contains("bad request")) {
                 statusCode = 400;
-            } else if (msg.contains("already taken")|| (msg.contains("403"))){
+            } else if (msg.contains("already taken")|| msg.contains("already exists")||(msg.contains("403"))){
                 statusCode = 403;
             } else{
                 statusCode = 500;
