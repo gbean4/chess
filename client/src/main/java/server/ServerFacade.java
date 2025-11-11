@@ -10,6 +10,7 @@ import java.net.http.*;
 import java.net.http.HttpRequest.BodyPublisher;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse.BodyHandlers;
+import java.util.Map;
 
 public class ServerFacade {
     private final HttpClient client = HttpClient.newHttpClient();
@@ -59,9 +60,9 @@ public class ServerFacade {
         return handleResponse(response, ListGamesResponse.class);
     }
 
-    public GameData joinGame(GameSpec gameSpec) throws ResponseException {
+    public GameData joinGame(GameSpec gameSpec, String authToken) throws ResponseException {
         var path = "game";
-        var httpRequest = buildRequest("PUT", path, gameSpec);
+        var httpRequest = buildRequest("PUT", path, gameSpec, authToken);
         var response = sendRequest(httpRequest);
         return handleResponse(response, GameData.class);
     }
@@ -125,23 +126,28 @@ public class ServerFacade {
 
     private <T> T handleResponse(HttpResponse<String> response, Class<T> responseClass) throws ResponseException {
         var status = response.statusCode();
+        String body = response.body();
         if (status == 200) {
-            var body = response.body();
-            if (body != null) {
-                throw ResponseException.fromJson(body);
+            if (responseClass == null ||body == null|| body.isEmpty()) {
+                return null;
             }
-            throw new ResponseException(ResponseException.fromHttpStatusCode(status), "other failure: " + status);
+            return gson.fromJson(body,responseClass);
+        }
+        try{
+            throw ResponseException.fromJson(body);
+        } catch (Exception e){
+            throw new ResponseException(ResponseException.fromHttpStatusCode(status), body);
         }
 
-        if (responseClass != null) {
-            T result = new Gson().fromJson(response.body(), responseClass);
-            if (result == null){
-                throw new ResponseException(ResponseException.Code.ServerError,
-                        "Server returned empty or invalid response: " + response.body());
-            }
-            return new Gson().fromJson(response.body(), responseClass);
-        }
-
-        return null;
+//        if (responseClass != null) {
+//            T result = new Gson().fromJson(response.body(), responseClass);
+//            if (result == null){
+//                throw new ResponseException(ResponseException.Code.ServerError,
+//                        "Server returned empty or invalid response: " + response.body());
+//            }
+//            return new Gson().fromJson(response.body(), responseClass);
+//        }
+//
+//        return null;
     }
 }

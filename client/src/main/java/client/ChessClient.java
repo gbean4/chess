@@ -169,7 +169,7 @@ public class ChessClient {
         int gameID = tempToRealIDs.get(Integer.parseInt(params[0]));
         String playerColor = params[1].toUpperCase();
         var spec = new GameSpec(playerColor, gameID);
-        var gameData = server.joinGame(spec);
+        var gameData = server.joinGame(spec, authToken);
 
         state = State.INGAME;
         this.game = gameData.game();
@@ -183,7 +183,7 @@ public class ChessClient {
             this.gameUI.render();
         }
 
-        return String.format("Joined game %d as %s", gameID, playerColor);
+        return String.format("Joined game %d as %s", tempToRealIDs.get(gameID), playerColor);
     }
 
 //    private void leave() throws ResponseException{
