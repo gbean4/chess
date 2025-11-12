@@ -239,11 +239,17 @@ public class ChessClient {
         if (params.length != 1) {
             return "Usage: play <gameID>";
         }
-        int tempID = Integer.parseInt(params[0]);
+        int tempID = 0;
+        try {
+            tempID = Integer.parseInt(params[0]);
+        } catch (NumberFormatException e) {
+            throw new ResponseException(ResponseException.Code.BadRequest,
+                    "Invalid ID: " + tempID+". Use a number." );
+        }
         Integer gameID = tempToRealIDs.get(tempID);
         if (gameID == null){
             throw new ResponseException(ResponseException.Code.BadRequest,
-                    "Invalid temporary ID: " + tempID+". Try 'list' again." );
+                    "Invalid ID: " + tempID+". Try 'list' again." );
         }
         ListGamesResponse listResponse = server.listGames(authToken);
         GameData targetGame = null;
