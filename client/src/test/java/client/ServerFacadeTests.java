@@ -1,8 +1,6 @@
 package client;
 
-import datamodel.LoginRequest;
-import datamodel.RegisterRequest;
-import datamodel.RegisterResponse;
+import datamodel.*;
 import exception.ResponseException;
 import org.junit.jupiter.api.*;
 import server.Server;
@@ -98,24 +96,54 @@ public class ServerFacadeTests {
     }
 
     @Test
-    void createGamePositive() {
+    void createGamePositive() throws ResponseException {
+        var request = new RegisterRequest("user1","email@example.com","password");
+        RegisterResponse response = facade.register(request);
+        var req = new CreateGameRequest("Cool Game");
+        assertDoesNotThrow(()-> facade.createGame(req, response.authToken()));
     }
     @Test
-    void createGameNegative() {
+    void createGameNegative() throws ResponseException {
+        var request = new RegisterRequest("user1","email@example.com","password");
+        RegisterResponse response = facade.register(request);
+        var req = new CreateGameRequest("");
+        assertThrows(ResponseException.class, ()-> facade.createGame(req, response.authToken()));
+        assertThrows(ResponseException.class, ()-> facade.createGame(new CreateGameRequest("GameName"), "noAuth"));
     }
 
     @Test
-    void listGamesPositive() {
+    void listGamesPositive() throws ResponseException {
+        var request = new RegisterRequest("user1","email@example.com","password");
+        RegisterResponse response = facade.register(request);
+        var list = facade.listGames(response.authToken());
+        assertNotNull(list);
+        assertNotNull(list.games());
     }
     @Test
-    void listGamesNegative() {
+    void listGamesNegative() throws ResponseException {
+        assertThrows(ResponseException.class, ()-> facade.listGames("noAuth"));
     }
 
     @Test
-    void joinGamePositive() {
+    void joinGamePositive() throws ResponseException {
+        var request = new RegisterRequest("user1","email@example.com","password");
+        RegisterResponse response = facade.register(request);
+        var req = new CreateGameRequest("Cool Game");
+        facade.createGame(req, response.authToken());
+        var list = facade.listGames(response.authToken());
+        var game = list.games()[0];
+        var joinSpec = new GameSpec("WHITE", game.gameID());
+        var joined = facade.joinGame(joinSpec, response.authToken());
+        assertNotNull(joined);
+        assertEquals(game.gameID(), joined.gameID());
     }
+
     @Test
-    void joinGameNegative() {
+    void joinGameNegative() throws ResponseException {
+        var request = new RegisterRequest("user1","email@example.com","password");
+        RegisterResponse response = facade.register(request);
+        var joinSpec = new GameSpec("WHITE", 999);
+        assertThrows(ResponseException.class, ()-> facade.joinGame(joinSpec, response.authToken()));
     }
 
     @Test
@@ -138,6 +166,4 @@ public class ServerFacadeTests {
     @Test
     void resignGameNegative() {
     }
-
-
 }
