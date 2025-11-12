@@ -1,7 +1,6 @@
 package server;
 
 import com.google.gson.Gson;
-import datamodel.*;
 import exception.ResponseException;
 //import model.*;
 
@@ -10,7 +9,6 @@ import java.net.http.*;
 import java.net.http.HttpRequest.BodyPublisher;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse.BodyHandlers;
-import java.util.Map;
 
 public class ServerFacade {
     private final HttpClient client = HttpClient.newHttpClient();

@@ -2,7 +2,6 @@ package server;
 
 import com.google.gson.Gson;
 import dataaccess.MySqlDataAccess;
-import datamodel.*;
 import exception.DataAccessException;
 import exception.ResponseException;
 import io.javalin.*;
