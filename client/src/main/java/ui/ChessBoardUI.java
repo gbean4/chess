@@ -25,14 +25,14 @@ public class ChessBoardUI {
 
         for (int row = rowRange[0]; row != rowRange[1]; row += rowRange[2]) {
             int rank = row + 1;
-            System.out.print(SET_BG_COLOR_LIGHT_GREY + " " + rank + " " + RESET_BG_COLOR);
+            System.out.print(RESET_TEXT_COLOR+ SET_BG_COLOR_LIGHT_GREY + " " + rank + " " + RESET_BG_COLOR);
 
             String bg;
             String color = "";
             String symbol = EMPTY;
             for (int col = colRange[0]; col != colRange[1]; col += colRange[2]) {
                 boolean isDark = (row + col) % 2 == 0;
-                bg = isDark ? SET_BG_COLOR_GREEN : SET_BG_COLOR_DARK_GREEN;
+                bg = isDark ? SET_BG_COLOR_DARK_GREEN : SET_BG_COLOR_GREEN;
 
                 ChessPosition pos = new ChessPosition(rank, col);
                 ChessPiece piece = board.getPiece(pos);
@@ -51,11 +51,11 @@ public class ChessBoardUI {
     }
 
     private static void boardLabels(ChessGame.TeamColor perspective) {
-        System.out.print(SET_BG_COLOR_LIGHT_GREY + "   ");
+        System.out.print(RESET_TEXT_COLOR+SET_BG_COLOR_LIGHT_GREY + "   ");
         for (char file = (perspective == ChessGame.TeamColor.WHITE? 'a' : 'h');
              (perspective == ChessGame.TeamColor.WHITE ? file <= 'h' : file >='a');
              file += perspective == ChessGame.TeamColor.WHITE? 1 : (char) -1){
-            System.out.print(" " + file + " ");
+            System.out.print("  " + file + "  ");
         }
         System.out.println(RESET_BG_COLOR);
     }
