@@ -293,26 +293,6 @@ public class ChessClient {
         this.gameUI.render();
     }
 
-//    private void leave() throws ResponseException{
-//        assertSignedIn();
-//        if (state != State.INGAME){
-//            throw new ResponseException(ResponseException.Code.ClientError, "You are not currently in a game.");
-//        }
-//        server.leaveGame(authToken, gameUI.getGameID());
-//        state = State.SIGNED_IN;
-//        System.out.println("You left the game");
-//    }
-//
-//    private void resign() throws ResponseException{
-//        assertSignedIn();
-//        if (state != State.INGAME){
-//            throw new ResponseException(ResponseException.Code.ClientError, "You are not currently in a game.");
-//        }
-//        server.leaveGame(authToken, gameUI.getGameID());
-//        state = State.SIGNED_IN;
-//        System.out.println("You resigned. Game over.");
-//    }
-
     public String help() {
         if (state == State.SIGNED_OUT) {
             return """

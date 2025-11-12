@@ -53,7 +53,9 @@ public class GameUI {
 
         return switch(cmd){
             case "move" -> {
-                if (tokens.length != 3) yield "Usage: move <from> <to>";
+                if (tokens.length != 3) {
+                    yield "Usage: move <from> <to>";
+                }
                 game.makeMove(new ChessMove(from, to, game.getBoard().getPiece(from).getPieceType()));
                 render();
                 yield "";

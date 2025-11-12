@@ -144,14 +144,18 @@ public class UserService {
     }
     public void leaveGame(String authToken, GameSpec gameSpec) throws Exception{
         AuthData auth = dataAccess.getAuth(authToken);
-        if (auth== null) throw new Exception("401 Unauthorized");
+        if (auth== null) {
+            throw new Exception("401 Unauthorized");
+        }
 
         dataAccess.leaveGame(auth.username(), gameSpec.gameID());
     }
 
     public void resignGame(String authToken, GameSpec gameSpec) throws Exception{
         AuthData auth = dataAccess.getAuth(authToken);
-        if (auth== null) throw new Exception("401 Unauthorized");
+        if (auth== null) {
+            throw new Exception("401 Unauthorized");
+        }
 
         dataAccess.resignGame(auth.username(), gameSpec.gameID());
     }

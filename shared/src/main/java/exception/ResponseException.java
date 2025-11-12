@@ -2,7 +2,6 @@ package exception;
 
 import com.google.gson.Gson;
 import java.util.HashMap;
-import java.util.Map;
 
 public class ResponseException extends Exception {
 
@@ -25,18 +24,12 @@ public class ResponseException extends Exception {
         return code;
     }
 
-    public String toJson() {
-        return new Gson().toJson(Map.of(
-                "message", getMessage(),
-                "status", code.name()));
-    }
-
     public static ResponseException fromJson(String json) {
         var map = new Gson().fromJson(json, HashMap.class);
         var statusString = map.get("status").toString();
         String message = map.get("message").toString();
 
-        Code status = null;
+        Code status;
         try {
             status = Code.valueOf(statusString);
         } catch (IllegalArgumentException e){
@@ -65,16 +58,6 @@ public class ResponseException extends Exception {
             case 500 -> Code.ServerError;
 
             default -> throw new IllegalArgumentException("Unknown HTTP status code: " + httpStatusCode);
-        };
-    }
-
-    public int toHttpStatusCode() {
-        return switch (code) {
-            case ServerError -> 500;
-            case BadRequest -> 400;
-            case Unauthorized -> 401;
-            case Forbidden -> 403;
-            case NotFound -> 404;
         };
     }
 }

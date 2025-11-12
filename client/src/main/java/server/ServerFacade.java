@@ -7,8 +7,6 @@ import exception.ResponseException;
 
 import java.net.*;
 import java.net.http.*;
-import java.net.http.HttpRequest.BodyPublisher;
-import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse.BodyHandlers;
 
 public class ServerFacade {
@@ -47,10 +45,10 @@ public class ServerFacade {
 //        sendRequest(httpRequest);
 //    }
 
-    public CreateGameResult createGame(CreateGameRequest request, String authToken) throws ResponseException {
+    public void createGame(CreateGameRequest request, String authToken) throws ResponseException {
         var httpRequest = buildRequest("POST", "game", request, authToken);
         var response = sendRequest(httpRequest);
-        return handleResponse(response, CreateGameResult.class);
+        handleResponse(response, CreateGameResult.class);
     }
 
     public ListGamesResponse listGames(String authToken) throws ResponseException {
@@ -97,9 +95,6 @@ public class ServerFacade {
         HttpRequest.Builder builder = HttpRequest.newBuilder()
                 .uri(URI.create(serverUrl + path))
                 .header("Accept", "application/json");
-        //        var request = HttpRequest.newBuilder()
-//                .uri(URI.create(serverUrl + path))
-//                .method(method, makeRequestBody(body));
         if (authToken != null){
             builder.header("authorization", authToken);
         }
@@ -111,14 +106,6 @@ public class ServerFacade {
             builder.method(method, HttpRequest.BodyPublishers.noBody());
         }
         return builder.build();
-    }
-
-    private BodyPublisher makeRequestBody(Object request) {
-        if (request != null) {
-            return BodyPublishers.ofString(new Gson().toJson(request));
-        } else {
-            return BodyPublishers.noBody();
-        }
     }
 
     private HttpResponse<String> sendRequest(HttpRequest request) throws ResponseException {
@@ -143,16 +130,5 @@ public class ServerFacade {
         } catch (Exception e){
             throw new ResponseException(ResponseException.fromHttpStatusCode(status), body);
         }
-
-//        if (responseClass != null) {
-//            T result = new Gson().fromJson(response.body(), responseClass);
-//            if (result == null){
-//                throw new ResponseException(ResponseException.Code.ServerError,
-//                        "Server returned empty or invalid response: " + response.body());
-//            }
-//            return new Gson().fromJson(response.body(), responseClass);
-//        }
-//
-//        return null;
     }
 }

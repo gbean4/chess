@@ -61,7 +61,9 @@ public class ChessBoardUI {
     }
 
     private static String getSymbol(ChessPiece piece){
-        if (piece == null) return EMPTY;
+        if (piece == null) {
+            return EMPTY;
+        }
         String key = piece.getTeamColor() + "_" + piece.getPieceType();
         return switch (key){
             case "WHITE_KING" -> WHITE_KING;
