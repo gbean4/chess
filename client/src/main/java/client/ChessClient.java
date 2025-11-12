@@ -4,6 +4,7 @@ import java.util.*;
 
 import chess.ChessGame;
 import chess.InvalidMoveException;
+import datamodel.*;
 import exception.ResponseException;
 import server.ServerFacade;
 import ui.GameUI;
