@@ -40,10 +40,10 @@ public class ServerFacade {
         handleResponse(response, null);
     }
 
-//    public void clear() throws ResponseException {
-//        var httpRequest = buildRequest("DELETE", "db", null);
-//        sendRequest(httpRequest);
-//    }
+    public void clear() throws ResponseException {
+        var httpRequest = buildRequest("DELETE", "db", null);
+        sendRequest(httpRequest);
+    }
 
     public void createGame(CreateGameRequest request, String authToken) throws ResponseException {
         var httpRequest = buildRequest("POST", "game", request, authToken);
@@ -83,9 +83,6 @@ public class ServerFacade {
         var response = sendRequest(httpRequest);
         handleResponse(response, null);
     }
-//    public ChessGame getGame(int gameID, authToken){
-//        return
-//    }
 
     private HttpRequest buildRequest(String method, String path, Object body){
         return buildRequest(method, path, body, null);

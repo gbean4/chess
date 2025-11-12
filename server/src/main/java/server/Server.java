@@ -159,11 +159,7 @@ public class Server {
         var serializer = new Gson();
         try {
             String authToken = ctx.header("authorization");
-//            var req = serializer.fromJson(ctx.body(), GetGameRequest.class);
             int gameID = Integer.parseInt(ctx.pathParam("id"));
-//            if (gameID ==null){
-//                throw new Exception("400: missing required fields");
-//            }
             var game = userService.getGame(authToken, gameID);
             ctx.status(200).result(serializer.toJson(game));
 
