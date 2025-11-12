@@ -3,7 +3,6 @@ package server;
 import com.google.gson.Gson;
 import datamodel.*;
 import exception.ResponseException;
-//import model.*;
 
 import java.net.*;
 import java.net.http.*;
@@ -19,7 +18,6 @@ public class ServerFacade {
             serverUrl += "/";
         }
         this.serverUrl = serverUrl;
-//        this.client = HttpClient.newHttpClient();
     }
 
     public RegisterResponse register(RegisterRequest request) throws ResponseException {
