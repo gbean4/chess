@@ -37,7 +37,8 @@ public class UserService {
     }
 
     public RegisterResponse register(UserData user) throws Exception {
-        if (user.username()==null || user.password()==null ||user.email()==null){
+        if (user.username()==null || user.password()==null ||user.email()==null||
+                user.username().isBlank() || user.password().isBlank() ||user.email().isBlank() ){
             throw new Exception("Missing required fields");
         }
         var existingUser = dataAccess.getUser(user.username());
@@ -165,6 +166,10 @@ public class UserService {
         if (auth == null){
             throw new Exception("401: unauthorized");
         }
-        return dataAccess.getGame(gameID);
+        var game= dataAccess.getGame(gameID);
+        if (game == null){
+            throw new Exception("404: game not found");
+        }
+        return game;
     }
 }
