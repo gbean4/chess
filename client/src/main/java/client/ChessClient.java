@@ -159,7 +159,7 @@ public class ChessClient {
             return "Usage: create <gameName>";
         }
         var req = new CreateGameRequest(params[0]);
-        var result = server.createGame(req, authToken);
+        server.createGame(req, authToken);
         return "Game created. Type List to check its ID to join";
     }
 
@@ -206,15 +206,7 @@ public class ChessClient {
         var spec = new GameSpec(playerColor, gameID);
         var gameData = server.joinGame(spec, authToken);
 
-        state = State.INGAME;
-        this.game = gameData.game();
-        this.playerColor = playerColor;
-        this.gameID = gameID;
-
-        if (this.gameUI == null){
-            this.gameUI = new GameUI(this);
-        }
-        this.gameUI.render();
+        gameModeAndRender(gameID, gameData, playerColor);
 
         return String.format("Joined game %d as %s", tempToRealIDs.get(gameID), playerColor);
     }
@@ -232,6 +224,7 @@ public class ChessClient {
         state = State.INGAME;
         this.game = gameData.game();
         this.gameID = gameID;
+        this.playerColor = null;
 
         if (this.gameUI == null){
             this.gameUI = new GameUI(this);
@@ -245,7 +238,11 @@ public class ChessClient {
         assertSignedIn();
 
         int tempID = Integer.parseInt(params[0]);
-        int gameID = tempToRealIDs.get(tempID);
+        Integer gameID = tempToRealIDs.get(tempID);
+        if (gameID == null){
+            throw new ResponseException(ResponseException.Code.BadRequest,
+                    "Invalid temporary ID: " + tempID+". Try 'list' again." );
+        }
         ListGamesResponse listResponse = server.listGames(authToken);
         GameData targetGame = null;
         for (GameData g : listResponse.games()){
@@ -266,6 +263,17 @@ public class ChessClient {
                     "You are not a player in this game. Join it first!");
         }
         String playerColor = (targetGame.whiteUsername().equals(username))? "white" : "black";
+        GameData fullGame = server.getGame(authToken, gameID);
+        if (fullGame == null|| fullGame.game()==null){
+            fullGame = new GameData(gameID, targetGame.whiteUsername(), targetGame.blackUsername(), targetGame.gameName(), new ChessGame());
+        }
+
+        gameModeAndRender(gameID, fullGame, playerColor);
+
+        return String.format("Playing game %d as %s", gameID, playerColor);
+    }
+
+    private void gameModeAndRender(int gameID, GameData targetGame, String playerColor) {
         state = State.INGAME;
         this.game = targetGame.game();
         this.playerColor = playerColor;
@@ -275,8 +283,6 @@ public class ChessClient {
             this.gameUI = new GameUI(this);
         }
         this.gameUI.render();
-
-        return String.format("Playing game %d as %s", gameID, playerColor);
     }
 
 //    private void leave() throws ResponseException{

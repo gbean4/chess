@@ -67,6 +67,12 @@ public class ServerFacade {
         return handleResponse(response, GameData.class);
     }
 
+    public GameData getGame(String authToken, int gameID) throws ResponseException{
+        var httpRequest = buildRequest("GET", "game/" + gameID, null, authToken);
+        var response = sendRequest(httpRequest);
+        return handleResponse(response, GameData.class);
+    }
+
     public void leaveGame(String authToken, int gameID) throws ResponseException{
         var req = new LeaveResignRequest(authToken, gameID);
         var httpRequest = buildRequest("PUT", "/game/leave", req);
