@@ -143,22 +143,58 @@ public class UserService {
             return dataAccess.getGame(gameSpec.gameID());
         }
     }
-    public void leaveGame(String authToken, GameSpec gameSpec) throws Exception{
+    public void leaveGame(String authToken, int gameID) throws Exception{
         AuthData auth = dataAccess.getAuth(authToken);
         if (auth== null) {
             throw new Exception("401 Unauthorized");
         }
+        var game= dataAccess.getGame(gameID);
+        if (game == null){
+            throw new Exception("404: game not found");
+        }
 
-        dataAccess.leaveGame(auth.username(), gameSpec.gameID());
+        String username = auth.username();
+        boolean isWhite = username.equals(game.whiteUsername());
+        boolean isBlack = username.equals(game.blackUsername());
+
+        if (!isBlack && !isWhite){
+            throw new ResponseException(ResponseException.Code.Forbidden, "You are not a player in this game.");
+        }
+        checkUser result = new checkUser(auth, username, isWhite);
+        if (result.isWhite()){
+            System.out.print(result.username() + " (WHITE) left the game.");
+        } else{
+            System.out.print(result.username() + " (BLACK) left the game.");
+        }
+        dataAccess.leaveGame(result.auth().username(), gameID);
     }
 
-    public void resignGame(String authToken, GameSpec gameSpec) throws Exception{
+    private record checkUser(AuthData auth, String username, boolean isWhite) {
+    }
+
+    public void resignGame(String authToken, int gameID) throws Exception{
         AuthData auth = dataAccess.getAuth(authToken);
         if (auth== null) {
             throw new Exception("401 Unauthorized");
         }
+        var game= dataAccess.getGame(gameID);
+        if (game == null){
+            throw new Exception("404: game not found");
+        }
+        String username = auth.username();
+        boolean isWhite = username.equals(game.whiteUsername());
+        boolean isBlack = username.equals(game.blackUsername());
 
-        dataAccess.resignGame(auth.username(), gameSpec.gameID());
+        if (!isBlack && !isWhite){
+            throw new ResponseException(ResponseException.Code.Forbidden, "You are not a player in this game.");
+        }
+        if (isWhite){
+            System.out.print(username + " (WHITE) resigned the game.");
+        } else{
+            System.out.print(username + " (BLACK) resigned the game.");
+        }
+
+        dataAccess.resignGame(auth.username(), gameID);
     }
 
     public Object getGame(String authToken, int gameID) throws Exception {

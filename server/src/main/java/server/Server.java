@@ -33,8 +33,8 @@ public class Server {
         server.get("game/{id}", this::getGame);
         server.post("game", this::createGame);
         server.put("game", this::joinGame);
-        server.put("/game/leave", this::leaveGame);
-        server.put("game/resign", this::resignGame);
+        server.put("/game/{id}/leave", this::leaveGame);
+        server.put("game/{id}/resign", this::resignGame);
     }
 
     private void handleException(Context ctx, Exception ex){
@@ -199,8 +199,8 @@ public class Server {
         var serializer = new Gson();
         try{
             String authToken = ctx.header("authorization");
-            var request = serializer.fromJson(ctx.body(), GameSpec.class);
-            userService.leaveGame(authToken, request);
+            int gameID = Integer.parseInt(ctx.pathParam("id"));
+            userService.leaveGame(authToken, gameID);
             ctx.status(200).result("{}");
         } catch(Exception ex){
             handleException(ctx, ex);
@@ -211,8 +211,8 @@ public class Server {
         var serializer = new Gson();
         try{
             String authToken = ctx.header("authorization");
-            var request = serializer.fromJson(ctx.body(), GameSpec.class);
-            userService.resignGame(authToken, request);
+            int gameID = Integer.parseInt(ctx.pathParam("id"));
+            userService.resignGame(authToken, gameID);
             ctx.status(200).result("{}");
         } catch(Exception ex){
             handleException(ctx, ex);
