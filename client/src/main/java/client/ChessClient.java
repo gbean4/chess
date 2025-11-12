@@ -87,7 +87,9 @@ public class ChessClient {
                 case "logout" -> logout();
                 case "list" -> listGames();
                 case "create" -> createGame(params);
+                case "play" -> playGame(params);
                 case "join" -> joinGame(params);
+                case "observe" ->observeGame(params);
                 case "help" -> help();
                 case "quit" -> "bye";
                 default -> "Unknown command. Type 'help' for options.";
@@ -164,10 +166,43 @@ public class ChessClient {
     public String joinGame(String... params) throws ResponseException {
         assertSignedIn();
         if (params.length != 2) {
-            return "Usage: join <gameID> <WHITE|BLACK|OBSERVER>";
+            return "Usage: join <gameID> <WHITE|BLACK>";
         }
-        int gameID = tempToRealIDs.get(Integer.parseInt(params[0]));
+        int tempID;
+        try{
+            tempID = Integer.parseInt(params[0]);
+        } catch (NumberFormatException e){
+            return "Invalid game ID format. Try again.";
+        }
+        if (!tempToRealIDs.containsKey(tempID)){
+            return "No such game number in your list. Try 'list' first.";
+        }
+
+        int gameID = tempToRealIDs.get(tempID);
         String playerColor = params[1].toUpperCase();
+
+        if (!playerColor.equals("WHITE")&& !playerColor.equals(("BLACK"))){
+            return "Invalid color. Use WHITE or BLACK";
+        }
+
+        ListGamesResponse listResponse = server.listGames(authToken);
+        GameData targetGame = null;
+        for (GameData g : listResponse.games()){
+            if (g.gameID() == gameID){
+                targetGame = g;
+                break;
+            }
+        }
+
+        if (targetGame == null){
+            return "Game not found on server. Try 'list' again to refresh.";
+        }
+        if (playerColor.equals("WHITE") && targetGame.whiteUsername() !=null){
+            return "Sorry! White is already taken.";
+        } else if (playerColor.equals("BLACK") && targetGame.blackUsername() !=null){
+            return "Sorry! Black is already taken.";
+        }
+
         var spec = new GameSpec(playerColor, gameID);
         var gameData = server.joinGame(spec, authToken);
 
@@ -178,12 +213,70 @@ public class ChessClient {
 
         if (this.gameUI == null){
             this.gameUI = new GameUI(this);
-            this.gameUI.render();
-        } else{
-            this.gameUI.render();
         }
+        this.gameUI.render();
 
         return String.format("Joined game %d as %s", tempToRealIDs.get(gameID), playerColor);
+    }
+
+    public String observeGame(String... params) throws ResponseException {
+        assertSignedIn();
+        if (params.length != 1) {
+            return "Usage: observe <gameID>";
+        }
+        int tempID = Integer.parseInt(params[0]);
+        int gameID = tempToRealIDs.get(tempID);
+        var spec = new GameSpec(null, gameID);
+        var gameData = server.joinGame(spec, authToken);
+
+        state = State.INGAME;
+        this.game = gameData.game();
+        this.gameID = gameID;
+
+        if (this.gameUI == null){
+            this.gameUI = new GameUI(this);
+        }
+        this.gameUI.render();
+
+        return String.format("Observing game %d", tempToRealIDs.get(gameID));
+    }
+
+    public String playGame(String... params) throws ResponseException {
+        assertSignedIn();
+
+        int tempID = Integer.parseInt(params[0]);
+        int gameID = tempToRealIDs.get(tempID);
+        ListGamesResponse listResponse = server.listGames(authToken);
+        GameData targetGame = null;
+        for (GameData g : listResponse.games()){
+            if (g.gameID() == gameID){
+                targetGame = g;
+                break;
+            }
+        }
+
+        if (targetGame == null){
+            throw new ResponseException(ResponseException.Code.BadRequest,
+                    "Game ID " + tempID + " not found.");
+        }
+
+        if (!username.equals(targetGame.whiteUsername()) &&
+                !username.equals(targetGame.blackUsername())){
+            throw new ResponseException(ResponseException.Code.BadRequest,
+                    "You are not a player in this game. Join it first!");
+        }
+        String playerColor = (targetGame.whiteUsername().equals(username))? "white" : "black";
+        state = State.INGAME;
+        this.game = targetGame.game();
+        this.playerColor = playerColor;
+        this.gameID = gameID;
+
+        if (this.gameUI == null){
+            this.gameUI = new GameUI(this);
+        }
+        this.gameUI.render();
+
+        return String.format("Playing game %d as %s", gameID, playerColor);
     }
 
 //    private void leave() throws ResponseException{
@@ -220,8 +313,11 @@ public class ChessClient {
                     Commands:
                     list - show all games
                     create <gameName> - create your own
-                    join <gameID> <WHITE|BLACK|OBSERVER> - join a game or observe
+                    join <gameID> <WHITE|BLACK> - join a game
+                    observe <gameID> - observe a game
+                    play <gameID>
                     logout - end session
+                    help - redisplay these commands
                     quit - playing chess
                     """;
         } else{
@@ -231,6 +327,8 @@ public class ChessClient {
                     board - render board
                     leave - let someone else take your spot
                     resign - give up :(
+                    logout - end session
+                    help - redisplay these commands
                     quit - playing chess
                     """;
         }

@@ -165,6 +165,10 @@ public class MySqlDataAccess implements DataAccess {
         }
         color = color.toLowerCase();
 
+        if (color.equals("observer")){
+            return;
+        }
+
         String statement;
         if (color.equals("white")){
             statement = "UPDATE GameData SET whiteUsername = ? WHERE gameID = ?";

@@ -111,30 +111,27 @@ public class UserService {
     public GameData joinGame(String authToken, GameSpec gameSpec) throws Exception {
         AuthData auth= dataAccess.getAuth(authToken);
         if (auth == null){
-            throw new Exception("401: Bad Request");
-        }
-        var existingAuth= dataAccess.getAuth(authToken);
-        if (existingAuth == null){
-            throw new Exception("unauthorized");
-        }
-
-        String color = gameSpec.playerColor();
-        if (color == null || (!color.equalsIgnoreCase("white") && (!color.equalsIgnoreCase("black")))){
-            throw new Exception("400: bad request invalid color");
+            throw new Exception("401: unauthorized");
         }
 
         var username = auth.username();
         var game = dataAccess.getGame(gameSpec.gameID());
-
         if (game == null){
-            throw new Exception("400: bad request");
+            throw new Exception("400: bad request - game not found");
         }
+
+        String color = gameSpec.playerColor();
+        if (color == null || color.isBlank()){
+            return game;
+        }
+
+        color = color.toLowerCase();
 
         if (game.whiteUsername() != null && game.blackUsername() != null){
             throw new Exception("403 already taken");
-        } else if ((Objects.equals(gameSpec.playerColor().toLowerCase(), "white") && game.whiteUsername()!= null)){
+        } else if ((Objects.equals(color.toLowerCase(), "white") && game.whiteUsername()!= null)){
             throw new Exception("403 already taken");
-        } else if ((Objects.equals(gameSpec.playerColor().toLowerCase(), "black") && game.blackUsername()!= null)){
+        } else if ((Objects.equals(color.toLowerCase(), "black") && game.blackUsername()!= null)){
             throw new Exception("403 already taken");
         } else {
             dataAccess.joinGame(username, gameSpec);

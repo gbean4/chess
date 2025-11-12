@@ -13,8 +13,5 @@ public class Main {
         client.setGameUI(gameUI);
 
         client.run();
-
-        //        var piece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
-//        System.out.println("♕ 240 Chess Client: " + piece);
     }
 }
