@@ -8,22 +8,16 @@ import server.ServerFacade;
 
 
 public class GameUI {
-    private final String playerColor;
-    private final ChessGame game;
-    private final ServerFacade server;
-    private final String authToken;
-    private final int gameID;
+    private final ChessClient client;
 
     public GameUI(ChessClient client) {
-        this.playerColor = client.getPlayerColor();
-        this.server = client.getServer();
-        this.authToken = client.getAuthToken();
-        this.gameID =  client.getGameID();
-        this.game = client.getGame();
+        this.client = client;
     }
 
     public void render(){
         ChessGame.TeamColor perspective= null;
+        String playerColor = client.getPlayerColor();
+        ChessGame game = client.getGame();
 
         if (playerColor != null){
            if (playerColor.equalsIgnoreCase("white")){
@@ -36,10 +30,16 @@ public class GameUI {
     }
 
     public String leave() throws ResponseException{
+        ServerFacade server = client.getServer();
+        String authToken = client.getAuthToken();
+        int gameID = client.getGameID();
         server.leaveGame(authToken, gameID);
         return "You left the game";
     }
     public String resign() throws ResponseException{
+        ServerFacade server = client.getServer();
+        String authToken = client.getAuthToken();
+        int gameID = client.getGameID();
         server.resignGame(authToken, gameID);
         return "You resigned. Game over.";
     }
@@ -49,6 +49,7 @@ public class GameUI {
         String cmd = (tokens.length > 0) ? tokens[0].toLowerCase(): "";
         ChessPosition from = posConvert(tokens[1]);
         ChessPosition to = posConvert(tokens[2]);
+        ChessGame game = client.getGame();
 
         return switch(cmd){
             case "move" -> {

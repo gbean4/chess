@@ -236,7 +236,9 @@ public class ChessClient {
 
     public String playGame(String... params) throws ResponseException {
         assertSignedIn();
-
+        if (params.length != 1) {
+            return "Usage: play <gameID>";
+        }
         int tempID = Integer.parseInt(params[0]);
         Integer gameID = tempToRealIDs.get(tempID);
         if (gameID == null){
@@ -270,7 +272,7 @@ public class ChessClient {
 
         gameModeAndRender(gameID, fullGame, playerColor);
 
-        return String.format("Playing game %d as %s", gameID, playerColor);
+        return String.format("Playing game %d as %s", tempID, playerColor);
     }
 
     private void gameModeAndRender(int gameID, GameData targetGame, String playerColor) {

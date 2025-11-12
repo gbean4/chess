@@ -151,4 +151,12 @@ public class UserService {
 
         dataAccess.resignGame(auth.username(), gameSpec.gameID());
     }
+
+    public Object getGame(String authToken, int gameID) throws Exception {
+        AuthData auth= dataAccess.getAuth(authToken);
+        if (auth == null){
+            throw new Exception("401: unauthorized");
+        }
+        return dataAccess.getGame(gameID);
+    }
 }

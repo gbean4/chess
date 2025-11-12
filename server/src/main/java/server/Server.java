@@ -30,6 +30,7 @@ public class Server {
         server.post("session", this::login);
         server.delete("session", this::logout);
         server.get("game", this::listGames);
+        server.get("game/{id}", this::getGame);
         server.post("game", this::createGame);
         server.put("game", this::joinGame);
         server.put("/game/leave", this::leaveGame);
@@ -79,22 +80,28 @@ public class Server {
             ctx.result(serializer.toJson(registrationResponse));
 
         } catch (Exception ex){
-            int statusCode;
-            var msg = (ex.getMessage() != null)? ex.getMessage().toLowerCase(): "";
-            if (msg.contains("401") || msg.contains("unauthorized")) {
-                statusCode = 401;
-            } else if (msg.contains("400") || msg.contains("missing required")){
-                statusCode = 400;
-            } else if (msg.contains("403") || msg.contains("forbidden")|| msg.contains("already exists")) {
-                statusCode = 403;
-            }else{
-                statusCode = 500;
-            }
+            int statusCode = getStatusCode(ex);
 
             ctx.status(statusCode).result(serializer.toJson(Map.of(
                     "message", "Error: " + ex.getMessage(),
                     "status", statusCode)));        }
     }
+
+    private static int getStatusCode(Exception ex) {
+        int statusCode;
+        var msg = (ex.getMessage() != null)? ex.getMessage().toLowerCase(): "";
+        if (msg.contains("401") || msg.contains("unauthorized")) {
+            statusCode = 401;
+        } else if (msg.contains("400") || msg.contains("missing required")){
+            statusCode = 400;
+        } else if (msg.contains("403") || msg.contains("forbidden")|| msg.contains("already exists")) {
+            statusCode = 403;
+        }else{
+            statusCode = 500;
+        }
+        return statusCode;
+    }
+
     private void login(Context ctx){
         var serializer = new Gson();
         try {
@@ -142,6 +149,23 @@ public class Server {
             String authToken = ctx.header("authorization");
             var games = userService.listGames(authToken);
             ctx.status(200).result(serializer.toJson(Map.of("games", games)));
+
+        } catch (Exception ex){
+            handleException(ctx, ex);
+        }
+    }
+
+    private void getGame(Context ctx){
+        var serializer = new Gson();
+        try {
+            String authToken = ctx.header("authorization");
+//            var req = serializer.fromJson(ctx.body(), GetGameRequest.class);
+            int gameID = Integer.parseInt(ctx.pathParam("id"));
+//            if (gameID ==null){
+//                throw new Exception("400: missing required fields");
+//            }
+            var game = userService.getGame(authToken, gameID);
+            ctx.status(200).result(serializer.toJson(game));
 
         } catch (Exception ex){
             handleException(ctx, ex);
