@@ -126,6 +126,10 @@ public class UserService {
         }
 
         color = color.toLowerCase();
+        if (!Objects.equals(color, "white")&& !Objects.equals(color, "black")){
+            throw new Exception(("400: bad request - invalid color"));
+        }
+
 
         if (game.whiteUsername() != null && game.blackUsername() != null){
             throw new Exception("403 already taken");
