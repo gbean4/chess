@@ -117,16 +117,16 @@ public class UserService {
         var username = auth.username();
         var game = dataAccess.getGame(gameSpec.gameID());
         if (game == null){
-            throw new Exception("400: bad request - game not found");
+            throw new ResponseException(ResponseException.Code.BadRequest, "400: bad request - game not found");
         }
 
         String color = gameSpec.playerColor();
         if (color == null || color.isBlank()){
-            return game;
+            throw new Exception(("400: bad request - invalid color"));
         }
 
         color = color.toLowerCase();
-        if (!Objects.equals(color, "white")&& !Objects.equals(color, "black")){
+        if (!Objects.equals(color, "white") && !Objects.equals(color, "black")){
             throw new Exception(("400: bad request - invalid color"));
         }
 
