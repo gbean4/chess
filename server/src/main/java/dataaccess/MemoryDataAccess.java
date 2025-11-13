@@ -89,6 +89,11 @@ public int createGame(String gameName) {
 
     }
 
+    @Override
+    public void updateGame(GameData game) {
+
+    }
+
 
     @Override
     public void joinGame(String username, GameSpec gameSpec) {

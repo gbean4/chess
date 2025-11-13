@@ -55,7 +55,7 @@ public class ChessBoardUI {
         for (char file = (perspective == ChessGame.TeamColor.WHITE? 'a' : 'h');
              (perspective == ChessGame.TeamColor.WHITE ? file <= 'h' : file >='a');
              file += perspective == ChessGame.TeamColor.WHITE? 1 : (char) -1){
-            System.out.print("  " + file + "  ");
+            System.out.print("  " + file + "   ");
         }
         System.out.println(RESET_BG_COLOR);
     }

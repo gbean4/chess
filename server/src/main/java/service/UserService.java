@@ -1,5 +1,6 @@
 package service;
 
+import chess.ChessGame;
 import dataaccess.DataAccess;
 import datamodel.*;
 import exception.ResponseException;
@@ -202,6 +203,11 @@ public class UserService {
         var game= dataAccess.getGame(gameID);
         if (game == null){
             throw new Exception("404: game not found");
+        }
+        if (game.game()== null){
+            var newGame = new ChessGame();
+            game = new GameData(game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName(), newGame);
+            dataAccess.updateGame(game);
         }
         return game;
     }

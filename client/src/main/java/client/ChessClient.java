@@ -74,7 +74,8 @@ public class ChessClient {
             if (state == State.INGAME){
                 String result = gameUI.handleCommand(input);
                 if (result.equalsIgnoreCase("You resigned.") ||
-                result.equalsIgnoreCase("You left the game.")){
+                result.equalsIgnoreCase("You left the game.")||
+                        result.equalsIgnoreCase("Returning to homescreen.")){
                     state = State.SIGNED_IN;
                     gameUI = null;
                 }
@@ -206,9 +207,16 @@ public class ChessClient {
         var spec = new GameSpec(playerColor, gameID);
         var gameData = server.joinGame(spec, authToken);
 
-        gameModeAndRender(gameID, gameData, playerColor);
-
-        return String.format("Joined game %d as %s", tempToRealIDs.get(gameID), playerColor);
+        var fullGame = server.getGame(authToken,gameID);
+        this.game = fullGame.game();
+        this.gameID = gameID;
+        this.playerColor = playerColor;
+//        if (game == null){
+//            return "Failed to load game after joining. Try 'list' again to refresh.";
+//        }
+//        gameModeAndRender(gameID, gameData, playerColor);
+//        playGame("play"+ fullGame.gameID());
+        return String.format("Joined game %d as %s. Type play %d to start", tempID, playerColor, tempID);
     }
 
     public String observeGame(String... params) throws ResponseException {
@@ -323,7 +331,7 @@ public class ChessClient {
                     resign - give up :(
                     logout - end session
                     help - redisplay these commands
-                    quit - playing chess
+                    homescreen - return to beginning
                     """;
         }
     }
@@ -346,4 +354,10 @@ public class ChessClient {
             throw new ResponseException("You must sign in");
         }
     }
+    private void assertInGame() throws ResponseException {
+        if (state != State.INGAME || game == null) {
+            throw new ResponseException("You're not currently in a game.");
+        }
+    }
+
 }

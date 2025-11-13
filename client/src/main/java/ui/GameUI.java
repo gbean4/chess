@@ -47,14 +47,17 @@ public class GameUI {
     public String handleCommand(String input) throws ResponseException, InvalidMoveException {
         String[] tokens = input.toLowerCase().split("\\s+");
         String cmd = (tokens.length > 0) ? tokens[0].toLowerCase(): "";
-        ChessPosition from = posConvert(tokens[1]);
-        ChessPosition to = posConvert(tokens[2]);
         ChessGame game = client.getGame();
 
         return switch(cmd){
             case "move" -> {
                 if (tokens.length != 3) {
                     yield "Usage: move <from> <to>";
+                }
+                ChessPosition from = posConvert(tokens[1]);
+                ChessPosition to = posConvert(tokens[2]);
+                if (game == null){
+                    yield "No game loaded. Try join <id> <color> first.";
                 }
                 game.makeMove(new ChessMove(from, to, game.getBoard().getPiece(from).getPieceType()));
                 render();
@@ -66,6 +69,8 @@ public class GameUI {
             }
             case "resign" -> resign();
             case "leave"-> leave();
+            case "help"-> client.help();
+            case "homescreen"-> "Returning to homescreen.";
             default -> "Unknown command. Type help for available commands.";
         };
     }

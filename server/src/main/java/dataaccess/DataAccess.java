@@ -23,4 +23,6 @@ public interface DataAccess {
     GameData getGame(int gameID) throws ResponseException;
     void leaveGame(String username, int gameID) throws DataAccessException;
     void resignGame(String username, int gameID);
+
+    void updateGame(GameData game);
 }
