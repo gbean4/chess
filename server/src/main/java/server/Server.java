@@ -203,6 +203,10 @@ public class Server {
                 throw new ResponseException(ResponseException.Code.Unauthorized, "Not authorized.");
             }
             var req = serializer.fromJson(ctx.body(), LeaveResignRequest.class);
+            if (req.authToken() == null){
+                req = new LeaveResignRequest(authToken, req.gameID());
+            }
+//            int gameID = Integer.parseInt(ctx.pathParam("id"));
             userService.leaveGame(req);
             ctx.status(200).result("{}");
         } catch(Exception ex){
@@ -218,6 +222,10 @@ public class Server {
                 throw new ResponseException(ResponseException.Code.Unauthorized, "Not authorized.");
             }
             var req = serializer.fromJson(ctx.body(), LeaveResignRequest.class);
+            if (req.authToken() == null){
+                req = new LeaveResignRequest(authToken, req.gameID());
+            }
+//            int gameID = Integer.parseInt(ctx.pathParam("id"));
             userService.resignGame(req);
             ctx.status(200).result("{}");
         } catch(Exception ex){
