@@ -67,6 +67,7 @@ public class GameUI {
                 render();
                 yield "";
             }
+            case "logout" -> client.logout();
             case "resign" -> resign();
             case "leave"-> leave();
             case "help"-> client.help();
