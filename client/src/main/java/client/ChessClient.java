@@ -243,12 +243,12 @@ public class ChessClient {
         try {
             tempID = Integer.parseInt(params[0]);
         } catch (NumberFormatException e) {
-            throw new ResponseException(ResponseException.Code.BadRequest,
+            throw new ResponseException(
                     "Invalid ID: " + tempID+". Use a number." );
         }
         Integer gameID = tempToRealIDs.get(tempID);
         if (gameID == null){
-            throw new ResponseException(ResponseException.Code.BadRequest,
+            throw new ResponseException(
                     "Invalid ID: " + tempID+". Try 'list' again." );
         }
         ListGamesResponse listResponse = server.listGames(authToken);
@@ -261,13 +261,13 @@ public class ChessClient {
         }
 
         if (targetGame == null){
-            throw new ResponseException(ResponseException.Code.BadRequest,
+            throw new ResponseException(
                     "Game ID " + tempID + " not found.");
         }
 
         if (!username.equals(targetGame.whiteUsername()) &&
                 !username.equals(targetGame.blackUsername())){
-            throw new ResponseException(ResponseException.Code.BadRequest,
+            throw new ResponseException(
                     "You are not a player in this game. Join it first!");
         }
         String playerColor = (targetGame.whiteUsername().equals(username))? "white" : "black";
@@ -343,7 +343,7 @@ public class ChessClient {
 
     private void assertSignedIn() throws ResponseException {
         if (state == State.SIGNED_OUT) {
-            throw new ResponseException(ResponseException.Code.BadRequest, "You must sign in");
+            throw new ResponseException("You must sign in");
         }
     }
 }

@@ -200,7 +200,7 @@ public class Server {
         try{
             String authToken = ctx.header("authorization");
             if (authToken == null){
-                throw new ResponseException(ResponseException.Code.Unauthorized, "Not authorized.");
+                throw new ResponseException("Not authorized.");
             }
             var req = serializer.fromJson(ctx.body(), LeaveResignRequest.class);
             if (req.authToken() == null){
@@ -219,7 +219,7 @@ public class Server {
         try{
             String authToken = ctx.header("authorization");
             if (authToken == null){
-                throw new ResponseException(ResponseException.Code.Unauthorized, "Not authorized.");
+                throw new ResponseException("Not authorized.");
             }
             var req = serializer.fromJson(ctx.body(), LeaveResignRequest.class);
             if (req.authToken() == null){

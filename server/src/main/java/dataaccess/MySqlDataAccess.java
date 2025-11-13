@@ -33,7 +33,7 @@ public class MySqlDataAccess implements DataAccess {
 
             stmt.execute("SET FOREIGN_KEY_CHECKS =1");
         } catch (SQLException | DataAccessException e) {
-            throw new RuntimeException(new ResponseException(ResponseException.Code.ServerError,
+            throw new RuntimeException(new ResponseException(
                     "unable to clear database: " + e.getMessage()));
         }
     }
@@ -64,7 +64,7 @@ public class MySqlDataAccess implements DataAccess {
                 }
             }
         } catch (SQLException e) {
-            throw new ResponseException(ResponseException.Code.ServerError, String.format("unable to connect to user: %s", e.getMessage()));
+            throw new ResponseException(String.format("unable to connect to user: %s", e.getMessage()));
         } catch (DataAccessException e){
             throw new RuntimeException(e);
         }
@@ -85,7 +85,7 @@ public class MySqlDataAccess implements DataAccess {
                 }
             }
         } catch (SQLException e) {
-            throw new ResponseException(ResponseException.Code.ServerError, String.format("unable to connect to user: %s", e.getMessage()));
+            throw new ResponseException(String.format("unable to connect to user: %s", e.getMessage()));
         } catch (DataAccessException e){
             throw new RuntimeException(e);
         }
@@ -99,10 +99,10 @@ public class MySqlDataAccess implements DataAccess {
             ps.setString(1, authToken);
             int rowsAffected = ps.executeUpdate();
             if (rowsAffected ==0){
-                throw new ResponseException(ResponseException.Code.BadRequest, "authToken not found");
+                throw new ResponseException("authToken not found");
             }
         } catch (SQLException e) {
-            throw new ResponseException(ResponseException.Code.ServerError, String.format("unable to connect to user: %s", e.getMessage()));
+            throw new ResponseException(String.format("unable to connect to user: %s", e.getMessage()));
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
@@ -150,7 +150,7 @@ public class MySqlDataAccess implements DataAccess {
             }
             return games.toArray(new GameData[0]);
         } catch (SQLException e) {
-            throw new ResponseException(ResponseException.Code.ServerError,
+            throw new ResponseException(
                     String.format("unable to connect to user: %s", e.getMessage()));
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
@@ -175,7 +175,7 @@ public class MySqlDataAccess implements DataAccess {
         } else if (color.equals("black")){
             statement = "UPDATE GameData SET blackUsername = ? WHERE gameID = ?";
         } else {
-            throw new ResponseException(ResponseException.Code.BadRequest, "Invalid color");
+            throw new ResponseException("Invalid color");
         }
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(statement)){
@@ -207,7 +207,7 @@ public class MySqlDataAccess implements DataAccess {
                 }
             }
         } catch (SQLException e) {
-            throw new ResponseException(ResponseException.Code.ServerError, String.format("unable to connect to user: %s", e.getMessage()));
+            throw new ResponseException(String.format("unable to connect to user: %s", e.getMessage()));
         } catch (DataAccessException e){
             throw new RuntimeException(e);
         }
@@ -260,10 +260,9 @@ public class MySqlDataAccess implements DataAccess {
             }
         } catch (SQLException e) {
             throw new ResponseException(
-                    ResponseException.Code.ServerError,
                     String.format("unable to update database: %s, %s", statement, e.getMessage()));
         } catch (DataAccessException e) {
-            throw new ResponseException(ResponseException.Code.ServerError,
+            throw new ResponseException(
                     String.format("unable to connect to database: %s", e.getMessage()));
         }
     }
@@ -330,7 +329,7 @@ public class MySqlDataAccess implements DataAccess {
                 }
             }
         } catch (SQLException | DataAccessException ex) {
-            throw new ResponseException(ResponseException.Code.ServerError,
+            throw new ResponseException(
                     String.format("Unable to configure database: %s", ex.getMessage()));
         }
     }

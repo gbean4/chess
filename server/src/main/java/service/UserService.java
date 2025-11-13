@@ -43,7 +43,7 @@ public class UserService {
         }
         var existingUser = dataAccess.getUser(user.username());
         if (existingUser != null){
-            throw new ResponseException(ResponseException.Code.Forbidden, "User already exists");
+            throw new ResponseException("User already exists");
         }
 
         String hashedPassword = makeUserPassword(user.password());
@@ -118,7 +118,7 @@ public class UserService {
         var username = auth.username();
         var game = dataAccess.getGame(gameSpec.gameID());
         if (game == null){
-            throw new ResponseException(ResponseException.Code.BadRequest, "400: bad request - game not found");
+            throw new ResponseException("400: bad request - game not found");
         }
 
         String color = gameSpec.playerColor();
@@ -158,7 +158,7 @@ public class UserService {
         boolean isBlack = username.equals(game.blackUsername());
 
         if (!isBlack && !isWhite){
-            throw new ResponseException(ResponseException.Code.Forbidden, "You are not a player in this game.");
+            throw new ResponseException("You are not a player in this game.");
         }
         if (isWhite){
             System.out.print(username + " (WHITE) left the game.");
@@ -183,7 +183,7 @@ public class UserService {
         boolean isBlack = username.equals(game.blackUsername());
 
         if (!isBlack && !isWhite){
-            throw new ResponseException(ResponseException.Code.Forbidden, "You are not a player in this game.");
+            throw new ResponseException("You are not a player in this game.");
         }
         if (isWhite){
             System.out.print(username + " (WHITE) resigned the game.");
