@@ -71,7 +71,7 @@ public class GameUI {
             case "resign" -> resign();
             case "leave"-> leave();
             case "help"-> client.help();
-            case "homescreen"-> "Returning to homescreen.";
+            case "back"-> "Returning to homescreen.";
             default -> "Unknown command. Type help for available commands.";
         };
     }

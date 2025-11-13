@@ -211,6 +211,9 @@ public class ChessClient {
         this.game = fullGame.game();
         this.gameID = gameID;
         this.playerColor = playerColor;
+        if (this.gameUI == null){
+            this.gameUI = new GameUI(this);
+        }
 
         this.gameUI.render();
         state = State.INGAME;
@@ -222,22 +225,32 @@ public class ChessClient {
         if (params.length != 1) {
             return "Usage: observe <gameID>";
         }
-        int tempID = Integer.parseInt(params[0]);
+        int tempID;
+        try{
+            tempID = Integer.parseInt(params[0]);
+        } catch (NumberFormatException e){
+            return "Invalid game ID format.";
+        }
+        if (!tempToRealIDs.containsKey(tempID)){
+            return "No such game number in your list. Try 'list' first.";
+        }
         int gameID = tempToRealIDs.get(tempID);
         var spec = new GameSpec(null, gameID);
 //        var gameData = server.joinGame(spec, authToken);
 
-        state = State.INGAME;
         var fullGame = server.getGame(authToken,gameID);
+        if (fullGame== null){
+            return "No one is here yet! Wait till someone joins.";
+        }
         this.game = fullGame.game();
         this.gameID = gameID;
         this.playerColor = null;
 
-        if (this.gameUI == null){
-            this.gameUI = new GameUI(this);
-        }
+//        if (this.gameUI == null){
+//            this.gameUI = new GameUI(this);
+//        }
         this.gameUI.render();
-
+        state = State.INGAME;
         return String.format("Observing game %d", tempID);
     }
 
@@ -331,7 +344,7 @@ public class ChessClient {
                     resign - give up :(
                     logout - end session
                     help - redisplay these commands
-                    homescreen - return to beginning
+                    back - return to beginning
                     """;
         }
     }
