@@ -246,9 +246,9 @@ public class ChessClient {
         this.gameID = gameID;
         this.playerColor = null;
 
-//        if (this.gameUI == null){
-//            this.gameUI = new GameUI(this);
-//        }
+        if (this.gameUI == null){
+            this.gameUI = new GameUI(this);
+        }
         this.gameUI.render();
         state = State.INGAME;
         return String.format("Observing game %d", tempID);
