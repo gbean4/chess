@@ -198,9 +198,9 @@ public class ChessClient {
         if (targetGame == null){
             return "Game not found on server. Try 'list' again to refresh.";
         }
-        if (playerColor.equals("WHITE") && targetGame.whiteUsername() !=null){
+        if (targetGame.whiteUsername() !=null && playerColor.equals("WHITE")){
             return "Sorry! White is already taken.";
-        } else if (playerColor.equals("BLACK") && targetGame.blackUsername() !=null){
+        } else if (targetGame.blackUsername() !=null && playerColor.equals("BLACK")){
             return "Sorry! Black is already taken.";
         }
 
@@ -223,10 +223,11 @@ public class ChessClient {
         int tempID = Integer.parseInt(params[0]);
         int gameID = tempToRealIDs.get(tempID);
         var spec = new GameSpec(null, gameID);
-        var gameData = server.joinGame(spec, authToken);
+//        var gameData = server.joinGame(spec, authToken);
 
         state = State.INGAME;
-        this.game = gameData.game();
+        var fullGame = server.getGame(authToken,gameID);
+        this.game = fullGame.game();
         this.gameID = gameID;
         this.playerColor = null;
 
@@ -235,7 +236,7 @@ public class ChessClient {
         }
         this.gameUI.render();
 
-        return String.format("Observing game %d", tempToRealIDs.get(gameID));
+        return String.format("Observing game %d", tempID);
     }
 
     public String playGame(String... params) throws ResponseException {
@@ -269,12 +270,13 @@ public class ChessClient {
                     "Game ID " + tempID + " not found.");
         }
 
-        if (!username.equals(targetGame.whiteUsername()) &&
-                !username.equals(targetGame.blackUsername())){
-            throw new ResponseException(
-                    "You are not a player in this game. Join it first!");
+        if (username.equals(targetGame.whiteUsername())){
+            playerColor = "white";
+        } else if(username.equals(targetGame.blackUsername())){
+            playerColor = "black";
+        } else{
+            throw new ResponseException("You are not a player in this game. Join it first!");
         }
-        String playerColor = (targetGame.whiteUsername().equals(username))? "white" : "black";
         GameData fullGame = server.getGame(authToken, gameID);
         if (fullGame == null|| fullGame.game()==null){
             fullGame = new GameData(gameID, targetGame.whiteUsername(), targetGame.blackUsername(), targetGame.gameName(), new ChessGame());
