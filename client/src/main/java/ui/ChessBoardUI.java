@@ -32,7 +32,7 @@ public class ChessBoardUI {
             String symbol = EMPTY;
             for (int col = colRange[0]; col != colRange[1]; col += colRange[2]) {
                 boolean isDark = (row + col) % 2 == 0;
-                bg = isDark ? SET_BG_COLOR_DARK_GREEN : SET_BG_COLOR_GREEN;
+                bg = isDark ? SET_BG_COLOR_GREEN : SET_BG_COLOR_DARK_GREEN;
 
                 ChessPosition pos = new ChessPosition(rank, col);
                 ChessPiece piece = board.getPiece(pos);
