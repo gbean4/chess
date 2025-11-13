@@ -211,11 +211,7 @@ public class ChessClient {
         this.game = fullGame.game();
         this.gameID = gameID;
         this.playerColor = playerColor;
-//        if (game == null){
-//            return "Failed to load game after joining. Try 'list' again to refresh.";
-//        }
-//        gameModeAndRender(gameID, gameData, playerColor);
-//        playGame("play"+ fullGame.gameID());
+
         return String.format("Joined game %d as %s. Type play %d to start", tempID, playerColor, tempID);
     }
 
@@ -352,11 +348,6 @@ public class ChessClient {
     private void assertSignedIn() throws ResponseException {
         if (state == State.SIGNED_OUT) {
             throw new ResponseException("You must sign in");
-        }
-    }
-    private void assertInGame() throws ResponseException {
-        if (state != State.INGAME || game == null) {
-            throw new ResponseException("You're not currently in a game.");
         }
     }
 
