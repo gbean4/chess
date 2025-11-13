@@ -122,10 +122,7 @@ public class ServerFacade {
             }
             return gson.fromJson(body,responseClass);
         }
-        try{
-            throw ResponseException.fromJson(body);
-        } catch (Exception e){
-            throw new ResponseException(ResponseException.fromHttpStatusCode(status), body);
-        }
+
+        throw ResponseException.fromJson(body);
     }
 }
