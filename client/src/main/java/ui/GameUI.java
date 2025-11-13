@@ -34,7 +34,7 @@ public class GameUI {
         String authToken = client.getAuthToken();
         int gameID = client.getGameID();
         server.leaveGame(authToken, gameID);
-        return "You left the game";
+        return "You left the game.";
     }
     public String resign() throws ResponseException{
         ServerFacade server = client.getServer();

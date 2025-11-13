@@ -73,7 +73,7 @@ public class ChessClient {
 
             if (state == State.INGAME){
                 String result = gameUI.handleCommand(input);
-                if (result.equalsIgnoreCase("You resigned.") ||
+                if (result.equalsIgnoreCase("You resigned. Game over.") ||
                 result.equalsIgnoreCase("You left the game.")||
                         result.equalsIgnoreCase("Returning to homescreen.")){
                     state = State.SIGNED_IN;
