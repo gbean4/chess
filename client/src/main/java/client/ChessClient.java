@@ -213,6 +213,7 @@ public class ChessClient {
         this.playerColor = playerColor;
 
         this.gameUI.render();
+        state = State.INGAME;
         return String.format("Joined game %d as %s.", tempID, playerColor);
     }
 

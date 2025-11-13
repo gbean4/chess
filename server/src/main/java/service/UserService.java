@@ -56,14 +56,14 @@ public class UserService {
 
     public AuthData login(String username, String password) throws Exception {
         if (username == null || password ==null){
-            throw new Exception("400: Missing fields");
+            throw new Exception("Missing fields");
         }
         UserData user = dataAccess.getUser(username);
         if (user == null){
-            throw new Exception("401: User not found");
+            throw new Exception("User not found");
         }
         if (!verifyUser(user.username(), password)){
-            throw new Exception("401: Invalid password");
+            throw new Exception("Invalid password");
         }
 
         String token = UUID.randomUUID().toString();
@@ -88,11 +88,11 @@ public class UserService {
     public int createGame(String authToken, String gameName) throws Exception {
         AuthData auth= dataAccess.getAuth(authToken);
         if (auth == null){
-            throw new Exception("401: Bad Request");
+            throw new Exception("Unauthorized");
         }
 
         if (gameName == null || gameName.isBlank()){
-            throw new Exception("400: missing game name");
+            throw new Exception("missing game name");
         }
         return dataAccess.createGame(gameName);
     }
@@ -100,11 +100,11 @@ public class UserService {
     public GameData[] listGames(String authToken) throws Exception {
         AuthData auth= dataAccess.getAuth(authToken);
         if (auth == null){
-            throw new Exception("401: Bad Request");
+            throw new Exception("Unauthorized");
         }
         var existingAuth= dataAccess.getAuth(authToken);
         if (existingAuth == null){
-            throw new Exception("unauthorized");
+            throw new Exception("Unauthorized");
         }
 
         return dataAccess.listGames(authToken);
@@ -113,32 +113,32 @@ public class UserService {
     public GameData joinGame(String authToken, GameSpec gameSpec) throws Exception {
         AuthData auth= dataAccess.getAuth(authToken);
         if (auth == null){
-            throw new Exception("401: unauthorized");
+            throw new Exception("Unauthorized");
         }
 
         var username = auth.username();
         var game = dataAccess.getGame(gameSpec.gameID());
         if (game == null){
-            throw new ResponseException("400: bad request - game not found");
+            throw new Exception("bad request - game not found");
         }
 
         String color = gameSpec.playerColor();
         if (color == null || color.isBlank()){
-            throw new Exception(("400: bad request - invalid color"));
+            throw new Exception(("bad request - invalid color"));
         }
 
         color = color.toLowerCase();
         if (!Objects.equals(color, "white") && !Objects.equals(color, "black")){
-            throw new Exception(("400: bad request - invalid color"));
+            throw new Exception(("bad request - invalid color"));
         }
 
 
         if (game.whiteUsername() != null && game.blackUsername() != null){
-            throw new Exception("403 already taken");
+            throw new Exception("color already taken");
         } else if ((Objects.equals(color.toLowerCase(), "white") && game.whiteUsername()!= null)){
-            throw new Exception("403 already taken");
+            throw new Exception("color already taken");
         } else if ((Objects.equals(color.toLowerCase(), "black") && game.blackUsername()!= null)){
-            throw new Exception("403 already taken");
+            throw new Exception("color already taken");
         } else {
             dataAccess.joinGame(username, gameSpec);
             return dataAccess.getGame(gameSpec.gameID());
@@ -147,11 +147,11 @@ public class UserService {
     public void leaveGame(LeaveResignRequest req) throws Exception{
         AuthData auth = dataAccess.getAuth(req.authToken());
         if (auth== null) {
-            throw new Exception("401 Unauthorized");
+            throw new Exception("Unauthorized");
         }
         var game= dataAccess.getGame(req.gameID());
         if (game == null){
-            throw new Exception("404: game not found");
+            throw new Exception("game not found");
         }
 
         String username = auth.username();
@@ -173,11 +173,11 @@ public class UserService {
     public void resignGame(LeaveResignRequest req) throws Exception{
         AuthData auth = dataAccess.getAuth(req.authToken());
         if (auth== null) {
-            throw new Exception("401 Unauthorized");
+            throw new Exception("Unauthorized");
         }
         var game= dataAccess.getGame(req.gameID());
         if (game == null){
-            throw new Exception("404: game not found");
+            throw new Exception("game not found");
         }
         String username = auth.username();
         boolean isWhite = username.equals(game.whiteUsername());
@@ -198,11 +198,11 @@ public class UserService {
     public Object getGame(String authToken, int gameID) throws Exception {
         AuthData auth= dataAccess.getAuth(authToken);
         if (auth == null){
-            throw new Exception("401: unauthorized");
+            throw new Exception("unauthorized");
         }
         var game= dataAccess.getGame(gameID);
         if (game == null){
-            throw new Exception("404: game not found");
+            throw new Exception("game not found");
         }
         if (game.game()== null){
             var newGame = new ChessGame();

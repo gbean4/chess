@@ -41,9 +41,9 @@ public class Server {
         var serializer= new Gson();
         int statusCode;
         var msg = (ex.getMessage() != null)? ex.getMessage().toLowerCase(): "";
-        if (msg.contains("401") || msg.contains("unauthorized")) {
+        if (msg.contains("401") || msg.contains("unauthorized")|| msg.contains("not found")|| msg.contains("invalid")) {
             statusCode = 401;
-        } else if (msg.contains("400") || msg.contains("missing required") || msg.contains("bad request")){
+        } else if (msg.contains("400") || msg.contains("missing") || msg.contains("bad request")|| msg.contains("game not found")){
             statusCode = 400;
         } else if (msg.contains("403") || msg.contains("forbidden") || msg.contains("already exists")|| msg.contains("already taken")){
             statusCode = 403;
@@ -130,7 +130,7 @@ public class Server {
         try{
             var req = serializer.fromJson(ctx.body(), CreateGameRequest.class);
             if (req == null || req.gameName() == null || req.gameName().isEmpty()){
-                throw new Exception("400: missing required fields");
+                throw new Exception("missing required fields");
             }
             String authToken = ctx.header("authorization");
 //            GameData gameData = userService.createGame(authToken, req.gameName());
@@ -180,7 +180,7 @@ public class Server {
             int statusCode;
             var msg = ex.getMessage().toLowerCase();
 
-            if (msg.contains("401")) {
+            if (msg.contains("unauthorized")) {
                 statusCode = 401;
             } else if (msg.contains("400") || msg.contains("bad request")) {
                 statusCode = 400;

@@ -123,7 +123,7 @@ class UserServiceTest {
         service.register(user);
 
         Exception ex = assertThrows(Exception.class, () -> service.createGame("badToken", "Chess Game"));
-        assertTrue(ex.getMessage().contains("401"));
+        assertTrue(ex.getMessage().contains("Unauthorized"));
     }
 
     @Test
@@ -147,7 +147,7 @@ class UserServiceTest {
         var service = new UserService(db);
 
         Exception ex = assertThrows(Exception.class, () -> service.listGames("badToken"));
-        assertTrue(ex.getMessage().contains("401"));
+        assertTrue(ex.getMessage().contains("Unauthorized"));
     }
     @Test
     void joinGamePositive() throws Exception{
