@@ -223,7 +223,9 @@ public class MySqlDataAccess implements DataAccess {
                 """;
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(statement)) {
-            ps.setInt(1, gameID);
+            ps.setString(1, username);
+            ps.setString(2, username);
+            ps.setInt(3, gameID);
             ps.executeUpdate();
         } catch (SQLException | DataAccessException e) {
             throw new RuntimeException(e);

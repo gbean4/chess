@@ -33,7 +33,7 @@ public class Server {
         server.get("game/{id}", this::getGame);
         server.post("game", this::createGame);
         server.put("game", this::joinGame);
-        server.put("/game/{id}/leave", this::leaveGame);
+        server.put("game/{id}/leave", this::leaveGame);
         server.put("game/{id}/resign", this::resignGame);
     }
 
@@ -199,8 +199,11 @@ public class Server {
         var serializer = new Gson();
         try{
             String authToken = ctx.header("authorization");
-            int gameID = Integer.parseInt(ctx.pathParam("id"));
-            userService.leaveGame(authToken, gameID);
+            if (authToken == null){
+                throw new ResponseException(ResponseException.Code.Unauthorized, "Not authorized.");
+            }
+            var req = serializer.fromJson(ctx.body(), LeaveResignRequest.class);
+            userService.leaveGame(req);
             ctx.status(200).result("{}");
         } catch(Exception ex){
             handleException(ctx, ex);
@@ -211,8 +214,11 @@ public class Server {
         var serializer = new Gson();
         try{
             String authToken = ctx.header("authorization");
-            int gameID = Integer.parseInt(ctx.pathParam("id"));
-            userService.resignGame(authToken, gameID);
+            if (authToken == null){
+                throw new ResponseException(ResponseException.Code.Unauthorized, "Not authorized.");
+            }
+            var req = serializer.fromJson(ctx.body(), LeaveResignRequest.class);
+            userService.resignGame(req);
             ctx.status(200).result("{}");
         } catch(Exception ex){
             handleException(ctx, ex);

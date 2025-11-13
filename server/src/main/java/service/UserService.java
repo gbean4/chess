@@ -143,12 +143,12 @@ public class UserService {
             return dataAccess.getGame(gameSpec.gameID());
         }
     }
-    public void leaveGame(String authToken, int gameID) throws Exception{
-        AuthData auth = dataAccess.getAuth(authToken);
+    public void leaveGame(LeaveResignRequest req) throws Exception{
+        AuthData auth = dataAccess.getAuth(req.authToken());
         if (auth== null) {
             throw new Exception("401 Unauthorized");
         }
-        var game= dataAccess.getGame(gameID);
+        var game= dataAccess.getGame(req.gameID());
         if (game == null){
             throw new Exception("404: game not found");
         }
@@ -160,24 +160,21 @@ public class UserService {
         if (!isBlack && !isWhite){
             throw new ResponseException(ResponseException.Code.Forbidden, "You are not a player in this game.");
         }
-        checkUser result = new checkUser(auth, username, isWhite);
-        if (result.isWhite()){
-            System.out.print(result.username() + " (WHITE) left the game.");
+        if (isWhite){
+            System.out.print(username + " (WHITE) left the game.");
         } else{
-            System.out.print(result.username() + " (BLACK) left the game.");
+            System.out.print(username + " (BLACK) left the game.");
         }
-        dataAccess.leaveGame(result.auth().username(), gameID);
+        dataAccess.leaveGame(username, req.gameID());
     }
 
-    private record checkUser(AuthData auth, String username, boolean isWhite) {
-    }
 
-    public void resignGame(String authToken, int gameID) throws Exception{
-        AuthData auth = dataAccess.getAuth(authToken);
+    public void resignGame(LeaveResignRequest req) throws Exception{
+        AuthData auth = dataAccess.getAuth(req.authToken());
         if (auth== null) {
             throw new Exception("401 Unauthorized");
         }
-        var game= dataAccess.getGame(gameID);
+        var game= dataAccess.getGame(req.gameID());
         if (game == null){
             throw new Exception("404: game not found");
         }
@@ -194,7 +191,7 @@ public class UserService {
             System.out.print(username + " (BLACK) resigned the game.");
         }
 
-        dataAccess.resignGame(auth.username(), gameID);
+        dataAccess.resignGame(auth.username(), req.gameID());
     }
 
     public Object getGame(String authToken, int gameID) throws Exception {

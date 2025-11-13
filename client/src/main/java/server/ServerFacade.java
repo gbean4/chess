@@ -69,15 +69,17 @@ public class ServerFacade {
     }
 
     public void leaveGame(String authToken, int gameID) throws ResponseException{
+        var path = "/game/"+gameID+"/leave";
         var req = new LeaveResignRequest(authToken, gameID);
-        var httpRequest = buildRequest("PUT", "/game/leave", req);
+        var httpRequest = buildRequest("PUT", path, req);
         var response = sendRequest(httpRequest);
         handleResponse(response, null);
     }
 
     public void resignGame(String authToken, int gameID) throws ResponseException{
+        var path = "/game/"+gameID+"/leave";
         var req = new LeaveResignRequest(authToken, gameID);
-        var httpRequest = buildRequest("PUT", "/game/resign", req);
+        var httpRequest = buildRequest("PUT", path, req);
         var response = sendRequest(httpRequest);
         handleResponse(response, null);
     }

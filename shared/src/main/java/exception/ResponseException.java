@@ -10,6 +10,7 @@ public class ResponseException extends Exception {
         BadRequest,
         Unauthorized,
         Forbidden,
+        NotFound
     }
 
     final private Code code;
@@ -53,6 +54,7 @@ public class ResponseException extends Exception {
             case 400 -> Code.BadRequest;
             case 401 -> Code.Unauthorized;
             case 403 -> Code.Forbidden;
+            case 404 -> Code.NotFound;
             case 500 -> Code.ServerError;
 
             default -> throw new IllegalArgumentException("Unknown HTTP status code: " + httpStatusCode);
