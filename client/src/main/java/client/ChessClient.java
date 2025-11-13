@@ -212,7 +212,8 @@ public class ChessClient {
         this.gameID = gameID;
         this.playerColor = playerColor;
 
-        return String.format("Joined game %d as %s. Type play %d to start", tempID, playerColor, tempID);
+        this.gameUI.render();
+        return String.format("Joined game %d as %s.", tempID, playerColor);
     }
 
     public String observeGame(String... params) throws ResponseException {
