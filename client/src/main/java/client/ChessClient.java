@@ -340,6 +340,7 @@ public class ChessClient {
                     Commands:
                     move <from> <to> - make move
                     board - render board
+                    highlight moves <from> - show available moves
                     leave - let someone else take your spot
                     resign - give up :(
                     logout - end session

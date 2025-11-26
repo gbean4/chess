@@ -6,6 +6,8 @@ import client.ChessClient;
 import exception.ResponseException;
 import server.ServerFacade;
 
+import java.util.Arrays;
+
 
 public class GameUI {
     private final ChessClient client;
@@ -44,25 +46,30 @@ public class GameUI {
         return "You resigned. Game over.";
     }
 
+    public String move(String... params) throws InvalidMoveException {
+        if (params.length != 2) {
+            return "Usage: move <from> <to>";
+        }
+        ChessPosition from = posConvert(params[0]);
+        ChessPosition to = posConvert(params[1]);
+        var game = client.getGame();
+
+        if (game == null) {
+            return "No game loaded. Try join <id> <color> first.";
+        }
+        game.makeMove(new ChessMove(from, to, game.getBoard().getPiece(from).getPieceType()));
+        render();
+        return "Move has been made";
+    }
+
+
     public String handleCommand(String input) throws ResponseException, InvalidMoveException {
         String[] tokens = input.toLowerCase().split("\\s+");
         String cmd = (tokens.length > 0) ? tokens[0].toLowerCase(): "";
-        ChessGame game = client.getGame();
+        String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
 
         return switch(cmd){
-            case "move" -> {
-                if (tokens.length != 3) {
-                    yield "Usage: move <from> <to>";
-                }
-                ChessPosition from = posConvert(tokens[1]);
-                ChessPosition to = posConvert(tokens[2]);
-                if (game == null){
-                    yield "No game loaded. Try join <id> <color> first.";
-                }
-                game.makeMove(new ChessMove(from, to, game.getBoard().getPiece(from).getPieceType()));
-                render();
-                yield "";
-            }
+            case "move" -> move(params);
             case "board" -> {
                 render();
                 yield "";
@@ -71,10 +78,12 @@ public class GameUI {
             case "resign" -> resign();
             case "leave"-> leave();
             case "help"-> client.help();
+            case "highlight moves"-> "input piece and get moves";
             case "back"-> "Returning to homescreen.";
             default -> "Unknown command. Type help for available commands.";
         };
     }
+
     public static ChessPosition posConvert(String pos){
         char file = pos.charAt(0);
         char rank = pos.charAt(1);
