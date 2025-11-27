@@ -1,29 +1,29 @@
 package server.websocket;
 
 import org.eclipse.jetty.websocket.api.Session;
-import webSocketMessages.Notification;
-
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ConnectionManager {
-    public final ConcurrentHashMap<Session, Session> connections = new ConcurrentHashMap<>();
+    public final ConcurrentHashMap<Integer, ConcurrentHashMap<Session, String>> games = new ConcurrentHashMap<>();
 
-    public void add(Session session) {
-        connections.put(session, session);
+    public void add(int gameID, Session session, String authToken) {
+        games.putIfAbsent(gameID, new ConcurrentHashMap<>());
+        games.get(gameID).put(session, authToken);
     }
 
-    public void remove(Session session) {
-        connections.remove(session);
+    public void remove(int gameID, Session session) {
+        if (games.containsKey(gameID)){
+            games.get(gameID).remove(session);
+        }
     }
 
-    public void broadcast(Session excludeSession, Notification notification) throws IOException {
-        String msg = notification.toString();
-        for (Session c : connections.values()) {
-            if (c.isOpen()) {
-                if (!c.equals(excludeSession)) {
-                    c.getRemote().sendString(msg);
-                }
+    public void broadcast(int gameID, Session exclude, String json) throws IOException {
+        if (!games.containsKey(gameID)){return;}
+
+        for (Session s : games.get(gameID).keySet()){
+            if (s.isOpen() && !s.equals(exclude)) {
+                s.getRemote().sendString(json);
             }
         }
     }

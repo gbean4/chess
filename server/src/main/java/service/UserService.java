@@ -211,4 +211,12 @@ public class UserService {
         }
         return game;
     }
+    public AuthData validate(String authToken) throws Exception {
+        AuthData auth= dataAccess.getAuth(authToken);
+        if (auth == null){
+            throw new Exception("unauthorized");
+        } else {
+            return auth;
+        }
+    }
 }
