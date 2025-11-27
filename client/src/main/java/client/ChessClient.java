@@ -9,6 +9,7 @@ import exception.ResponseException;
 import server.ServerFacade;
 import ui.GameUI;
 import websocket.ChessWebsocket;
+import websocket.NotificationHandler;
 
 import static ui.EscapeSequences.RESET_TEXT_COLOR;
 import static ui.EscapeSequences.*;
@@ -22,12 +23,10 @@ public class ChessClient {
     private ChessGame game = null;
     private String playerColor = null;
     private int gameID = -1;
-    private ChessWebsocket ws;
     private final Map<Integer, Integer> tempToRealIDs = new HashMap<>();
 
     public ChessClient(String serverUrl) throws ResponseException {
         this.server = new ServerFacade(serverUrl);
-        ws = new ChessWebsocket(serverUrl);
     }
 
     public void setGameUI(GameUI gameUI){
@@ -41,7 +40,6 @@ public class ChessClient {
 
     public void run() {
         System.out.println(LOGO + " Welcome to Chess! Type Help to get started.");
-//        System.out.print(help());
 
         Scanner scanner = new Scanner(System.in);
         var result = "";
@@ -220,6 +218,11 @@ public class ChessClient {
 
         this.gameUI.render();
         state = State.INGAME;
+
+        if (this.ws == null){
+            this.ws = new ChessWebsocket(server.getServerUrl(), authToken, new WebsocketHandler())
+        }
+        ws.sendConnect(authToken, gameID);
         return String.format("Joined game %d as %s.", tempID, playerColor);
     }
 
