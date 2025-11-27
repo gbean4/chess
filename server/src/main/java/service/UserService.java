@@ -1,6 +1,6 @@
 package service;
 
-import chess.ChessGame;
+import chess.*;
 import dataaccess.DataAccess;
 import datamodel.*;
 import exception.ResponseException;
@@ -218,5 +218,26 @@ public class UserService {
         } else {
             return auth;
         }
+    }
+    public ChessGame applyMove(String authToken, int gameID, ChessMove move) throws Exception {
+        var game = dataAccess.getGame(gameID);
+        if (game == null || move == null){
+            throw new Exception("game not found");
+        }
+        AuthData auth= dataAccess.getAuth(authToken);
+        if (auth == null){
+            throw new Exception("unauthorized");
+        }
+        var turn = game.game().getTeamTurn();
+
+        if (turn == ChessGame.TeamColor.WHITE && !Objects.equals(game.whiteUsername(), auth.username()) ||
+        (turn == ChessGame.TeamColor.BLACK && !Objects.equals(game.blackUsername(), auth.username()))){
+            throw new Exception("unauthorized");
+        }
+
+        game.game().applyMove(move, game.game().getBoard());
+        dataAccess.updateGame(game);
+
+        return game.game();
     }
 }

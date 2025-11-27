@@ -2,14 +2,12 @@ package server.websocket;
 
 import chess.ChessGame;
 import com.google.gson.Gson;
-import exception.ResponseException;
 import io.javalin.websocket.*;
 import org.eclipse.jetty.websocket.api.Session;
+import org.jetbrains.annotations.NotNull;
 import service.UserService;
 import websocket.commands.*;
 import websocket.messages.*;
-
-import java.io.IOException;
 
 public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
 
@@ -29,14 +27,14 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     @Override
-    public void handleMessage(WsMessageContext ctx) {
+    public void handleMessage(@NotNull WsMessageContext ctx) {
         try {
             UserGameCommand cmd = gson.fromJson(ctx.message(), UserGameCommand.class);
             Session session = ctx.session;
 
             switch (cmd.getCommandType()) {
                 case CONNECT -> onConnect(cmd, session);
-                case MAKE_MOVE -> onMove((MakeMoveCommand), cmd, session);
+                case MAKE_MOVE -> onMove((MakeMoveCommand) cmd, session);
                 case LEAVE -> onLeave(cmd, session);
                 case RESIGN -> onResign(cmd, session);
             }
@@ -50,7 +48,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     @Override
-    public void handleClose(WsCloseContext ctx) {
+    public void handleClose(@NotNull WsCloseContext ctx) {
         System.out.println("Websocket closed");
     }
 
@@ -78,7 +76,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         service.validate(auth);
 
         try{
-            ChessGame updated = service.applyMove(gameID, move);
+            ChessGame updated = service.applyMove(auth, gameID, move);
             LoadGameMessage msg = new LoadGameMessage(updated);
             String json = gson.toJson(msg);
 
