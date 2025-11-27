@@ -8,6 +8,7 @@ import datamodel.*;
 import exception.ResponseException;
 import server.ServerFacade;
 import ui.GameUI;
+import websocket.ChessWebsocket;
 
 import static ui.EscapeSequences.RESET_TEXT_COLOR;
 import static ui.EscapeSequences.*;
@@ -21,10 +22,12 @@ public class ChessClient {
     private ChessGame game = null;
     private String playerColor = null;
     private int gameID = -1;
+    private ChessWebsocket ws;
     private final Map<Integer, Integer> tempToRealIDs = new HashMap<>();
 
-    public ChessClient(ServerFacade serverFacade) {
-        this.server = serverFacade;
+    public ChessClient(String serverUrl) throws ResponseException {
+        this.server = new ServerFacade(serverUrl);
+        ws = new ChessWebsocket(serverUrl);
     }
 
     public void setGameUI(GameUI gameUI){

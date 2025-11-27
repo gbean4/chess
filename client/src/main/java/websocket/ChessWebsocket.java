@@ -3,10 +3,14 @@ package websocket;
 import com.google.gson.Gson;
 import exception.ResponseException;
 import jakarta.websocket.*;
-import org.glassfish.tyrus.core.wsadl.model.Endpoint;
+import jakarta.websocket.Endpoint;
+import websocket.commands.UserGameCommand;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
+import websocket.messages.ServerMessage;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
+import java.net.URI;
 
 public class ChessWebsocket extends Endpoint {
     private Session session;
@@ -14,29 +18,53 @@ public class ChessWebsocket extends Endpoint {
     private final Gson gson = new Gson();
     private final String authToken;
 
-    public ChessWebsocket(String url, String authToken, NotificationHandler handler) throws ResponseException
-        try{
+    public ChessWebsocket(String url, String authToken, NotificationHandler handler) throws ResponseException {
+        try {
             this.handler = handler;
             this.authToken = authToken;
 
-            url = url.replace ("http","ws");
+            url = url.replace("http", "ws");
+            URI uri = new URI(url + "/ws");
 
-        WebSocketContainer container = ContainerProvider.getWebSocketContainer();
-        this.session = container.connectToServer(this, url);
+            WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+            this.session = container.connectToServer(this, uri);
 
-        this.session.addMessageHandler((MessageHandler.Whole<String>) message -> {
-            ChessNotification note = gson.fromJson(message, ChessNotification.class);
-            handler.notify(note);
-        });
+            this.session.addMessageHandler((MessageHandler.Whole<String>) this::handleIncomingMessage);
 
-    } catch (Exception e){
-        throw new ResponseException(e.getMessage());
+        } catch (Exception e) {
+            throw new ResponseException(e.getMessage());
+        }
     }
-}
 
-@Override
-public void onOpen(Session session, EndpointConfig config){
-    try{
-        session.getBasicRemote().sendText(authJson());
+    @Override
+    public void onOpen(Session session, EndpointConfig config) {
     }
+
+    private void handleIncomingMessage(String json){
+        ServerMessage base = gson.fromJson(json, ServerMessage.class);
+
+        switch(base.getServerMessageType()){
+            case LOAD_GAME -> {
+                LoadGameMessage msg = gson.fromJson(json, LoadGameMessage.class);
+                handler.loadGame(msg);
+            }
+            case ERROR -> {
+                ErrorMessage msg = gson.fromJson(json, ErrorMessage.class);
+                handler.error(msg);
+            }
+            case NOTIFICATION -> {
+                NotificationMessage msg = gson.fromJson(json, NotificationMessage.class);
+                handler.notify(msg);
+            }
+        }
+    }
+
+    public void sendCommand(UserGameCommand cmd) throws ResponseException{
+        try{
+            session.getBasicRemote().sendText(gson.toJson(cmd));
+        } catch(Exception e){
+            throw new ResponseException(e.getMessage());
+        }
+    }
+
 }
