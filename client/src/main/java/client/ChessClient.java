@@ -6,10 +6,14 @@ import chess.ChessGame;
 import chess.InvalidMoveException;
 import datamodel.*;
 import exception.ResponseException;
+import jakarta.websocket.WebSocketContainer;
 import server.ServerFacade;
 import ui.GameUI;
 import websocket.ChessWebsocket;
+import websocket.ClientNotificationHandler;
+import websocket.ClientWebsocketHandler;
 import websocket.NotificationHandler;
+import websocket.commands.UserGameCommand;
 
 import static ui.EscapeSequences.RESET_TEXT_COLOR;
 import static ui.EscapeSequences.*;
@@ -23,6 +27,7 @@ public class ChessClient {
     private ChessGame game = null;
     private String playerColor = null;
     private int gameID = -1;
+    private ChessWebsocket ws;
     private final Map<Integer, Integer> tempToRealIDs = new HashMap<>();
 
     public ChessClient(String serverUrl) throws ResponseException {
@@ -220,9 +225,8 @@ public class ChessClient {
         state = State.INGAME;
 
         if (this.ws == null){
-            this.ws = new ChessWebsocket(server.getServerUrl(), authToken, new WebsocketHandler())
-        }
-        ws.sendConnect(authToken, gameID);
+            this.ws = new ChessWebsocket(server.getServerUrl(), authToken, new ClientNotificationHandler(this));
+        ws.sendCommand(new UserGameCommand(UserGameCommand.CommandType.CONNECT,authToken, gameID));
         return String.format("Joined game %d as %s.", tempID, playerColor);
     }
 
