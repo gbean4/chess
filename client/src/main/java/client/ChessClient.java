@@ -107,6 +107,7 @@ public class ChessClient {
         } catch (InvalidMoveException e) {
             throw new RuntimeException(e);
         }
+
     }
 
     public String register(String... params) throws ResponseException {
