@@ -120,12 +120,12 @@ public class MySqlDataAccess implements DataAccess {
 
     @Override
     public int createGame(String gameName) {
-        var statement ="INSERT INTO GameData (whiteUsername, blackUsername, gameName, game) VALUES(?, ?, ?, ?)";
+        var statement ="INSERT INTO GameData (whiteUsername, blackUsername, gameName, game, gameOver) VALUES(?, ?, ?, ?, ?)";
         try {
             ChessGame game = new ChessGame();
             String gameJson = new Gson().toJson(game);
 
-            return executeUpdate(statement,null, null, gameName, gameJson);
+            return executeUpdate(statement,null, null, gameName, gameJson, false);
         } catch (ResponseException e) {
             throw new RuntimeException(e);
         }
@@ -133,7 +133,7 @@ public class MySqlDataAccess implements DataAccess {
 
     @Override
     public GameData[] listGames(String authToken) throws ResponseException {
-        var statement = "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM GameData; ";
+        var statement = "SELECT gameID, whiteUsername, blackUsername, gameName, game, gameOver FROM GameData; ";
         try(Connection conn = DatabaseManager.getConnection();
             PreparedStatement ps = conn.prepareStatement(statement);
             ResultSet rs = ps.executeQuery()){
@@ -145,8 +145,9 @@ public class MySqlDataAccess implements DataAccess {
                 String blackUsername = rs.getString("blackUsername");
                 String gameName = rs.getString("gameName");
                 String gameJson = rs.getString("game");
+                boolean gameOver = rs.getBoolean("gameOver");
                 ChessGame game = gson.fromJson(gameJson, ChessGame.class);
-                games.add (new GameData(gameID, whiteUsername,blackUsername, gameName, game));
+                games.add (new GameData(gameID, whiteUsername,blackUsername, gameName, game, gameOver));
             }
             return games.toArray(new GameData[0]);
         } catch (SQLException e) {
@@ -189,7 +190,7 @@ public class MySqlDataAccess implements DataAccess {
 
     @Override
     public GameData getGame(int gameID) throws ResponseException {
-        var statement = "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM GameData WHERE gameID = ?";
+        var statement = "SELECT gameID, whiteUsername, blackUsername, gameName, game, gameOver FROM GameData WHERE gameID = ?";
         try(Connection conn = DatabaseManager.getConnection(); PreparedStatement ps = conn.prepareStatement(statement)){
             ps.setInt(1, gameID);
             try(ResultSet rs = ps.executeQuery()){
@@ -199,9 +200,10 @@ public class MySqlDataAccess implements DataAccess {
                     String blackUsername = rs.getString("blackUsername");
                     String gameName = rs.getString("gameName");
                     String gameJson = rs.getString("game");
+                    boolean gameOver = rs.getBoolean("gameOver");
                     Gson gson = new Gson();
                     ChessGame game = gson.fromJson(gameJson, ChessGame.class);
-                    return new GameData(foundGameID, whiteUsername,blackUsername, gameName, game);
+                    return new GameData(foundGameID, whiteUsername,blackUsername, gameName, game, gameOver);
                 } else {
                     return null;
                 }
@@ -236,8 +238,7 @@ public class MySqlDataAccess implements DataAccess {
     public void resignGame(String username, int gameID){
         String statement = """
                 UPDATE GameData
-                SET whiteUsername = NULL,
-                blackUsername = NULL
+                SET gameOver = TRUE
                 WHERE gameID = ?;
                 """;
         try (Connection conn = DatabaseManager.getConnection();
@@ -254,14 +255,16 @@ public class MySqlDataAccess implements DataAccess {
         var gson = new Gson();
         String statement = """
                 UPDATE GameData
-                SET game = ?
+                SET game = ?,
+                gameOver = ?
                 WHERE gameID = ?;
                 """;
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(statement)) {
             String gameJson = gson.toJson(game.game());
             ps.setString(1, gameJson);
-            ps.setInt(2, game.gameID());
+            ps.setBoolean(2, game.gameOver());
+            ps.setInt(3, game.gameID());
             ps.executeUpdate();
         } catch (SQLException | DataAccessException e) {
             throw new RuntimeException(e);
@@ -302,6 +305,7 @@ public class MySqlDataAccess implements DataAccess {
                 case String p -> ps.setString(i + 1, p);
                 case Integer p -> ps.setInt(i + 1, p);
                 case null -> ps.setNull(i + 1, NULL);
+                case Boolean b-> ps.setBoolean(i+1, b);
                 default -> {
                 }
             }
@@ -324,6 +328,7 @@ public class MySqlDataAccess implements DataAccess {
               blackUsername VARCHAR(255),
               gameName VARCHAR(255),
               game JSON,
+              gameOver BOOLEAN DEFAULT FALSE,
               PRIMARY KEY (gameID),
               FOREIGN KEY (whiteUsername) REFERENCES UserData(username) ON DELETE SET NULL ON UPDATE CASCADE,
               FOREIGN KEY (blackUsername) REFERENCES UserData(username) ON DELETE SET NULL ON UPDATE CASCADE

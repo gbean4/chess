@@ -2,6 +2,7 @@ package websocket;
 
 import chess.ChessGame;
 import com.google.gson.Gson;
+import datamodel.LeaveResignRequest;
 import io.javalin.websocket.*;
 import org.eclipse.jetty.websocket.api.Session;
 import org.jetbrains.annotations.NotNull;
@@ -109,18 +110,35 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         int gameID = cmd.getGameID();
         connections.remove(gameID,session);
         var user = service.validate(cmd.getAuthToken());
+
+        var req = new LeaveResignRequest(user.authToken(), gameID);
+        service.leaveGame(req);
         NotificationMessage notify = new NotificationMessage(user.username() +" has left the game.");
 
         connections.broadcast(gameID, session, gson.toJson(notify));
+        var updatedGame = service.getGame(user.authToken(), gameID);
+        var msg = new LoadGameMessage(updatedGame);
+        String json = gson.toJson(msg);
+        connections.broadcast(gameID, null, json);
+
+        connections.remove(gameID, session);
     }
 
     private void onResign(UserGameCommand cmd, Session session) throws Exception{
         int gameID = cmd.getGameID();
 
         var user = service.validate(cmd.getAuthToken());
+        var req = new LeaveResignRequest(user.authToken(), gameID);
+        service.resignGame(req);
+
         NotificationMessage notify = new NotificationMessage(user.username() +" has resigned.");
 
-        connections.broadcast(gameID, null, gson.toJson(notify));
+        connections.broadcast(gameID, session, gson.toJson(notify));
+        var updatedGame = service.getGame(user.authToken(), gameID);
+        var msg = new LoadGameMessage(updatedGame);
+        var json = gson.toJson(msg);
+        connections.broadcast(gameID, session, json);
+
         connections.remove(gameID,session);
     }
 

@@ -121,6 +121,9 @@ public class UserService {
         if (game == null){
             throw new Exception("bad request - game not found");
         }
+        if (game.gameOver()){
+            throw new Exception("Game already finished");
+        }
 
         String color = gameSpec.playerColor();
         if (color == null || color.isBlank()){
@@ -153,6 +156,9 @@ public class UserService {
         if (game == null){
             throw new Exception("game not found");
         }
+        if (game.gameOver()){
+            throw new Exception("Game already finished");
+        }
 
         String username = auth.username();
         boolean isWhite = username.equals(game.whiteUsername());
@@ -179,6 +185,10 @@ public class UserService {
         if (game == null){
             throw new Exception("game not found");
         }
+        if (game.gameOver()){
+            throw new Exception("Game already finished");
+        }
+
         String username = auth.username();
         boolean isWhite = username.equals(game.whiteUsername());
         boolean isBlack = username.equals(game.blackUsername());
@@ -206,7 +216,7 @@ public class UserService {
         }
         if (game.game()== null){
             var newGame = new ChessGame();
-            game = new GameData(game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName(), newGame);
+            game = new GameData(game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName(), newGame, game.gameOver());
             dataAccess.updateGame(game);
         }
         return game.game();
@@ -224,6 +234,16 @@ public class UserService {
         if (game == null || move == null){
             throw new Exception("game not found");
         }
+        if (game.gameOver()){
+            throw new Exception("Game already finished");
+        }
+        if(game.game().isInCheckmate(ChessGame.TeamColor.WHITE) || game.game().isInCheckmate(ChessGame.TeamColor.BLACK)
+                || game.game().isInCheck(ChessGame.TeamColor.WHITE) || game.game().isInCheck(ChessGame.TeamColor.BLACK)){
+            var newGame = new GameData(game.gameID(),game.whiteUsername(),game.blackUsername(), game.gameName(), game.game(), true);
+            dataAccess.updateGame(game);
+        }
+
+
         AuthData auth= dataAccess.getAuth(authToken);
         if (auth == null){
             throw new Exception("unauthorized");
