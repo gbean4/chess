@@ -53,7 +53,7 @@ public class MemoryDataAccess implements DataAccess{
 @Override
 public int createGame(String gameName) {
     int gameID = nextID();
-    GameData gameData = new GameData(gameID, null, null, gameName, new ChessGame());
+    GameData gameData = new GameData(gameID, null, null, gameName, new ChessGame(), false);
     games.put(gameID, gameData);
     return gameData.gameID();
 }
@@ -69,7 +69,8 @@ public int createGame(String gameName) {
                     g.whiteUsername(),
                     g.blackUsername(),
                     g.gameName(),
-                    g.game()));
+                    g.game(),
+                    g.gameOver()));
         }
         return gameList.toArray(new GameData[0]);
     }
@@ -99,9 +100,9 @@ public int createGame(String gameName) {
     public void joinGame(String username, GameSpec gameSpec) {
         var game = games.get(gameSpec.gameID());
         if (Objects.equals(gameSpec.playerColor().toLowerCase(), "white")){
-            games.put(game.gameID(),new GameData(game.gameID(), username, game.blackUsername(), game.gameName(), game.game()));
+            games.put(game.gameID(),new GameData(game.gameID(), username, game.blackUsername(), game.gameName(), game.game(), game.gameOver()));
         } else{
-            games.put(game.gameID(),new GameData(game.gameID(), game.whiteUsername(), username, game.gameName(), game.game()));
+            games.put(game.gameID(),new GameData(game.gameID(), game.whiteUsername(), username, game.gameName(), game.game(), game.gameOver()));
         }
     }
 }

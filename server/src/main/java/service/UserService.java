@@ -240,7 +240,7 @@ public class UserService {
         if(game.game().isInCheckmate(ChessGame.TeamColor.WHITE) || game.game().isInCheckmate(ChessGame.TeamColor.BLACK)
                 || game.game().isInCheck(ChessGame.TeamColor.WHITE) || game.game().isInCheck(ChessGame.TeamColor.BLACK)){
             var newGame = new GameData(game.gameID(),game.whiteUsername(),game.blackUsername(), game.gameName(), game.game(), true);
-            dataAccess.updateGame(game);
+            dataAccess.updateGame(newGame);
         }
 
 
