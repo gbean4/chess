@@ -226,8 +226,10 @@ public class ChessClient {
 
         if (this.ws == null){
             this.ws = new ChessWebsocket(server.getServerUrl(), authToken, new ClientNotificationHandler(this));
+        }
         ws.sendCommand(new UserGameCommand(UserGameCommand.CommandType.CONNECT,authToken, gameID));
         return String.format("Joined game %d as %s.", tempID, playerColor);
+
     }
 
     public String observeGame(String... params) throws ResponseException {
