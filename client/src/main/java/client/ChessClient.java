@@ -265,6 +265,10 @@ public class ChessClient {
         }
         this.gameUI.render();
         state = State.INGAME;
+        if (this.ws == null){
+            this.ws = new ChessWebsocket(server.getServerUrl(), authToken, new ClientNotificationHandler(this));
+        }
+        ws.sendCommand(new UserGameCommand(UserGameCommand.CommandType.CONNECT,authToken, gameID));
         return String.format("Observing game %d", tempID);
     }
 
@@ -314,6 +318,22 @@ public class ChessClient {
         gameModeAndRender(gameID, fullGame, playerColor);
 
         return String.format("Playing game %d as %s", tempID, playerColor);
+    }
+
+    public void updateGame(ChessGame newGame){
+        this.game = newGame;
+
+        if (this.gameUI != null){
+            this.gameUI.render();
+        }
+    }
+
+    public void displayNotification(String msg){
+        System.out.println("\n"+msg+"\n");
+    }
+
+    public void displayError(String msg){
+        System.out.println("\n" + SET_TEXT_COLOR_RED + msg + RESET_TEXT_COLOR + "\n");
     }
 
     private void gameModeAndRender(int gameID, GameData targetGame, String playerColor) {

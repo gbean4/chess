@@ -59,7 +59,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         service.validate(auth);
         connections.add(gameID, session, auth);
 
-        Object game = service.getGame(auth, gameID);
+        ChessGame game = service.getGame(auth, gameID);
         LoadGameMessage msg = new LoadGameMessage(game);
 
         session.getRemote().sendString(gson.toJson(msg));

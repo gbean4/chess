@@ -195,7 +195,7 @@ public class UserService {
         dataAccess.resignGame(auth.username(), req.gameID());
     }
 
-    public Object getGame(String authToken, int gameID) throws Exception {
+    public ChessGame getGame(String authToken, int gameID) throws Exception {
         AuthData auth= dataAccess.getAuth(authToken);
         if (auth == null){
             throw new Exception("unauthorized");
@@ -209,7 +209,7 @@ public class UserService {
             game = new GameData(game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName(), newGame);
             dataAccess.updateGame(game);
         }
-        return game;
+        return game.game();
     }
     public AuthData validate(String authToken) throws Exception {
         AuthData auth= dataAccess.getAuth(authToken);

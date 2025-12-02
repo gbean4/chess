@@ -1,5 +1,6 @@
 package websocket;
 
+import chess.ChessGame;
 import client.ChessClient;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
@@ -15,16 +16,19 @@ public class ClientNotificationHandler implements NotificationHandler{
 
     @Override
     public void loadGame(LoadGameMessage message) {
-        client.game = message.getGame();
+        ChessGame newGame = message.getGame();
+        client.updateGame(newGame);
     }
 
     @Override
     public void notify(NotificationMessage message) {
-
+        var text = message.getMessage();
+        client.displayNotification(text);
     }
 
     @Override
     public void error(ErrorMessage message) {
-
+        String text = message.getErrorMessage();
+        client.displayError(text);
     }
 }
