@@ -86,6 +86,7 @@ public class ChessClient {
                     gameUI = null;
                 }
                 return result;
+
             }
 
             return switch (cmd) {
