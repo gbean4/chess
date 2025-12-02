@@ -8,12 +8,14 @@ import exception.ResponseException;
 import io.javalin.*;
 import io.javalin.http.Context;
 import service.UserService;
+import websocket.*;
 
 import java.util.Map;
 
 public class Server {
     private final Javalin server;
     private final UserService userService;
+    private final WebSocketHandler webSocketHandler;
 
     public Server() {
         MySqlDataAccess dataAccess;
@@ -23,7 +25,13 @@ public class Server {
             throw new RuntimeException(e);
         }
         userService = new UserService(dataAccess);
+        webSocketHandler = new WebSocketHandler(userService);
         server = Javalin.create(config -> config.staticFiles.add("web"));
+        server.ws("/ws", ws-> {
+            ws.onConnect(webSocketHandler);
+            ws.onMessage(webSocketHandler);
+            ws.onClose(webSocketHandler);
+        });
 
         server.delete("db", this::clear);
         server.post("user", this::register); //ctx.result("{ \"username\":\"\", \"authToken\":\"\" }")

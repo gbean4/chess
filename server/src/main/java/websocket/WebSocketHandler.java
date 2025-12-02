@@ -72,11 +72,29 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         String auth = cmd.getAuthToken();
         int gameID = cmd.getGameID();
         var move = cmd.getMove();
+        var start = move.getStartPosition();
+        var end = move.getEndPosition();
+        var startFile = convertColumn(start.getColumn());
+        var endFile = convertColumn(end.getColumn());
+        var startSquare = startFile+start.getRow();
+        var endSquare = endFile+end.getRow();
 
         service.validate(auth);
 
         try{
             ChessGame updated = service.applyMove(auth, gameID, move);
+
+            var username = service.validate(auth).username();
+            var notifyText = username + " moved from " + startSquare + " to " + endSquare;
+            var promotion = move.getPromotionPiece();
+            if (promotion !=null){
+                notifyText+= " (promoted to "+promotion.toString()+")";
+            }
+            var notifyMsg = new NotificationMessage(notifyText);
+            var notifyJson = gson.toJson(notifyMsg);
+
+            connections.broadcast(gameID,null,notifyJson);
+
             LoadGameMessage msg = new LoadGameMessage(updated);
             String json = gson.toJson(msg);
 
@@ -104,5 +122,9 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
         connections.broadcast(gameID, null, gson.toJson(notify));
         connections.remove(gameID,session);
+    }
+
+    private char convertColumn(int col){
+        return (char)('a' + (col-1));
     }
 }
