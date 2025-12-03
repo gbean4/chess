@@ -142,10 +142,6 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             NotificationMessage notify = new NotificationMessage(user.username() + " has resigned.\n");
 
             connections.broadcast(gameID, null, gson.toJson(notify));
-//            var updatedGame = service.getGame(user.authToken(), gameID).game();
-//            var msg = new LoadGameMessage(updatedGame);
-//            var json = gson.toJson(msg);
-//            connections.broadcast(gameID, session, json);
 
             connections.remove(gameID, session);
         } catch (Exception e){

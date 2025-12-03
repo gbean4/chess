@@ -147,7 +147,8 @@ public class UserService {
             return dataAccess.getGame(gameSpec.gameID());
         }
     }
-    public void leaveGame(LeaveResignRequest req) throws Exception{
+
+    public GameData validateLeaveOrResign(LeaveResignRequest req) throws Exception {
         AuthData auth = dataAccess.getAuth(req.authToken());
         if (auth== null) {
             throw new Exception("Unauthorized");
@@ -159,37 +160,42 @@ public class UserService {
         if (game.gameOver()){
             throw new Exception("Game already finished");
         }
+        return game;
+    }
 
-        String username = auth.username();
+    public void leaveGame(LeaveResignRequest req) throws Exception{
+//        AuthData auth = dataAccess.getAuth(req.authToken());
+//        if (auth== null) {
+//            throw new Exception("Unauthorized");
+//        }
+//        var game= dataAccess.getGame(req.gameID());
+//        if (game == null){
+//            throw new Exception("game not found");
+//        }
+//        if (game.gameOver()){
+//            throw new Exception("Game already finished");
+//        }
+        GameData game = validateLeaveOrResign(req);
+
+        String username = dataAccess.getAuth(req.authToken()).username();
         boolean isWhite = username.equals(game.whiteUsername());
         boolean isBlack = username.equals(game.blackUsername());
 
-//        if (!isBlack && !isWhite){
-//            throw new ResponseException("You are not a player in this game.");
-//        }
         if (isWhite){
             System.out.print(username + " (WHITE) left the game.");
-        } else{
+        } else if (isBlack){
             System.out.print(username + " (BLACK) left the game.");
+        } else {
+            System.out.print(username + " (OBSERVER) left the game.");
         }
         dataAccess.leaveGame(username, req.gameID());
     }
 
 
     public void resignGame(LeaveResignRequest req) throws Exception{
-        AuthData auth = dataAccess.getAuth(req.authToken());
-        if (auth== null) {
-            throw new Exception("Unauthorized");
-        }
-        var game= dataAccess.getGame(req.gameID());
-        if (game == null){
-            throw new Exception("game not found");
-        }
-        if (game.gameOver()){
-            throw new Exception("Game already finished");
-        }
+        GameData game = validateLeaveOrResign(req);
 
-        String username = auth.username();
+        String username = dataAccess.getAuth(req.authToken()).username();
         boolean isWhite = username.equals(game.whiteUsername());
         boolean isBlack = username.equals(game.blackUsername());
 
@@ -202,7 +208,7 @@ public class UserService {
             System.out.print(username + " (BLACK) resigned the game.");
         }
 
-        dataAccess.resignGame(auth.username(), req.gameID());
+        dataAccess.resignGame(username, req.gameID());
     }
 
     public GameData getGame(String authToken, int gameID) throws Exception {

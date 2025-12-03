@@ -312,7 +312,8 @@ public class ChessClient {
         }
         GameData fullGame = server.getGame(authToken, gameID);
         if (fullGame == null|| fullGame.game()==null){
-            fullGame = new GameData(gameID, targetGame.whiteUsername(), targetGame.blackUsername(), targetGame.gameName(), new ChessGame(), targetGame.gameOver());
+            fullGame = new GameData(gameID, targetGame.whiteUsername(),
+                    targetGame.blackUsername(), targetGame.gameName(), new ChessGame(), targetGame.gameOver());
         }
 
         gameModeAndRender(gameID, fullGame, playerColor);
