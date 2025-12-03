@@ -110,39 +110,49 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     private void onLeave(UserGameCommand cmd, Session session) throws Exception{
-        int gameID = cmd.getGameID();
-        connections.remove(gameID,session);
-        var user = service.validate(cmd.getAuthToken());
+        try{
+            int gameID = cmd.getGameID();
+            connections.remove(gameID, session);
+            var user = service.validate(cmd.getAuthToken());
 
-        var req = new LeaveResignRequest(user.authToken(), gameID);
-        service.leaveGame(req);
-        NotificationMessage notify = new NotificationMessage(user.username() +" has left the game.\n");
+            var req = new LeaveResignRequest(user.authToken(), gameID);
+            service.leaveGame(req);
+            NotificationMessage notify = new NotificationMessage(user.username() + " has left the game.\n");
 
-        connections.broadcast(gameID, session, gson.toJson(notify));
-        var updatedGame = service.getGame(user.authToken(), gameID).game();
-        var msg = new LoadGameMessage(updatedGame);
-        String json = gson.toJson(msg);
-        connections.broadcast(gameID, null, json);
+            connections.broadcast(gameID, session, gson.toJson(notify));
+            var updatedGame = service.getGame(user.authToken(), gameID).game();
+            var msg = new LoadGameMessage(updatedGame);
+            String json = gson.toJson(msg);
+            connections.broadcast(gameID, null, json);
 
-        connections.remove(gameID, session);
+            connections.remove(gameID, session);
+        } catch (Exception e){
+            ErrorMessage err = new ErrorMessage(e.getMessage());
+            session.getRemote().sendString(gson.toJson(err));
+        }
     }
 
     private void onResign(UserGameCommand cmd, Session session) throws Exception{
-        int gameID = cmd.getGameID();
+        try{
+            int gameID = cmd.getGameID();
 
-        var user = service.validate(cmd.getAuthToken());
-        var req = new LeaveResignRequest(user.authToken(), gameID);
-        service.resignGame(req);
+            var user = service.validate(cmd.getAuthToken());
+            var req = new LeaveResignRequest(user.authToken(), gameID);
+            service.resignGame(req);
 
-        NotificationMessage notify = new NotificationMessage(user.username() +" has resigned.\n");
+            NotificationMessage notify = new NotificationMessage(user.username() + " has resigned.\n");
 
-        connections.broadcast(gameID, session, gson.toJson(notify));
-        var updatedGame = service.getGame(user.authToken(), gameID).game();
-        var msg = new LoadGameMessage(updatedGame);
-        var json = gson.toJson(msg);
-        connections.broadcast(gameID, session, json);
+            connections.broadcast(gameID, session, gson.toJson(notify));
+            var updatedGame = service.getGame(user.authToken(), gameID).game();
+            var msg = new LoadGameMessage(updatedGame);
+            var json = gson.toJson(msg);
+            connections.broadcast(gameID, session, json);
 
-        connections.remove(gameID,session);
+            connections.remove(gameID, session);
+        } catch (Exception e){
+            ErrorMessage err = new ErrorMessage(e.getMessage());
+            session.getRemote().sendString(gson.toJson(err));
+        }
     }
 
     private char convertColumn(int col){

@@ -237,11 +237,11 @@ public class UserService {
         if (game.gameOver()){
             throw new Exception("Game already finished");
         }
-        if(game.game().isInCheckmate(ChessGame.TeamColor.WHITE) || game.game().isInCheckmate(ChessGame.TeamColor.BLACK)
-                || game.game().isInCheck(ChessGame.TeamColor.WHITE) || game.game().isInCheck(ChessGame.TeamColor.BLACK)){
-            var newGame = new GameData(game.gameID(),game.whiteUsername(),game.blackUsername(), game.gameName(), game.game(), true);
-            dataAccess.updateGame(newGame);
-        }
+//        if (game.game().isInCheckmate(ChessGame.TeamColor.WHITE) || game.game().isInCheckmate(ChessGame.TeamColor.BLACK)
+//                || game.game().isInCheck(ChessGame.TeamColor.WHITE) || game.game().isInCheck(ChessGame.TeamColor.BLACK)){
+//            var newGame = new GameData(game.gameID(),game.whiteUsername(),game.blackUsername(), game.gameName(), game.game(), true);
+//            dataAccess.updateGame(newGame);
+//        }
 
 
         AuthData auth= dataAccess.getAuth(authToken);
@@ -255,8 +255,21 @@ public class UserService {
             throw new Exception("unauthorized");
         }
 
-        game.game().applyMove(move, game.game().getBoard());
+        try{
+//            game.game().applyMove(move, game.game().getBoard());
+            game.game().makeMove(move);
+
+        } catch (Exception e){
+            throw new Exception("invalid move");
+        }
+
         dataAccess.updateGame(game);
+
+        if (game.game().isInCheckmate(ChessGame.TeamColor.WHITE) || game.game().isInCheckmate(ChessGame.TeamColor.BLACK)
+                || game.game().isInStalemate(ChessGame.TeamColor.WHITE) || game.game().isInStalemate(ChessGame.TeamColor.BLACK)){
+            var newGame = new GameData(game.gameID(),game.whiteUsername(),game.blackUsername(), game.gameName(), game.game(), true);
+            dataAccess.updateGame(newGame);
+        }
 
         return game.game();
     }
