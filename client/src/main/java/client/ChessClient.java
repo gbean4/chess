@@ -259,16 +259,19 @@ public class ChessClient {
         this.game = fullGame.game();
         this.gameID = gameID;
         this.playerColor = null;
-
+        if (this.ws == null){
+            this.ws = new ChessWebsocket(server.getServerUrl(), authToken, new ClientNotificationHandler(this));
+        }
+        ws.sendCommand(new UserGameCommand(UserGameCommand.CommandType.CONNECT,authToken, gameID));
         if (this.gameUI == null){
             this.gameUI = new GameUI(this);
         }
         this.gameUI.render();
         state = State.INGAME;
-        if (this.ws == null){
-            this.ws = new ChessWebsocket(server.getServerUrl(), authToken, new ClientNotificationHandler(this));
-        }
-        ws.sendCommand(new UserGameCommand(UserGameCommand.CommandType.CONNECT,authToken, gameID));
+//        if (this.ws == null){
+//            this.ws = new ChessWebsocket(server.getServerUrl(), authToken, new ClientNotificationHandler(this));
+//        }
+//        ws.sendCommand(new UserGameCommand(UserGameCommand.CommandType.CONNECT,authToken, gameID));
         return String.format("Observing game %d", tempID);
     }
 
@@ -375,7 +378,7 @@ public class ChessClient {
                     Commands:
                     move <from> <to> - make move
                     board - render board
-                    highlight moves <from> - show available moves
+                    highlight moves <position> - show available moves
                     leave - let someone else take your spot
                     resign - give up :(
                     logout - end session

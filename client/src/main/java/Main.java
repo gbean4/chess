@@ -10,7 +10,6 @@ public class Main {
         String serverUrl = "http://localhost:8080";
         ServerFacade serverFacade = new ServerFacade(serverUrl);
         ChessClient client = new ChessClient(serverUrl);
-//        ChessWebsocket ws = new ChessWebsocket(serverUrl);
         GameUI gameUI = new GameUI(client);
 
         client.setGameUI(gameUI);

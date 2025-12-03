@@ -1,15 +1,16 @@
 package ui;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import static ui.EscapeSequences.*;
 
 public class ChessBoardUI {
 
-    public static void renderBoard(ChessGame game, ChessGame.TeamColor perspective){
+    public static void renderBoard(ChessGame game, ChessGame.TeamColor perspective, ChessPosition highlightPos, Set<ChessPosition> highlightSquares){
         ChessBoard board = game.getBoard();
 
         if (perspective == null){
@@ -32,22 +33,47 @@ public class ChessBoardUI {
             String symbol = EMPTY;
             for (int col = colRange[0]; col != colRange[1]; col += colRange[2]) {
                 boolean isDark = (row + col) % 2 == 0;
-                bg = isDark ? SET_BG_COLOR_GREEN : SET_BG_COLOR_DARK_GREEN;
+                bg = isDark ? SET_BG_COLOR_WHITE : SET_BG_COLOR_BLACK;
 
                 ChessPosition pos = new ChessPosition(rank, col);
                 ChessPiece piece = board.getPiece(pos);
 
+                if (highlightPos != null && pos.equals(highlightPos)){
+                    bg = SET_BG_COLOR_YELLOW;
+                }
+
+                if (highlightSquares != null && highlightSquares.contains(pos) && isDark){
+                    bg = SET_BG_COLOR_GREEN;
+                }
+                if (highlightSquares != null && highlightSquares.contains(pos) && !isDark){
+                    bg = SET_BG_COLOR_DARK_GREEN;
+                }
+
                 if (piece != null) {
                     symbol = getSymbol(piece);
                     color = (piece.getTeamColor() == ChessGame.TeamColor.WHITE)
-                            ? SET_TEXT_COLOR_WHITE
-                            : SET_TEXT_COLOR_BLACK;
+                            ? SET_TEXT_COLOR_MAGENTA
+                            : SET_TEXT_COLOR_RED;
                 }
                 System.out.print(bg + color + " " + symbol + " " + RESET_BG_COLOR+ RESET_TEXT_COLOR);
             }
             System.out.println(SET_BG_COLOR_LIGHT_GREY + " " + rank + " " + RESET_BG_COLOR);
         }
         boardLabels(perspective);
+    }
+
+    public static Set<ChessPosition> getHighlightSquares(ChessGame game, ChessPosition pos) {
+        Set<ChessPosition> highlights = new HashSet<>();
+        if (pos == null){
+            return highlights;
+        }
+        try{
+            Collection<ChessMove> moves = game.validMoves(pos);
+            for (ChessMove move: moves){
+                highlights.add(move.getEndPosition());
+            }
+        } catch (Exception ignored){}
+        return highlights;
     }
 
     private static void boardLabels(ChessGame.TeamColor perspective) {

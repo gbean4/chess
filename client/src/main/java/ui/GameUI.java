@@ -8,6 +8,7 @@ import server.ServerFacade;
 
 import java.util.Arrays;
 import java.util.Scanner;
+import java.util.Set;
 
 
 public class GameUI {
@@ -29,7 +30,29 @@ public class GameUI {
                perspective = ChessGame.TeamColor.BLACK;
             }
         }
-        ChessBoardUI.renderBoard(game, perspective);
+        ChessBoardUI.renderBoard(game, perspective, null, null);
+    }
+
+    public String highlightMoves(String...params){
+        ChessGame.TeamColor perspective= null;
+        String playerColor = client.getPlayerColor();
+        ChessGame game = client.getGame();
+        if (params.length != 1) {
+            return "Usage: highlight moves <position>";
+        }
+        String pos = params[0];
+        ChessPosition position = new ChessPosition(pos.charAt(0), pos.charAt(1));
+        if (playerColor != null){
+            if (playerColor.equalsIgnoreCase("white")){
+                perspective = ChessGame.TeamColor.WHITE;
+            } else if (playerColor.equalsIgnoreCase("black")){
+                perspective = ChessGame.TeamColor.BLACK;
+            }
+        }
+        Set<ChessPosition> moves = ChessBoardUI.getHighlightSquares(game,position);
+
+        ChessBoardUI.renderBoard(game, perspective, position, moves);
+        return "Moves for " + pos;
     }
 
     public String leave() throws ResponseException{
@@ -86,7 +109,7 @@ public class GameUI {
             case "resign" -> resign();
             case "leave"-> leave();
             case "help"-> client.help();
-            case "highlight moves"-> "input piece and get moves";
+            case "highlight"-> highlightMoves(params);
             case "back"-> "Returning to homescreen.";
             default -> "Unknown command. Type help for available commands.";
         };
