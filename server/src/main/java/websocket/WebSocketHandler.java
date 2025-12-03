@@ -35,7 +35,10 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
             switch (cmd.getCommandType()) {
                 case CONNECT -> onConnect(cmd, session);
-                case MAKE_MOVE -> onMove((MakeMoveCommand) cmd, session);
+                case MAKE_MOVE -> {
+                    MakeMoveCommand moveCmd = gson.fromJson(ctx.message(), MakeMoveCommand.class);
+                    onMove(moveCmd, session);
+                }
                 case LEAVE -> onLeave(cmd, session);
                 case RESIGN -> onResign(cmd, session);
             }
@@ -77,8 +80,8 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         var end = move.getEndPosition();
         var startFile = convertColumn(start.getColumn());
         var endFile = convertColumn(end.getColumn());
-        var startSquare = startFile+start.getRow();
-        var endSquare = endFile+end.getRow();
+        var startSquare = String.valueOf(startFile)+start.getRow();
+        var endSquare = String.valueOf(endFile)+end.getRow();
 
         service.validate(auth);
 
@@ -89,12 +92,12 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             var notifyText = username + " moved from " + startSquare + " to " + endSquare + "\n";
             var promotion = move.getPromotionPiece();
             if (promotion !=null){
-                notifyText+= " (promoted to "+promotion.toString()+")\n";
+                notifyText+= " (promoted to "+promotion.toString()+")";
             }
             var notifyMsg = new NotificationMessage(notifyText);
             var notifyJson = gson.toJson(notifyMsg);
 
-            connections.broadcast(gameID,null,notifyJson);
+            connections.broadcast(gameID,session,notifyJson);
 
             LoadGameMessage msg = new LoadGameMessage(updated);
             String json = gson.toJson(msg);
