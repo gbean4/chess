@@ -6,13 +6,10 @@ import chess.ChessGame;
 import chess.InvalidMoveException;
 import datamodel.*;
 import exception.ResponseException;
-import jakarta.websocket.WebSocketContainer;
 import server.ServerFacade;
 import ui.GameUI;
 import websocket.ChessWebsocket;
 import websocket.ClientNotificationHandler;
-import websocket.ClientWebsocketHandler;
-import websocket.NotificationHandler;
 import websocket.commands.UserGameCommand;
 
 import static ui.EscapeSequences.RESET_TEXT_COLOR;
@@ -30,7 +27,7 @@ public class ChessClient {
     private ChessWebsocket ws;
     private final Map<Integer, Integer> tempToRealIDs = new HashMap<>();
 
-    public ChessClient(String serverUrl) throws ResponseException {
+    public ChessClient(String serverUrl){
         this.server = new ServerFacade(serverUrl);
     }
 
@@ -213,23 +210,24 @@ public class ChessClient {
         }
 
         var spec = new GameSpec(playerColor, gameID);
-        var gameData = server.joinGame(spec, authToken);
+        server.joinGame(spec, authToken);
 
         var fullGame = server.getGame(authToken,gameID);
-        this.game = fullGame.game();
-        this.gameID = gameID;
-        this.playerColor = playerColor;
-        if (this.gameUI == null){
-            this.gameUI = new GameUI(this);
-        }
-
-        this.gameUI.render();
-        state = State.INGAME;
-
-        if (this.ws == null){
-            this.ws = new ChessWebsocket(server.getServerUrl(), authToken, new ClientNotificationHandler(this));
-        }
-        ws.sendCommand(new UserGameCommand(UserGameCommand.CommandType.CONNECT,authToken, gameID));
+        gameModeAndRender(gameID, fullGame, playerColor);
+//        this.game = fullGame.game();
+//        this.gameID = gameID;
+//        this.playerColor = playerColor;
+//        if (this.gameUI == null){
+//            this.gameUI = new GameUI(this);
+//        }
+//
+//        this.gameUI.render();
+//        state = State.INGAME;
+//
+//        if (this.ws == null){
+//            this.ws = new ChessWebsocket(server.getServerUrl(), authToken, new ClientNotificationHandler(this));
+//        }
+//        ws.sendCommand(new UserGameCommand(UserGameCommand.CommandType.CONNECT,authToken, gameID));
         return String.format("Joined game %d as %s.", tempID, playerColor);
 
     }
@@ -256,18 +254,19 @@ public class ChessClient {
         if (fullGame== null){
             return "No one is here yet! Wait till someone joins.";
         }
-        this.game = fullGame.game();
-        this.gameID = gameID;
-        this.playerColor = null;
-        if (this.ws == null){
-            this.ws = new ChessWebsocket(server.getServerUrl(), authToken, new ClientNotificationHandler(this));
-        }
-        ws.sendCommand(new UserGameCommand(UserGameCommand.CommandType.CONNECT,authToken, gameID));
-        if (this.gameUI == null){
-            this.gameUI = new GameUI(this);
-        }
-        this.gameUI.render();
-        state = State.INGAME;
+        gameModeAndRender(gameID, fullGame, null);
+//        this.game = fullGame.game();
+//        this.gameID = gameID;
+//        this.playerColor = null;
+//        if (this.ws == null){
+//            this.ws = new ChessWebsocket(server.getServerUrl(), authToken, new ClientNotificationHandler(this));
+//        }
+//        ws.sendCommand(new UserGameCommand(UserGameCommand.CommandType.CONNECT,authToken, gameID));
+//        if (this.gameUI == null){
+//            this.gameUI = new GameUI(this);
+//        }
+//        this.gameUI.render();
+//        state = State.INGAME;
 //        if (this.ws == null){
 //            this.ws = new ChessWebsocket(server.getServerUrl(), authToken, new ClientNotificationHandler(this));
 //        }
@@ -340,16 +339,21 @@ public class ChessClient {
         System.out.println("\n" + SET_TEXT_COLOR_RED + msg + RESET_TEXT_COLOR + "\n");
     }
 
-    private void gameModeAndRender(int gameID, GameData targetGame, String playerColor) {
-        state = State.INGAME;
-        this.game = targetGame.game();
-        this.playerColor = playerColor;
+    private void gameModeAndRender(int gameID, GameData fullGame, String playerColor) throws ResponseException {
+        this.game = fullGame.game();
         this.gameID = gameID;
-
+        this.playerColor = playerColor;
         if (this.gameUI == null){
             this.gameUI = new GameUI(this);
         }
+
         this.gameUI.render();
+        state = State.INGAME;
+
+        if (this.ws == null){
+            this.ws = new ChessWebsocket(server.getServerUrl(), authToken, new ClientNotificationHandler(this));
+        }
+        ws.sendCommand(new UserGameCommand(UserGameCommand.CommandType.CONNECT,authToken, gameID));
     }
 
     public String help() {

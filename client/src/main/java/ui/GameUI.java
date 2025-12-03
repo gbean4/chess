@@ -38,10 +38,12 @@ public class GameUI {
         String playerColor = client.getPlayerColor();
         ChessGame game = client.getGame();
         if (params.length != 1) {
-            return "Usage: highlight moves <position>";
+            return "Usage: highlight <position>";
         }
-        String pos = params[0];
-        ChessPosition position = new ChessPosition(pos.charAt(0), pos.charAt(1));
+        ChessPosition pos = posConvert(params[0]);
+        if (!game.getBoard().inBounds(pos)){
+            return "Not a real position. Enter letter column first and then row like 'a1'";
+        }
         if (playerColor != null){
             if (playerColor.equalsIgnoreCase("white")){
                 perspective = ChessGame.TeamColor.WHITE;
@@ -49,9 +51,9 @@ public class GameUI {
                 perspective = ChessGame.TeamColor.BLACK;
             }
         }
-        Set<ChessPosition> moves = ChessBoardUI.getHighlightSquares(game,position);
+        Set<ChessPosition> moves = ChessBoardUI.getHighlightSquares(game,pos);
 
-        ChessBoardUI.renderBoard(game, perspective, position, moves);
+        ChessBoardUI.renderBoard(game, perspective, pos, moves);
         return "Moves for " + pos;
     }
 
@@ -119,8 +121,8 @@ public class GameUI {
         char file = pos.charAt(0);
         char rank = pos.charAt(1);
 
-        int col = file - 'a';
-        int row = 8- (rank - '0');
+        int col = (file - 'a')+1;
+        int row = rank - '0';
         return new ChessPosition(row,col);
     }
 }
