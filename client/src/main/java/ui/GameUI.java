@@ -54,7 +54,7 @@ public class GameUI {
         Set<ChessPosition> moves = ChessBoardUI.getHighlightSquares(game,pos);
 
         ChessBoardUI.renderBoard(game, perspective, pos, moves);
-        return "Moves for " + pos;
+        return "Moves for " + params[0];
     }
 
     public String leave() throws ResponseException{
