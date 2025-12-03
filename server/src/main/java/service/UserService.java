@@ -164,9 +164,9 @@ public class UserService {
         boolean isWhite = username.equals(game.whiteUsername());
         boolean isBlack = username.equals(game.blackUsername());
 
-        if (!isBlack && !isWhite){
-            throw new ResponseException("You are not a player in this game.");
-        }
+//        if (!isBlack && !isWhite){
+//            throw new ResponseException("You are not a player in this game.");
+//        }
         if (isWhite){
             System.out.print(username + " (WHITE) left the game.");
         } else{

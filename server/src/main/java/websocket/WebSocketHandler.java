@@ -3,6 +3,7 @@ package websocket;
 import chess.ChessGame;
 import com.google.gson.Gson;
 import datamodel.LeaveResignRequest;
+import exception.ResponseException;
 import io.javalin.websocket.*;
 import org.eclipse.jetty.websocket.api.Session;
 import org.jetbrains.annotations.NotNull;
@@ -112,7 +113,6 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     private void onLeave(UserGameCommand cmd, Session session) throws Exception{
         try{
             int gameID = cmd.getGameID();
-            connections.remove(gameID, session);
             var user = service.validate(cmd.getAuthToken());
 
             var req = new LeaveResignRequest(user.authToken(), gameID);
@@ -120,13 +120,12 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             NotificationMessage notify = new NotificationMessage(user.username() + " has left the game.\n");
 
             connections.broadcast(gameID, session, gson.toJson(notify));
-            var updatedGame = service.getGame(user.authToken(), gameID).game();
-            var msg = new LoadGameMessage(updatedGame);
-            String json = gson.toJson(msg);
-            connections.broadcast(gameID, null, json);
-
             connections.remove(gameID, session);
         } catch (Exception e){
+            if (e.getMessage().equals("You are not a player in this game.")){
+                connections.remove(cmd.getGameID(), session);
+                return;
+            }
             ErrorMessage err = new ErrorMessage(e.getMessage());
             session.getRemote().sendString(gson.toJson(err));
         }
@@ -142,11 +141,11 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
             NotificationMessage notify = new NotificationMessage(user.username() + " has resigned.\n");
 
-            connections.broadcast(gameID, session, gson.toJson(notify));
-            var updatedGame = service.getGame(user.authToken(), gameID).game();
-            var msg = new LoadGameMessage(updatedGame);
-            var json = gson.toJson(msg);
-            connections.broadcast(gameID, session, json);
+            connections.broadcast(gameID, null, gson.toJson(notify));
+//            var updatedGame = service.getGame(user.authToken(), gameID).game();
+//            var msg = new LoadGameMessage(updatedGame);
+//            var json = gson.toJson(msg);
+//            connections.broadcast(gameID, session, json);
 
             connections.remove(gameID, session);
         } catch (Exception e){
