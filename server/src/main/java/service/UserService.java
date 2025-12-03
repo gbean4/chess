@@ -164,17 +164,6 @@ public class UserService {
     }
 
     public void leaveGame(LeaveResignRequest req) throws Exception{
-//        AuthData auth = dataAccess.getAuth(req.authToken());
-//        if (auth== null) {
-//            throw new Exception("Unauthorized");
-//        }
-//        var game= dataAccess.getGame(req.gameID());
-//        if (game == null){
-//            throw new Exception("game not found");
-//        }
-//        if (game.gameOver()){
-//            throw new Exception("Game already finished");
-//        }
         GameData game = validateLeaveOrResign(req);
 
         String username = dataAccess.getAuth(req.authToken()).username();
@@ -243,12 +232,6 @@ public class UserService {
         if (game.gameOver()){
             throw new Exception("Game already finished");
         }
-//        if (game.game().isInCheckmate(ChessGame.TeamColor.WHITE) || game.game().isInCheckmate(ChessGame.TeamColor.BLACK)
-//                || game.game().isInCheck(ChessGame.TeamColor.WHITE) || game.game().isInCheck(ChessGame.TeamColor.BLACK)){
-//            var newGame = new GameData(game.gameID(),game.whiteUsername(),game.blackUsername(), game.gameName(), game.game(), true);
-//            dataAccess.updateGame(newGame);
-//        }
-
 
         AuthData auth= dataAccess.getAuth(authToken);
         if (auth == null){
@@ -262,7 +245,6 @@ public class UserService {
         }
 
         try{
-//            game.game().applyMove(move, game.game().getBoard());
             game.game().makeMove(move);
 
         } catch (Exception e){
