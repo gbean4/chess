@@ -60,12 +60,12 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         service.validate(auth);
         connections.add(gameID, session, auth);
 
-        ChessGame game = service.getGame(auth, gameID);
+        ChessGame game = service.getGame(auth, gameID).game();
         LoadGameMessage msg = new LoadGameMessage(game);
 
         session.getRemote().sendString(gson.toJson(msg));
 
-        NotificationMessage joined = new NotificationMessage(service.validate(auth).username() + " has joined.");
+        NotificationMessage joined = new NotificationMessage(service.validate(auth).username() + " has joined.\n");
         connections.broadcast(gameID, session, gson.toJson(joined));
     }
 
@@ -86,10 +86,10 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             ChessGame updated = service.applyMove(auth, gameID, move);
 
             var username = service.validate(auth).username();
-            var notifyText = username + " moved from " + startSquare + " to " + endSquare;
+            var notifyText = username + " moved from " + startSquare + " to " + endSquare + "\n";
             var promotion = move.getPromotionPiece();
             if (promotion !=null){
-                notifyText+= " (promoted to "+promotion.toString()+")";
+                notifyText+= " (promoted to "+promotion.toString()+")\n";
             }
             var notifyMsg = new NotificationMessage(notifyText);
             var notifyJson = gson.toJson(notifyMsg);
@@ -113,10 +113,10 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
         var req = new LeaveResignRequest(user.authToken(), gameID);
         service.leaveGame(req);
-        NotificationMessage notify = new NotificationMessage(user.username() +" has left the game.");
+        NotificationMessage notify = new NotificationMessage(user.username() +" has left the game.\n");
 
         connections.broadcast(gameID, session, gson.toJson(notify));
-        var updatedGame = service.getGame(user.authToken(), gameID);
+        var updatedGame = service.getGame(user.authToken(), gameID).game();
         var msg = new LoadGameMessage(updatedGame);
         String json = gson.toJson(msg);
         connections.broadcast(gameID, null, json);
@@ -131,10 +131,10 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         var req = new LeaveResignRequest(user.authToken(), gameID);
         service.resignGame(req);
 
-        NotificationMessage notify = new NotificationMessage(user.username() +" has resigned.");
+        NotificationMessage notify = new NotificationMessage(user.username() +" has resigned.\n");
 
         connections.broadcast(gameID, session, gson.toJson(notify));
-        var updatedGame = service.getGame(user.authToken(), gameID);
+        var updatedGame = service.getGame(user.authToken(), gameID).game();
         var msg = new LoadGameMessage(updatedGame);
         var json = gson.toJson(msg);
         connections.broadcast(gameID, session, json);
