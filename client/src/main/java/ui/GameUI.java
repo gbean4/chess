@@ -7,6 +7,7 @@ import exception.ResponseException;
 import server.ServerFacade;
 
 import java.util.Arrays;
+import java.util.Scanner;
 
 
 public class GameUI {
@@ -39,6 +40,13 @@ public class GameUI {
         return "You left the game.";
     }
     public String resign() throws ResponseException{
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Are you sure you want to resign? (y/n)");
+        String answer = scanner.nextLine().trim().toLowerCase();
+        if (!answer.equals("y") && !answer.equals("yes")){
+            return "Resign cancelled. Keep playing!";
+        }
+
         ServerFacade server = client.getServer();
         String authToken = client.getAuthToken();
         int gameID = client.getGameID();
