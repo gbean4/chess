@@ -19,7 +19,9 @@ public class ChessWebsocket extends Endpoint {
             this.handler = handler;
             this.authToken = authToken;
 
-            url = url.replace("http", "ws");
+//            url = url.replace("http", "ws");
+//            URI uri = new URI(url + "/ws");
+            url = url.replaceFirst("^http", "ws");
             URI uri = new URI(url + "/ws");
 
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
@@ -28,6 +30,7 @@ public class ChessWebsocket extends Endpoint {
             this.session.addMessageHandler((MessageHandler.Whole<String>) this::handleIncomingMessage);
 
         } catch (Exception e) {
+            System.out.println("WS CONNECT ERROR: "+ e);
             throw new ResponseException(e.getMessage());
         }
     }

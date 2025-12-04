@@ -287,6 +287,9 @@ public class ChessClient {
             fullGame = new GameData(gameID, targetGame.whiteUsername(),
                     targetGame.blackUsername(), targetGame.gameName(), new ChessGame(), targetGame.gameOver());
         }
+        if (fullGame.gameOver()){
+            return "Game is already finished!";
+        }
 
         gameModeAndRender(gameID, fullGame, playerColor);
 
