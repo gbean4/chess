@@ -214,20 +214,6 @@ public class ChessClient {
 
         var fullGame = server.getGame(authToken,gameID);
         gameModeAndRender(gameID, fullGame, playerColor);
-//        this.game = fullGame.game();
-//        this.gameID = gameID;
-//        this.playerColor = playerColor;
-//        if (this.gameUI == null){
-//            this.gameUI = new GameUI(this);
-//        }
-//
-//        this.gameUI.render();
-//        state = State.INGAME;
-//
-//        if (this.ws == null){
-//            this.ws = new ChessWebsocket(server.getServerUrl(), authToken, new ClientNotificationHandler(this));
-//        }
-//        ws.sendCommand(new UserGameCommand(UserGameCommand.CommandType.CONNECT,authToken, gameID));
         return String.format("Joined game %d as %s.", tempID, playerColor);
 
     }
@@ -255,22 +241,6 @@ public class ChessClient {
             return "No one is here yet! Wait till someone joins.";
         }
         gameModeAndRender(gameID, fullGame, null);
-//        this.game = fullGame.game();
-//        this.gameID = gameID;
-//        this.playerColor = null;
-//        if (this.ws == null){
-//            this.ws = new ChessWebsocket(server.getServerUrl(), authToken, new ClientNotificationHandler(this));
-//        }
-//        ws.sendCommand(new UserGameCommand(UserGameCommand.CommandType.CONNECT,authToken, gameID));
-//        if (this.gameUI == null){
-//            this.gameUI = new GameUI(this);
-//        }
-//        this.gameUI.render();
-//        state = State.INGAME;
-//        if (this.ws == null){
-//            this.ws = new ChessWebsocket(server.getServerUrl(), authToken, new ClientNotificationHandler(this));
-//        }
-//        ws.sendCommand(new UserGameCommand(UserGameCommand.CommandType.CONNECT,authToken, gameID));
         return String.format("Observing game %d", tempID);
     }
 
