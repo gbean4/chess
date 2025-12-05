@@ -90,7 +90,6 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         service.validate(auth);
 
         try{
-            System.out.println("Attempted to move: "+ move);
             ChessGame updated = service.applyMove(auth, gameID, move);
 
             var username = service.validate(auth).username();

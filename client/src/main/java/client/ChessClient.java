@@ -301,13 +301,13 @@ public class ChessClient {
     public void updateGame(ChessGame newGame){
         this.game = newGame;
 
-        if (this.gameUI != null){
-            this.gameUI.render();
-        }
+//        if (this.gameUI != null){
+//            this.gameUI = new GameUI(this);
+//        }
     }
 
     public void displayNotification(String msg){
-        System.out.println("\n"+msg+"\n");
+        System.out.println(msg);
     }
 
     public void displayError(String msg){
@@ -321,8 +321,6 @@ public class ChessClient {
         if (this.gameUI == null){
             this.gameUI = new GameUI(this);
         }
-
-//        this.gameUI.render();
         state = State.INGAME;
 
         if (this.ws == null){
@@ -365,6 +363,10 @@ public class ChessClient {
                     back - return to beginning
                     """;
         }
+    }
+
+    public ChessWebsocket getWebsocket() {
+        return ws;
     }
 
     private enum State{

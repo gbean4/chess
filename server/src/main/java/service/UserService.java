@@ -241,14 +241,14 @@ public class UserService {
 
         if (turn == ChessGame.TeamColor.WHITE && !Objects.equals(game.whiteUsername(), auth.username()) ||
         (turn == ChessGame.TeamColor.BLACK && !Objects.equals(game.blackUsername(), auth.username()))){
-            throw new Exception("unauthorized");
+            throw new Exception("Not your turn silly. Unless you're an observer, then you can't participate. Stop.");
         }
 
         try{
             game.game().makeMove(move);
 
         } catch (Exception e){
-            throw new Exception("invalid move");
+            throw new Exception("invalid move. Make sure you're moving YOUR pieces");
         }
 
         dataAccess.updateGame(game);
