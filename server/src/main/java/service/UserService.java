@@ -261,4 +261,14 @@ public class UserService {
 
         return game.game();
     }
+
+    public String getPlayerColor(GameData game, String username) {
+        if (Objects.equals(game.whiteUsername(), username)){
+            return "white";
+        } if (Objects.equals(game.blackUsername(), username)){
+            return "black";
+        } else{
+            return "observer";
+        }
+    }
 }

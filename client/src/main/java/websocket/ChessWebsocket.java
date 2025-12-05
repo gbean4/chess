@@ -23,19 +23,9 @@ public class ChessWebsocket {
         try {
             url = url.replaceFirst("^http","ws").replaceAll("/+$", "");
             URI uri = new URI(url + "/ws");
-//            System.out.println("client connecting websocket to: " + uri);
 
-
-//            sendCommand(new UserGameCommand(UserGameCommand.CommandType.CONNECT,authToken, gameID));
-//            System.out.println("client sent CONNECT command over websocket");
-//            ClientEndpointConfig config = ClientEndpointConfig.Builder.create().
-//                    configurator(new TyrusConfigurator()).build();
-//
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             container.connectToServer(this, uri);
-//            this.session = container.connectToServer(this, uri);
-//
-//            this.session.addMessageHandler((MessageHandler.Whole<String>) this::handleIncomingMessage);
 
         } catch (Exception e) {
             System.out.println("WS CONNECT ERROR: "+ e);

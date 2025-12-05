@@ -2,6 +2,7 @@ package websocket;
 
 import chess.ChessGame;
 import com.google.gson.Gson;
+import datamodel.GameData;
 import datamodel.LeaveResignRequest;
 import exception.ResponseException;
 import io.javalin.websocket.*;
@@ -61,15 +62,17 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         String auth = cmd.getAuthToken();
         int gameID = cmd.getGameID();
 
-        service.validate(auth);
+        var user = service.validate(auth);
         connections.add(gameID, session, auth);
 
-        ChessGame game = service.getGame(auth, gameID).game();
+        GameData gameData = service.getGame(auth, gameID);
+        ChessGame game = gameData.game();
         LoadGameMessage msg = new LoadGameMessage(game);
 
         session.getRemote().sendString(gson.toJson(msg));
-
-        NotificationMessage joined = new NotificationMessage(service.validate(auth).username() + " has joined.\n");
+        var playerColor = service.getPlayerColor(gameData, user.username());
+        NotificationMessage joined = new NotificationMessage(service.validate(auth).username()
+                + " (" + playerColor + ") "+"has joined.\n");
         connections.broadcast(gameID, session, gson.toJson(joined));
     }
 
@@ -87,6 +90,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         service.validate(auth);
 
         try{
+            System.out.println("Attempted to move: "+ move);
             ChessGame updated = service.applyMove(auth, gameID, move);
 
             var username = service.validate(auth).username();
