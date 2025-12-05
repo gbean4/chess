@@ -60,13 +60,9 @@ public class GameUI {
     }
 
     public String leave() throws ResponseException{
-//        ServerFacade server = client.getServer();
-//        String authToken = client.getAuthToken();
-//        int gameID = client.getGameID();
         UserGameCommand cmd = new UserGameCommand(UserGameCommand.CommandType.LEAVE,
                 client.getAuthToken(), client.getGameID());
         client.getWebsocket().sendCommand(cmd);
-//        server.leaveGame(authToken, gameID);
         return "You left the game.";
     }
     public String resign() throws ResponseException{
@@ -81,11 +77,6 @@ public class GameUI {
                 client.getAuthToken(), client.getGameID());
         client.getWebsocket().sendCommand(cmd);
         return "Resignation sent to server... Don't cry";
-//        ServerFacade server = client.getServer();
-//        String authToken = client.getAuthToken();
-//        int gameID = client.getGameID();
-//        server.resignGame(authToken, gameID);
-//        return "You resigned. Game over.";
     }
 
     public String move(String... params) throws InvalidMoveException, ResponseException {
@@ -97,14 +88,6 @@ public class GameUI {
 
         UserGameCommand cmd = new MakeMoveCommand(client.getAuthToken(), client.getGameID(), new ChessMove(from, to, null));
         client.getWebsocket().sendCommand(cmd);
-
-//        var game = client.getGame();
-//        if (game == null) {
-//            return "No game loaded. Try join <id> <color> first.";
-//        }
-//        var turn = game.getTeamTurn();
-//        game.makeMove(new ChessMove(from, to, game.getBoard().getPiece(from).getPieceType()));
-//        render();
         return "Move sent...";
     }
 

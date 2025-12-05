@@ -16,44 +16,44 @@ public class ChessBoardUI {
         if (perspective == null){
             perspective = ChessGame.TeamColor.WHITE;
         }
+        int rowStart = (perspective == ChessGame.TeamColor.WHITE? 7: 0);
+        int rowEnd = (perspective == ChessGame.TeamColor.WHITE? -1: 8);
+        int rowStep = (perspective == ChessGame.TeamColor.WHITE? -1: 1);
 
-        int[] rowRange = (perspective == ChessGame.TeamColor.WHITE) ? new int[]{7, -1, -1}: new int[]{0,8,1};
-        int[] colRange = (perspective == ChessGame.TeamColor.WHITE) ? new int[]{1, 9, 1}: new int[]{8,0,-1};
-
+        int colStart = (perspective == ChessGame.TeamColor.WHITE? 1: 8);
+        int colEnd = (perspective == ChessGame.TeamColor.WHITE? 9: 0);
+        int colStep = (perspective == ChessGame.TeamColor.WHITE? 1: -1);
 
         boardLabels(perspective);
 
 
-        for (int row = rowRange[0]; row != rowRange[1]; row += rowRange[2]) {
+        for (int row = rowStart; row != rowEnd; row += rowStep) {
             int rank = row + 1;
             System.out.print(RESET_TEXT_COLOR+ SET_BG_COLOR_LIGHT_GREY + " " + rank + " " + RESET_BG_COLOR);
 
-            String bg;
-            String color = "";
-            String symbol = EMPTY;
-            for (int col = colRange[0]; col != colRange[1]; col += colRange[2]) {
-                boolean isDark = (row + col) % 2 == 0;
+            for (int col = colStart; col != colEnd; col += colStep) {
+                String bg;
+                String color = RESET_TEXT_COLOR;
+                String symbol = EMPTY;
+
+                boolean isDark = ((row + col) % 2 == 0);
                 bg = isDark ? SET_BG_COLOR_WHITE : SET_BG_COLOR_BLACK;
 
                 ChessPosition pos = new ChessPosition(rank, col);
-                ChessPiece piece = board.getPiece(pos);
 
                 if (highlightPos != null && pos.equals(highlightPos)){
                     bg = SET_BG_COLOR_YELLOW;
                 }
 
                 if (highlightSquares != null && highlightSquares.contains(pos) && isDark){
-                    bg = SET_BG_COLOR_GREEN;
+                    bg = isDark? SET_BG_COLOR_GREEN : SET_BG_COLOR_DARK_GREEN;
                 }
-                if (highlightSquares != null && highlightSquares.contains(pos) && !isDark){
-                    bg = SET_BG_COLOR_DARK_GREEN;
-                }
-
+                ChessPiece piece = board.getPiece(pos);
                 if (piece != null) {
-                    symbol = getSymbol(piece);
                     color = (piece.getTeamColor() == ChessGame.TeamColor.WHITE)
                             ? SET_TEXT_COLOR_MAGENTA
                             : SET_TEXT_COLOR_RED;
+                    symbol = getSymbol(piece);
                 }
                 System.out.print(bg + color + " " + symbol + " " + RESET_BG_COLOR+ RESET_TEXT_COLOR);
             }
