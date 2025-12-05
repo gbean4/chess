@@ -22,7 +22,7 @@ public class ClientNotificationHandler implements NotificationHandler{
 
     @Override
     public void notify(NotificationMessage message) {
-        var text = message.getMessage();
+        var text = "\n"+message.getMessage()+ "\n";
         client.displayNotification(text);
     }
 
