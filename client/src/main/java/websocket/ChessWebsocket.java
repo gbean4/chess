@@ -1,5 +1,6 @@
 package websocket;
 
+import client.ChessClient;
 import com.google.gson.Gson;
 import exception.ResponseException;
 import jakarta.websocket.*;
@@ -7,27 +8,34 @@ import websocket.commands.UserGameCommand;
 import websocket.messages.*;
 
 import java.net.URI;
-
-public class ChessWebsocket extends Endpoint {
+@ClientEndpoint
+public class ChessWebsocket {
     private Session session;
-    private final NotificationHandler handler;
     private final Gson gson = new Gson();
+    private final ClientNotificationHandler handler;
     private final String authToken;
+    private final int gameID;
 
-    public ChessWebsocket(String url, String authToken, NotificationHandler handler) throws ResponseException {
+    public ChessWebsocket(String url, String authToken, int gameID, ChessClient client) throws ResponseException {
+        this.handler = new ClientNotificationHandler(client);
+        this.authToken = authToken;
+        this.gameID = gameID;
         try {
-            this.handler = handler;
-            this.authToken = authToken;
-
-//            url = url.replace("http", "ws");
-//            URI uri = new URI(url + "/ws");
-            url = url.replaceFirst("^http", "ws");
+            url = url.replaceFirst("^http","ws").replaceAll("/+$", "");
             URI uri = new URI(url + "/ws");
+//            System.out.println("client connecting websocket to: " + uri);
 
+
+//            sendCommand(new UserGameCommand(UserGameCommand.CommandType.CONNECT,authToken, gameID));
+//            System.out.println("client sent CONNECT command over websocket");
+//            ClientEndpointConfig config = ClientEndpointConfig.Builder.create().
+//                    configurator(new TyrusConfigurator()).build();
+//
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
-            this.session = container.connectToServer(this, uri);
-
-            this.session.addMessageHandler((MessageHandler.Whole<String>) this::handleIncomingMessage);
+            container.connectToServer(this, uri);
+//            this.session = container.connectToServer(this, uri);
+//
+//            this.session.addMessageHandler((MessageHandler.Whole<String>) this::handleIncomingMessage);
 
         } catch (Exception e) {
             System.out.println("WS CONNECT ERROR: "+ e);
@@ -35,8 +43,29 @@ public class ChessWebsocket extends Endpoint {
         }
     }
 
-    @Override
-    public void onOpen(Session session, EndpointConfig config) {
+    @OnOpen
+    public void onOpen(Session session, EndpointConfig config) throws ResponseException {
+        this.session = session;
+        System.out.println("WebSocket connected! on open");
+        sendCommand(new UserGameCommand(UserGameCommand.CommandType.CONNECT,authToken, gameID));
+
+
+        try{
+            sendCommand(new UserGameCommand(UserGameCommand.CommandType.CONNECT,authToken, gameID));
+            System.out.println("connection sent");
+        } catch (Exception e) {
+            System.out.println("Failed sending CONNECT: "+ e.getMessage());
+        }
+    }
+
+    @OnMessage
+    public void onMessage(String json){
+        handleIncomingMessage(json);
+    }
+
+    @OnClose
+    public void onClose(Session session, CloseReason reason){
+        System.out.println("WebSocket closed: " + reason);
     }
 
     private void handleIncomingMessage(String json){
@@ -60,7 +89,8 @@ public class ChessWebsocket extends Endpoint {
 
     public void sendCommand(UserGameCommand cmd) throws ResponseException{
         try{
-            session.getBasicRemote().sendText(gson.toJson(cmd));
+            String json = gson.toJson(cmd);
+            session.getBasicRemote().sendText(json);
         } catch(Exception e){
             throw new ResponseException(e.getMessage());
         }

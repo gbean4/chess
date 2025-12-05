@@ -93,7 +93,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             var notifyText = username + " moved from " + startSquare + " to " + endSquare + "\n";
             var promotion = move.getPromotionPiece();
             if (promotion !=null){
-                notifyText+= " (promoted to "+promotion.toString()+")";
+                notifyText+= " (promoted to "+promotion+")\n";
             }
             var notifyMsg = new NotificationMessage(notifyText);
             var notifyJson = gson.toJson(notifyMsg);
@@ -122,7 +122,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             connections.broadcast(gameID, session, gson.toJson(notify));
             connections.remove(gameID, session);
         } catch (Exception e){
-            if (e.getMessage().equals("You are not a player in this game.")){
+            if (e.getMessage().equals("You are not a player in this game.\n")){
                 connections.remove(cmd.getGameID(), session);
                 return;
             }

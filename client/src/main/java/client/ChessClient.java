@@ -101,7 +101,7 @@ public class ChessClient {
             };
         } catch (ResponseException ex) {
             return ex.getMessage();
-        } catch (InvalidMoveException e) {
+        } catch (InvalidMoveException | InterruptedException e) {
             throw new RuntimeException(e);
         }
 
@@ -169,7 +169,7 @@ public class ChessClient {
         return "Game created. Type List to check its ID to join";
     }
 
-    public String joinGame(String... params) throws ResponseException {
+    public String joinGame(String... params) throws ResponseException, InterruptedException {
         assertSignedIn();
         if (params.length != 2) {
             return "Usage: join <gameID> <WHITE|BLACK>";
@@ -212,13 +212,16 @@ public class ChessClient {
         var spec = new GameSpec(playerColor, gameID);
         server.joinGame(spec, authToken);
 
+//        if (this.ws == null){
+//            this.ws = new ChessWebsocket(server.getServerUrl(), authToken, gameID, new ClientNotificationHandler(this));
+//        }
         var fullGame = server.getGame(authToken,gameID);
         gameModeAndRender(gameID, fullGame, playerColor);
         return String.format("Joined game %d as %s.", tempID, playerColor);
 
     }
 
-    public String observeGame(String... params) throws ResponseException {
+    public String observeGame(String... params) throws ResponseException, InterruptedException {
         assertSignedIn();
         if (params.length != 1) {
             return "Usage: observe <gameID>";
@@ -244,7 +247,7 @@ public class ChessClient {
         return String.format("Observing game %d", tempID);
     }
 
-    public String playGame(String... params) throws ResponseException {
+    public String playGame(String... params) throws ResponseException, InterruptedException {
         assertSignedIn();
         if (params.length != 1) {
             return "Usage: play <gameID>";
@@ -312,7 +315,7 @@ public class ChessClient {
         System.out.println("\n" + SET_TEXT_COLOR_RED + msg + RESET_TEXT_COLOR + "\n");
     }
 
-    private void gameModeAndRender(int gameID, GameData fullGame, String playerColor) throws ResponseException {
+    private void gameModeAndRender(int gameID, GameData fullGame, String playerColor) throws ResponseException, InterruptedException {
         this.game = fullGame.game();
         this.gameID = gameID;
         this.playerColor = playerColor;
@@ -324,9 +327,9 @@ public class ChessClient {
         state = State.INGAME;
 
         if (this.ws == null){
-            this.ws = new ChessWebsocket(server.getServerUrl(), authToken, new ClientNotificationHandler(this));
+            this.ws = new ChessWebsocket(server.getServerUrl(), authToken, gameID, this);
         }
-        ws.sendCommand(new UserGameCommand(UserGameCommand.CommandType.CONNECT,authToken, gameID));
+//        ws.sendCommand(new UserGameCommand(UserGameCommand.CommandType.CONNECT,authToken, gameID));
     }
 
     public String help() {
