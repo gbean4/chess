@@ -4,7 +4,6 @@ import chess.ChessGame;
 import com.google.gson.Gson;
 import datamodel.GameData;
 import datamodel.LeaveResignRequest;
-import exception.ResponseException;
 import io.javalin.websocket.*;
 import org.eclipse.jetty.websocket.api.Session;
 import org.jetbrains.annotations.NotNull;

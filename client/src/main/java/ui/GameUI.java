@@ -4,7 +4,6 @@ package ui;
 import chess.*;
 import client.ChessClient;
 import exception.ResponseException;
-import server.ServerFacade;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 
@@ -79,7 +78,7 @@ public class GameUI {
         return "Resignation sent to server... Don't cry";
     }
 
-    public String move(String... params) throws InvalidMoveException, ResponseException {
+    public String move(String... params) throws ResponseException {
         if (params.length != 2) {
             return "Usage: move <from> <to>";
         }
