@@ -86,7 +86,33 @@ public class GameUI {
         ChessPosition from = posConvert(params[0]);
         ChessPosition to = posConvert(params[1]);
 
-        UserGameCommand cmd = new MakeMoveCommand(client.getAuthToken(), client.getGameID(), new ChessMove(from, to, null));
+        ChessGame game = client.getGame();
+        if (game == null){
+            return "No game loaded";
+        }
+
+        ChessPiece piece = game.getBoard().getPiece(from);
+        if (piece == null){
+            return "No piece at " + params[0];
+        }
+
+        ChessMove move;
+
+        if (piece.getPieceType()== ChessPiece.PieceType.PAWN){
+            boolean whitePromotion = (piece.getTeamColor() == ChessGame.TeamColor.WHITE && to.getRow()==8);
+            boolean blackPromotion = (piece.getTeamColor() == ChessGame.TeamColor.BLACK && to.getRow()==1);
+
+            if (whitePromotion || blackPromotion){
+                ChessPiece.PieceType promoType = askForPromotion();
+                move = new ChessMove(from, to, promoType);
+            } else {
+                move = new ChessMove(from, to, null);
+            }
+        } else {
+            move = new ChessMove(from, to, null);
+        }
+
+        UserGameCommand cmd = new MakeMoveCommand(client.getAuthToken(), client.getGameID(), move);
         client.getWebsocket().sendCommand(cmd);
         return "Move sent...";
     }
@@ -120,5 +146,24 @@ public class GameUI {
         int col = (file - 'a')+1;
         int row = rank - '0';
         return new ChessPosition(row,col);
+    }
+
+    private ChessPiece.PieceType askForPromotion(){
+        Scanner scanner = new Scanner(System.in);
+
+        while(true){
+            System.out.print("Promote to (Q/R/B/N)");
+            String input = scanner.next().trim().toUpperCase();
+
+            switch (input){
+                case "Q": return ChessPiece.PieceType.QUEEN;
+                case "R": return ChessPiece.PieceType.ROOK;
+                case "B": return ChessPiece.PieceType.BISHOP;
+                case "N": return ChessPiece.PieceType.KNIGHT;
+                default:
+                    System.out.println("Invalid choice. Try Q, R, B, or N.");
+            }
+        }
+
     }
 }
