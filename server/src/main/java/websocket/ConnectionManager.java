@@ -31,19 +31,18 @@ public class ConnectionManager {
         Iterator<Session> it = gameMap.keySet().iterator();
 
         while (it.hasNext()){
-            try (Session s = it.next()) {
-                if (s.equals(exclude)) {
-                    continue;
-                }
-                try {
-                    if (s.isOpen()) {
-                        s.getRemote().sendString(json);
-                    } else {
-                        it.remove();
-                    }
-                } catch (IOException e) {
+            Session s = it.next() ;
+            if (s.equals(exclude)) {
+                continue;
+            }
+            try {
+                if (s.isOpen()) {
+                    s.getRemote().sendString(json);
+                } else {
                     it.remove();
                 }
+            } catch (IOException e) {
+                it.remove();
             }
         }
         if (gameMap.isEmpty()){

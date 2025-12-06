@@ -34,7 +34,7 @@ public class ChessWebsocket {
     }
 
     @OnOpen
-    public void onOpen(Session session, EndpointConfig config) throws ResponseException {
+    public void onOpen(Session session) throws ResponseException {
         this.session = session;
         System.out.println("WebSocket connected! on open");
         sendCommand(new UserGameCommand(UserGameCommand.CommandType.CONNECT,authToken, gameID));

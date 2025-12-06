@@ -369,6 +369,10 @@ public class ChessClient {
         return ws;
     }
 
+    public GameUI getGameUI() {
+        return gameUI;
+    }
+
     private enum State{
         SIGNED_OUT,
         SIGNED_IN,

@@ -18,6 +18,10 @@ public class ClientNotificationHandler implements NotificationHandler{
     public void loadGame(LoadGameMessage message) {
         ChessGame newGame = message.getGame();
         client.updateGame(newGame);
+        if (client.getGameUI() != null){
+            System.out.println("\n");
+            client.getGameUI().render();
+        }
     }
 
     @Override

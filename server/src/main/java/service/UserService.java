@@ -157,9 +157,9 @@ public class UserService {
         if (game == null){
             throw new Exception("game not found");
         }
-        if (game.gameOver()){
-            throw new Exception("Game already finished");
-        }
+//        if (game.gameOver()){
+//            throw new Exception("Game already finished");
+//        }
         return game;
     }
 
@@ -183,6 +183,9 @@ public class UserService {
 
     public void resignGame(LeaveResignRequest req) throws Exception{
         GameData game = validateLeaveOrResign(req);
+        if (game.gameOver()){
+            throw new Exception("Game already finished");
+        }
 
         String username = dataAccess.getAuth(req.authToken()).username();
         boolean isWhite = username.equals(game.whiteUsername());

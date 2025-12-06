@@ -45,7 +45,7 @@ public class ChessBoardUI {
                     bg = SET_BG_COLOR_YELLOW;
                 }
 
-                if (highlightSquares != null && highlightSquares.contains(pos) && isDark){
+                if (highlightSquares != null && highlightSquares.contains(pos)){
                     bg = isDark? SET_BG_COLOR_GREEN : SET_BG_COLOR_DARK_GREEN;
                 }
                 ChessPiece piece = board.getPiece(pos);
