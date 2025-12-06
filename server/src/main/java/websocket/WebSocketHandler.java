@@ -102,6 +102,12 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
             connections.broadcast(gameID,session,notifyJson);
 
+            String statusMsg = detectGameState(updated);
+            if (statusMsg!= null){
+                NotificationMessage statusNotice = new NotificationMessage(statusMsg);
+                connections.broadcast(gameID, null, gson.toJson(statusNotice));
+            }
+
             LoadGameMessage msg = new LoadGameMessage(updated);
             String json = gson.toJson(msg);
 
@@ -110,6 +116,21 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             ErrorMessage err = new ErrorMessage(e.getMessage());
             session.getRemote().sendString(gson.toJson(err));
         }
+    }
+
+    private String detectGameState(ChessGame game){
+        ChessGame.TeamColor turn = game.getTeamTurn();
+
+        if(game.isInCheck(turn)){
+            return turn + " is in CHECK.";
+        }
+        if (game.isInStalemate(turn)){
+            return "STALEMATE. Game over!";
+        }
+        if (game.isInCheckmate(turn)){
+            return turn + " is in CHECKMATE. Game over!";
+        }
+        return null;
     }
 
     private void onLeave(UserGameCommand cmd, Session session) throws Exception{
