@@ -157,9 +157,6 @@ public class UserService {
         if (game == null){
             throw new Exception("game not found");
         }
-//        if (game.gameOver()){
-//            throw new Exception("Game already finished");
-//        }
         return game;
     }
 

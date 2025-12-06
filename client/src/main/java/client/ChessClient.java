@@ -9,8 +9,6 @@ import exception.ResponseException;
 import server.ServerFacade;
 import ui.GameUI;
 import websocket.ChessWebsocket;
-import websocket.ClientNotificationHandler;
-import websocket.commands.UserGameCommand;
 
 import static ui.EscapeSequences.RESET_TEXT_COLOR;
 import static ui.EscapeSequences.*;
@@ -38,7 +36,6 @@ public class ChessClient {
     public String getPlayerColor(){return playerColor;}
     public int getGameID() {return gameID;}
     public String getAuthToken() {return authToken;}
-    public ServerFacade getServer() {return server;}
 
     public void run() {
         System.out.println(LOGO + " Welcome to Chess! Type Help to get started.");
@@ -211,9 +208,6 @@ public class ChessClient {
         var spec = new GameSpec(playerColor, gameID);
         server.joinGame(spec, authToken);
 
-//        if (this.ws == null){
-//            this.ws = new ChessWebsocket(server.getServerUrl(), authToken, gameID, new ClientNotificationHandler(this));
-//        }
         var fullGame = server.getGame(authToken,gameID);
         gameModeAndRender(gameID, fullGame, playerColor);
         return String.format("Joined game %d as %s.", tempID, playerColor);
@@ -235,8 +229,6 @@ public class ChessClient {
             return "No such game number in your list. Try 'list' first.";
         }
         int gameID = tempToRealIDs.get(tempID);
-        var spec = new GameSpec(null, gameID);
-//        var gameData = server.joinGame(spec, authToken);
 
         var fullGame = server.getGame(authToken,gameID);
         if (fullGame== null){
@@ -300,10 +292,6 @@ public class ChessClient {
 
     public void updateGame(ChessGame newGame){
         this.game = newGame;
-
-//        if (this.gameUI != null){
-//            this.gameUI = new GameUI(this);
-//        }
     }
 
     public void displayNotification(String msg){
@@ -314,7 +302,7 @@ public class ChessClient {
         System.out.println("\n" + SET_TEXT_COLOR_RED + msg + RESET_TEXT_COLOR + "\n");
     }
 
-    private void gameModeAndRender(int gameID, GameData fullGame, String playerColor) throws ResponseException, InterruptedException {
+    private void gameModeAndRender(int gameID, GameData fullGame, String playerColor) throws ResponseException{
         this.game = fullGame.game();
         this.gameID = gameID;
         this.playerColor = playerColor;

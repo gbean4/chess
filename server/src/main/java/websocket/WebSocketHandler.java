@@ -44,7 +44,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 case RESIGN -> onResign(cmd, session);
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+            System.out.println("[WS ERROR] "+ ex.getMessage());
             ErrorMessage err = new ErrorMessage("Invalid command format");
             try{
                 ctx.session.getRemote().sendString(gson.toJson(err));
