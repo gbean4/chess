@@ -101,8 +101,8 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             var notifyJson = gson.toJson(notifyMsg);
 
             connections.broadcast(gameID,session,notifyJson);
-
-            String statusMsg = detectGameState(updated);
+            GameData data = service.getGame(auth, gameID);
+            String statusMsg = detectGameState(updated, data);
             if (statusMsg!= null){
                 NotificationMessage statusNotice = new NotificationMessage(statusMsg);
                 connections.broadcast(gameID, null, gson.toJson(statusNotice));
@@ -118,17 +118,19 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
     }
 
-    private String detectGameState(ChessGame game){
+    private String detectGameState(ChessGame game, GameData data){
         ChessGame.TeamColor turn = game.getTeamTurn();
+        var player = (turn == ChessGame.TeamColor.WHITE)? data.whiteUsername(): data.blackUsername();
+
         if (game.isInCheckmate(turn)){
-            return turn + " is in CHECKMATE. Game over!";
+            return player + " ("+ turn + ") is in CHECKMATE. Game over!";
         }
 
         if (game.isInStalemate(turn)){
             return "STALEMATE. Game over!";
         }
         if(game.isInCheck(turn)){
-            return turn + " is in CHECK.";
+            return  player + " ("+turn + ") is in CHECK.";
         }
         return null;
     }

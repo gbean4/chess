@@ -89,8 +89,12 @@ public class GameUI {
         if (params.length != 2) {
             return "Usage: move <from> <to>";
         }
+
+        try{
+
         ChessPosition from = posConvert(params[0]);
         ChessPosition to = posConvert(params[1]);
+
 
         ChessGame game = client.getGame();
         if (game == null){
@@ -118,9 +122,13 @@ public class GameUI {
             move = new ChessMove(from, to, null);
         }
 
+
         UserGameCommand cmd = new MakeMoveCommand(client.getAuthToken(), client.getGameID(), move);
         client.getWebsocket().sendCommand(cmd);
         return "Move sent...";
+        } catch (Exception e){
+            return "Invalid move format. Use something like 'a2 a4'";
+        }
     }
 
 
