@@ -37,7 +37,7 @@ public class ChessWebsocket {
     public void onOpen(Session session) throws ResponseException {
         this.session = session;
         System.out.println("WebSocket connected! on open");
-        sendCommand(new UserGameCommand(UserGameCommand.CommandType.CONNECT,authToken, gameID));
+//        sendCommand(new UserGameCommand(UserGameCommand.CommandType.CONNECT,authToken, gameID));
 
 
         try{
@@ -54,8 +54,12 @@ public class ChessWebsocket {
     }
 
     @OnClose
-    public void onClose(Session session, CloseReason reason){
-        System.out.println("WebSocket closed: " + reason);
+    public void close(){
+        try{
+            if (session != null && session.isOpen()){
+                session.close();
+            }
+        }catch (Exception ignored){}
     }
 
     private void handleIncomingMessage(String json){

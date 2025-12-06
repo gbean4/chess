@@ -62,9 +62,14 @@ public class GameUI {
         UserGameCommand cmd = new UserGameCommand(UserGameCommand.CommandType.LEAVE,
                 client.getAuthToken(), client.getGameID());
         client.getWebsocket().sendCommand(cmd);
+        client.getWebsocket().close();
+        client.setWebsocket(null);
         return "You left the game.";
     }
     public String resign() throws ResponseException{
+        if (client.getGameOver()){
+            return "Game is already over.";
+        }
         Scanner scanner = new Scanner(System.in);
         System.out.print("Are you sure you want to resign? (y/n)");
         String answer = scanner.nextLine().trim().toLowerCase();
@@ -75,6 +80,8 @@ public class GameUI {
         UserGameCommand cmd = new UserGameCommand(UserGameCommand.CommandType.RESIGN,
                 client.getAuthToken(), client.getGameID());
         client.getWebsocket().sendCommand(cmd);
+        client.getWebsocket().close();
+        client.setWebsocket(null);
         return "Resignation sent to server... Don't cry";
     }
 

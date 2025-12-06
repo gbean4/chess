@@ -373,6 +373,14 @@ public class ChessClient {
         return gameUI;
     }
 
+    public void setWebsocket(ChessWebsocket ws) {
+        this.ws = ws;
+    }
+
+    public boolean getGameOver() throws ResponseException {
+        return server.getGame(authToken,gameID).gameOver();
+    }
+
     private enum State{
         SIGNED_OUT,
         SIGNED_IN,

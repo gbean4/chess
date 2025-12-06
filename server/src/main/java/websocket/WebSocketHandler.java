@@ -120,15 +120,15 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     private String detectGameState(ChessGame game){
         ChessGame.TeamColor turn = game.getTeamTurn();
-
-        if(game.isInCheck(turn)){
-            return turn + " is in CHECK.";
+        if (game.isInCheckmate(turn)){
+            return turn + " is in CHECKMATE. Game over!";
         }
+
         if (game.isInStalemate(turn)){
             return "STALEMATE. Game over!";
         }
-        if (game.isInCheckmate(turn)){
-            return turn + " is in CHECKMATE. Game over!";
+        if(game.isInCheck(turn)){
+            return turn + " is in CHECK.";
         }
         return null;
     }
